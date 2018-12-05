@@ -1,8 +1,19 @@
+# Installation
+
+## Install Dep
+
+* `$ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh`
+
+## Using Dep
+
+* We will need to initialize dep with `$ dep init` but before that we have to ensure that our project is in the correct path, follow option #1 in this [dep tutorial](https://golang.github.io/dep/docs/new-project.html) to know where your project should be.
+* After running `$ dep init` a _vendor_ folder will be created and you can _add your dependencies_ with the following `$ dep ensure -add github.com/foo/bar github.com/baz/quux` if you want to know more about dep just check this the tutorial provided above.
+
 # Standard Go Project Layout
 
 This is a basic layout for Go application projects. It's not an official standard defined by the core Go dev team; however, it is a set of common historical and emerging project layout patterns in the Go ecosystem. Some of these patterns are more popular than others. It also has a number of small enhancements along with several supporting directories common to any large enough real world application.
 
-If you are trying to learn Go or if you are building a PoC or a toy project for yourself this project layout is an overkill. Start with something really simple (a single `main.go` file is more than enough). As your project grows keep in mind that it'll be important to make sure your code is well structured otherwise you'll end up with a messy code with lots of hidden dependencies and global state. When you have more people working on the project you'll need even more structure. That's when it's important to introduce a common way to manage packages/libraries. When you have an open source project or when you know other projects import the code from your project repository that's when it's important to have private (aka `internal`) packages and code. Clone the repository, keep what you need and delete everything else! Just because it's there it doesn't mean you have to use it all. None of these patterns are used in every single project. Even the `vendor` pattern is not universal.
+If you are trying to learn Go or if you are building a PoC or a toy project for yourself this project layout is an overkill. Start with something really simple (a single `main.go` file is more than enough). As your project grows keep in mind that it'll be important to make sure your code is well structured otherwise you'll end up with a messy code with lots of hidden dependencies and global state. When you have more people working on the project you'll need even more structure. That's when it's important to introduce a common way to manage packages/libraries. When you have an open source project or when you know other projects import the code from your project repository that's when it's important to have private packages and code. Clone the repository, keep what you need and delete everything else! Just because it's there it doesn't mean you have to use it all. None of these patterns are used in every single project. Even the `vendor` pattern is not universal.
 
 This project layout is intentionally generic and it doesn't try to impose a specific Go package structure.
 
@@ -36,39 +47,11 @@ It's common to have a small `main` function that imports and invokes the code fr
 
 See the [`/cmd`](cmd/README.md) directory for examples.
 
-### `/internal`
-
-Private application and library code. This is the code you don't want others importing in their applications or libraries.
-
-Put your actual application code in the `/internal/app` directory (e.g., `/internal/app/myapp`) and the code shared by those apps in the `/internal/pkg` directory (e.g., `/internal/pkg/myprivlib`).
-
-### `/pkg`
-
-Library code that's ok to use by external applications (e.g., `/pkg/mypubliclib`). Other projects will import these libraries expecting them to work, so think twice before you put something here :-)
-
-It's also a way to group Go code in one place when your root directory contains lots of non-Go components and directories making it easier to run various Go tool (as mentioned in the [`Best Practices for Industrial Programming`](https://www.youtube.com/watch?v=PTE4VJIdHPg) from GopherCon EU 2018).
-
-See the [`/pkg`](pkg/README.md) directory if you want to see which popular Go repos use this project layout pattern. This is a common layout pattern, but it's not universally accepted and some in the Go community don't recommend it. 
-
 ### `/vendor`
 
 Application dependencies (managed manually or by your favorite dependency management tool like [`dep`](https://github.com/golang/dep)).
 
 Don't commit your application dependencies if you are building a library.
-
-## Service Application Directories
-
-### `/api`
-
-OpenAPI/Swagger specs, JSON schema files, protocol definition files.
-
-See the [`/api`](api/README.md) directory for examples.
-
-## Web Application Directories
-
-### `/web`
-
-Web application specific components: static web assets, server side templates and SPAs.
 
 ## Common Application Directories
 
@@ -77,10 +60,6 @@ Web application specific components: static web assets, server side templates an
 Configuration file templates or default configs.
 
 Put your `confd` or `consul-template` template files here.
-
-### `/init`
-
-System init (systemd, upstart, sysv) and process manager/supervisor (runit, supervisord) configs.
 
 ### `/scripts`
 
@@ -110,41 +89,11 @@ See the [`/test`](test/README.md) directory for examples.
 
 ## Other Directories
 
-### `/docs`
-
-Design and user documents (in addition to your godoc generated documentation).
-
-See the [`/docs`](docs/README.md) directory for examples.
-
 ### `/tools`
 
 Supporting tools for this project. Note that these tools can import code from the `/pkg` and `/internal` directories.
 
 See the [`/tools`](tools/README.md) directory for examples.
-
-### `/examples`
-
-Examples for your applications and/or public libraries.
-
-See the [`/examples`](examples/README.md) directory for examples.
-
-### `/third_party`
-
-External helper tools, forked code and other 3rd party utilities (e.g., Swagger UI).
-
-### `/githooks`
-
-Git hooks.
-
-### `/assets`
-
-Other assets to go along with your repository (images, logos, etc).
-
-### `/website`
-
-This is the place to put your project's website data if you are not using Github pages.
-
-See the [`/website`](website/README.md) directory for examples.
 
 ## Directories You Shouldn't Have
 
@@ -170,4 +119,3 @@ Don't confuse the project level `/src` directory with the `/src` directory Go us
 ## Notes
 
 A more opinionated project template with sample/reusable configs, scripts and code is a WIP.
-
