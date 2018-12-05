@@ -10,6 +10,11 @@
 * After running `$ dep init` a _vendor_ folder will be created and you can _add your dependencies_ with the following `$ dep ensure -add github.com/foo/bar github.com/baz/quux` if you want to know more about dep just check this the tutorial provided above.
 * To understand how are you going to use dep please check [this](https://golang.github.io/dep/docs/daily-dep.html#using-dep-ensure) out
 
+## How to run the tests
+
+* After you install everything with dep you should be able to do `go test ./...` this will run all the test files in the project.
+* Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
+
 # Standard Go Project Layout
 
 This is a basic layout for Go application projects. It's not an official standard defined by the core Go dev team; however, it is a set of common historical and emerging project layout patterns in the Go ecosystem. Some of these patterns are more popular than others. It also has a number of small enhancements along with several supporting directories common to any large enough real world application.
