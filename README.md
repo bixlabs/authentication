@@ -30,6 +30,13 @@
     * Run it: `./tmp/web-server`
 * You can build whatever you want (it doesn't have to be a web-server), for example there is another main with which you can follow the same steps _./cmd/cli/main.go_
 
+## Hot reload for the Web Server
+* We have to install [Air](https://github.com/cosmtrek/air):
+    * `curl -fLo ~/.air \
+           https://raw.githubusercontent.com/cosmtrek/air/master/bin/linux/air`
+    * `chmod +x ~/.air`
+* To run the project with hot reload: `~/.air -c .air.config`
+
 ## How to run the tests
 
 * After you install everything with dep you should be able to do `go test -cover -v ./...` this will run all the test files in the project.
