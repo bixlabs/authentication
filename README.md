@@ -1,4 +1,4 @@
-# Installation
+# Installation & Usage
 
 ## Install Dep
 
@@ -12,9 +12,27 @@
 * After running `$ dep init` a _vendor_ folder will be created and you can _add your dependencies_ with the following `$ dep ensure -add github.com/foo/bar github.com/baz/quux` if you want to know more about dep just check the tutorial above.
 * To understand how are you going to be using dep please check [this](https://golang.github.io/dep/docs/daily-dep.html#using-dep-ensure) out
 
+## Creating an API through [gin-gonic](https://github.com/gin-gonic/gin)
+
+* When installing the dependencies for this project you will get gin-gonic for API definition.
+* To run the main for the API application you have to `go run cmd/api/main.go`, this will run an HTTP server in port 8080
+* For testing all the define endpoint you can try out these different CURL commands:
+    * Create: `$ curl -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"`
+    * Read: `$ curl -X GET "http://localhost:8080/todo/1"`
+    * Update: `$ curl -X PUT -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"`
+    * Delete: `$ curl -X DELETE "http://localhost:8080/todo/1"`
+
+## How to create a build of a main.go file and run it.
+* `$ go build -o ./tmp/web-server ./cmd/api/main.go`
+* The command above will create a file called `web-server` in folder _tmp_, that file is an executable with the main in _./cmd/api/main.go_
+* To run your executable you have to:
+    * Make it executable: `sudo chmod +x ./tmp/web-server`
+    * Run it: `./tmp/web-server`
+* You can build whatever you want (it doesn't have to be a web-server), for example there is another main with which you can follow the same steps _./cmd/cli/main.go_
+
 ## How to run the tests
 
-* After you install everything with dep you should be able to do `go test ./...` this will run all the test files in the project.
+* After you install everything with dep you should be able to do `go test -cover -v ./...` this will run all the test files in the project.
 * Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
 
 # Standard Go Project Layout

@@ -4,12 +4,11 @@ import (
 	. "github.com/bixlabs/go-layout/business/structures"
 )
 
-
 type TodoOperations interface {
-	create(todo Todo) *Todo
-	read(id string) *Todo
-	update(todo Todo) *Todo
-	delete(id string) bool
+	Create(todo Todo) *Todo
+	Read(id string) *Todo
+	Update(todo Todo) *Todo
+	Delete(id string) bool
 }
 
 /*
@@ -24,26 +23,28 @@ type TodoOperations interface {
 
 // TODO: open to discussion, I'm not sure where the implementation should be.
 
-type TodoOperationsHandler struct {}
+type TodoOperationsHandler struct{}
 
-func (handler TodoOperationsHandler) create(todo Todo) *Todo {
+func NewTodoOperationsHandler() TodoOperationsHandler {
+	return TodoOperationsHandler{}
+}
+
+func (handler TodoOperationsHandler) Create(todo Todo) *Todo {
 	println("A Todo was created")
-	return nil
+	return &todo
 }
 
-func (handler TodoOperationsHandler) read(id string) *Todo {
+func (handler TodoOperationsHandler) Read(id string) *Todo {
 	println("A Todo was retrieved")
-	return nil
+	return &Todo{ID:id}
 }
 
-func (handler TodoOperationsHandler) update(todo Todo) *Todo {
+func (handler TodoOperationsHandler) Update(todo Todo) *Todo {
 	println("A Todo was updated")
-	return nil
+	return &todo
 }
 
-func (handler TodoOperationsHandler) delete(id string) bool {
+func (handler TodoOperationsHandler) Delete(id string) bool {
 	println("A Todo was deleted")
 	return true
 }
-
-
