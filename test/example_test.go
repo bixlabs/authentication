@@ -14,7 +14,7 @@ func Test(t *testing.T) {
 		})
 		// Failing Test
 		g.It("Should match equal numbers", func() {
-			g.Assert(2).Equal(4)
+			g.Assert(4).Equal(4)
 		})
 		// Pending Test
 		g.It("Should substract two numbers")
