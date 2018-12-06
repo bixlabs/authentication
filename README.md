@@ -59,6 +59,12 @@ Application dependencies (managed manually or by your favorite dependency manage
 
 Don't commit your application dependencies if you are building a library.
 
+## Service Application Directories
+
+### `/api`
+
+OpenAPI/Swagger specs, JSON schema files, protocol definition files.
+
 ## Common Application Directories
 
 ### `/configs`
