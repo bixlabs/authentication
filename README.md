@@ -15,14 +15,14 @@
 ## Creating an API through [gin-gonic](https://github.com/gin-gonic/gin)
 
 * When installing the dependencies for this project you will get gin-gonic for API definition.
-* To run the main for the API application you have to `go run cmd/api/main.go`, this will run an HTTP server in port 8080
+* To run the main for the API application you have to `$ go run cmd/api/main.go`, this will run an HTTP server in port 8080
 * For testing all the define endpoint you can try out these different CURL commands:
     * Create: `$ curl -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"`
     * Read: `$ curl -X GET "http://localhost:8080/todo/1"`
     * Update: `$ curl -X PUT -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"`
     * Delete: `$ curl -X DELETE "http://localhost:8080/todo/1"`
 
-## How to create a build of a main.go file and run it.
+## How to make build of a main.go file and run it.
 * `$ go build -o ./tmp/web-server ./cmd/api/main.go`
 * The command above will create a file called `web-server` in folder _tmp_, that file is an executable with the main in _./cmd/api/main.go_
 * To run your executable you have to:
@@ -38,6 +38,14 @@
 * To run the project with hot reload: `~/.air -c .air.config`
 
 ## How to run the tests
+
+## TL;DR How to run/build
+* Build: `$ go build -o <destination_of_executable_relative_to_root> <path_of_main_file_relative_to_root>`
+* Run:
+    * Without executable: `$ go run <path_of_main_file_relative_to_root>`
+    * With executable:
+        * Make the file executable: `$ sudo chmod +x <path_to_executable_relative_to_root>
+        * Run it: `$ <path_to_executable_relative_to_root>
 
 * After you install everything with dep you should be able to do `go test -cover -v ./...` this will run all the test files in the project.
 * Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
