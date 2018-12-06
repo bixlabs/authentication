@@ -6,9 +6,11 @@
 
 ## Using Dep
 
-* We will need to initialize dep with `$ dep init` but before that we have to ensure that our project is in the correct path, follow option #1 in this [dep tutorial](https://golang.github.io/dep/docs/new-project.html) to know where your project should be.
-* After running `$ dep init` a _vendor_ folder will be created and you can _add your dependencies_ with the following `$ dep ensure -add github.com/foo/bar github.com/baz/quux` if you want to know more about dep just check this the tutorial provided above.
-* To understand how are you going to use dep please check [this](https://golang.github.io/dep/docs/daily-dep.html#using-dep-ensure) out
+* First of all we have to ensure that our project is in the correct path, follow option #1 in this [dep tutorial](https://golang.github.io/dep/docs/new-project.html) to know where your project should be.
+* If you are going to run this template you have to install the dependencies with `dep ensure`.
+* If you are going from scratch and don't need the examples provided in this template you will need to remove `Gopkg.lock` and `Gopkg.toml` and initialize dep with `$ dep init`
+* After running `$ dep init` a _vendor_ folder will be created and you can _add your dependencies_ with the following `$ dep ensure -add github.com/foo/bar github.com/baz/quux` if you want to know more about dep just check the tutorial above.
+* To understand how are you going to be using dep please check [this](https://golang.github.io/dep/docs/daily-dep.html#using-dep-ensure) out
 
 ## How to run the tests
 
