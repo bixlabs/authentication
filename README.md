@@ -41,6 +41,8 @@
 * To run the project with hot reload: `~/.air -c .air.config`
 
 ## How to run the tests
+* After you install everything with dep you should be able to do `go test -cover -v ./...` this will run all the test files in the project.
+* Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
 
 ## TL;DR How to run/build
 * Build: `$ go build -o <destination_of_executable_relative_to_root> <path_of_main_file_relative_to_root>`
@@ -49,9 +51,6 @@
     * With executable:
         * Make the file executable: `$ sudo chmod +x <path_to_executable_relative_to_root>
         * Run it: `$ <path_to_executable_relative_to_root>
-
-* After you install everything with dep you should be able to do `go test -cover -v ./...` this will run all the test files in the project.
-* Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
 
 # Standard Go Project Layout
 
