@@ -1,3 +1,6 @@
+# Requirements
+* go 1.9 or higher.
+
 # Installation & Usage
 
 ## Install Dep
