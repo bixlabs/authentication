@@ -4,7 +4,7 @@
 # Installation & Usage
 
 * First of all we have to ensure that our project is in the correct path, follow option #1 in this [dep tutorial](https://golang.github.io/dep/docs/new-project.html) to know where your project should be.
-* Run `$ make` to install all the dependencies.
+* Run `$ make deps` to install all the dependencies.
 
 ## Using Dep
 
@@ -16,7 +16,7 @@
 ## Creating an API through [gin-gonic](https://github.com/gin-gonic/gin)
 
 * When installing the dependencies for this project you will get gin-gonic for API definition.
-* To run the main for the API application you have to `$ go run cmd/api/main.go`, this will run an HTTP server in port 8080
+* To run the main for the API application you have to `$ make run` or `$ go run cmd/api/main.go`, this will run an HTTP server in port 8080
 * For testing all the define endpoint you can try out these different CURL commands:
     * Create: `$ curl -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"`
     * Read: `$ curl -X GET "http://localhost:8080/todo/1"`
@@ -24,30 +24,31 @@
     * Delete: `$ curl -X DELETE "http://localhost:8080/todo/1"`
 
 ## How to make build of a main.go file and run it.
-* `$ go build -o ./tmp/web-server ./cmd/api/main.go`
+* `$ make build` or `$ go build -o ./tmp/web-server ./cmd/api/main.go`
 * The command above will create a file called `web-server` in folder _tmp_, that file is an executable with the main in _./cmd/api/main.go_
 * To run your executable you have to:
-    * Make it executable: `sudo chmod +x ./tmp/web-server`
+    * Make it executable: `chmod +x ./tmp/web-server`
     * Run it: `./tmp/web-server`
 * You can build whatever you want (it doesn't have to be a web-server), for example there is another main with which you can follow the same steps _./cmd/cli/main.go_
 
 ## Hot reload for the Web Server
-* We have to install [Air](https://github.com/cosmtrek/air) (if you ran `$ make` command this should be already installed and you can skip this:
+* For Mac/Windows users you will have to modify [install_dep.sh](./scripts/install_dep.sh) and change the OS variable to match your Operating System.
+* We have to install [Air](https://github.com/cosmtrek/air) (if you ran `$ make deps` command this should be already installed and you can skip this):
     * `curl -fLo ~/.air \
            https://raw.githubusercontent.com/cosmtrek/air/master/bin/linux/air`
     * `chmod +x ~/.air`
-* To run the project with hot reload: `~/.air -c .air.config`
+* To run the project with hot reload: `$ make run-dev` or `~/.air -c .air.config`
 
 ## How to run the tests
-* After you install everything with dep you should be able to do `go test -cover -v ./...` this will run all the test files in the project.
+* After you install everything with dep you should be able to do `$ make test` or `$ go test -cover -v ./...` this will run all the test files in the project.
 * Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
 
 ## TL;DR How to run/build
-* Build: `$ go build -o <destination_of_executable_relative_to_root> <path_of_main_file_relative_to_root>`
+* Build:  `$ make build` or `$ go build -o <destination_of_executable_relative_to_root> <path_of_main_file_relative_to_root>`
 * Run:
-    * Without executable: `$ go run <path_of_main_file_relative_to_root>`
+    * Without executable: `$ make run` or `$ go run <path_of_main_file_relative_to_root>`
     * With executable:
-        * Make the file executable: `$ sudo chmod +x <path_to_executable_relative_to_root>
+        * Make the file executable: `$ chmod +x <path_to_executable_relative_to_root>
         * Run it: `$ <path_to_executable_relative_to_root>
 
 # Standard Go Project Layout
