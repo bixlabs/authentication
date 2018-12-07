@@ -3,14 +3,12 @@
 
 # Installation & Usage
 
-## Install Dep
-
-* `$ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh`
+* First of all we have to ensure that our project is in the correct path, follow option #1 in this [dep tutorial](https://golang.github.io/dep/docs/new-project.html) to know where your project should be.
+* Run `$ make` to install all the dependencies.
 
 ## Using Dep
 
-* First of all we have to ensure that our project is in the correct path, follow option #1 in this [dep tutorial](https://golang.github.io/dep/docs/new-project.html) to know where your project should be.
-* If you are going to run this template you have to install the dependencies with `dep ensure`.
+* `dep ensure` ensures that all the go dependencies are installed (this is run in the Makefile).
 * If you are going from scratch and don't need the examples provided in this template you will need to remove `Gopkg.lock` and `Gopkg.toml` and initialize dep with `$ dep init`
 * After running `$ dep init` a _vendor_ folder will be created and you can _add your dependencies_ with the following `$ dep ensure -add github.com/foo/bar github.com/baz/quux` if you want to know more about dep just check the tutorial above.
 * To understand how are you going to be using dep please check [this](https://golang.github.io/dep/docs/daily-dep.html#using-dep-ensure) out
@@ -34,7 +32,7 @@
 * You can build whatever you want (it doesn't have to be a web-server), for example there is another main with which you can follow the same steps _./cmd/cli/main.go_
 
 ## Hot reload for the Web Server
-* We have to install [Air](https://github.com/cosmtrek/air):
+* We have to install [Air](https://github.com/cosmtrek/air) (if you ran `$ make` command this should be already installed and you can skip this:
     * `curl -fLo ~/.air \
            https://raw.githubusercontent.com/cosmtrek/air/master/bin/linux/air`
     * `chmod +x ~/.air`
