@@ -2,8 +2,8 @@
 package main
 
 import (
-	. "github.com/bixlabs/go-layout/business/use_cases"
-	. "github.com/bixlabs/go-layout/business/structures"
+	. "github.com/bixlabs/go-layout/todo/use_cases"
+	. "github.com/bixlabs/go-layout/todo/structures"
 )
 
 func main() {

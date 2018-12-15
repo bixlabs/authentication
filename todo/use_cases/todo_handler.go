@@ -1,7 +1,7 @@
 package use_cases
 
 import (
-	. "github.com/bixlabs/go-layout/business/structures"
+	. "github.com/bixlabs/go-layout/todo/structures"
 )
 
 type TodoOperations interface {

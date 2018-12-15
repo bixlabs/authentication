@@ -77,6 +77,11 @@ More about naming and organizing packages as well as other code structure recomm
 
 ## Go Directories
 
+### `/todo`
+
+This directory varies according to the name of the application, in this example it is _todo_ because that's what this example is about. You will have all
+your business related code under this directory.
+
 ### `/cmd`
 
 Main applications for this project.
