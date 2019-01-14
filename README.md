@@ -48,8 +48,8 @@
 * Run:
     * Without executable: `$ make run` or `$ go run <path_of_main_file_relative_to_root>`
     * With executable:
-        * Make the file executable: `$ chmod +x <path_to_executable_relative_to_root>
-        * Run it: `$ <path_to_executable_relative_to_root>
+        * Make the file executable: `$ chmod +x <path_to_executable_relative_to_root>`
+        * Run it: `$ <path_to_executable_relative_to_root>`
 
 # Standard Go Project Layout
 
