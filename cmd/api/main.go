@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/bixlabs/go-layout/api"
-	"github.com/bixlabs/go-layout/todo/use_cases"
+	"github.com/bixlabs/go-layout/todo/useCases"
 )
 
 func main() {
-	todoOperations := use_cases.NewTodoOperationsHandler()
+	todoOperations := useCases.NewTodoOperationsHandler()
 	api.NewTodoRestConfigurator(todoOperations)
 }
 

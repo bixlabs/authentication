@@ -3,18 +3,19 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	. "github.com/bixlabs/go-layout/todo/use_cases"
-	. "github.com/bixlabs/go-layout/todo/structures"
+	"github.com/bixlabs/go-layout/todo/useCases"
+	"github.com/bixlabs/go-layout/todo/structures"
 	"fmt"
 	"time"
 )
 
-type TodoRestConfigurator struct {
-	handler TodoOperations
+type todoRestConfigurator struct {
+	handler useCases.TodoOperations
 }
 
-func NewTodoRestConfigurator(handler TodoOperations) {
-	todoOperations := TodoRestConfigurator{handler}
+// NewTodoRestConfigurator: constructor
+func NewTodoRestConfigurator(handler useCases.TodoOperations) {
+	todoOperations := todoRestConfigurator{handler}
 	// Disable Console Color
 	// gin.DisableConsoleColor()
 
@@ -31,14 +32,18 @@ func NewTodoRestConfigurator(handler TodoOperations) {
 
 	// By default it serves on :8080 unless a
 	// PORT environment variable was defined.
-	router.Run(":3000")
+	err := router.Run(":3000")
+
+	if err != nil {
+		panic(err)
+	}
 	// router.Run(":3000") for a hard coded port
 }
 
 
-func (config TodoRestConfigurator) createTodo(c *gin.Context) {
+func (config todoRestConfigurator) createTodo(c *gin.Context) {
 	var request TodoRequest
-	var todo *Todo
+	var todo *structures.Todo
 
 	if err := c.ShouldBind(&request); err == nil {
 		fmt.Printf("%s", request)
@@ -50,7 +55,7 @@ func (config TodoRestConfigurator) createTodo(c *gin.Context) {
 
 }
 
-func (config TodoRestConfigurator) readTodo(c *gin.Context) {
+func (config todoRestConfigurator) readTodo(c *gin.Context) {
 	id := c.Param("id")
 	todo := config.handler.Read(id)
 	c.String(http.StatusOK, fmt.Sprintf("Read was successful for TODO with ID: %s", todo.ID))
@@ -63,24 +68,25 @@ type TodoRequest struct {
 	DueDate time.Time `json:"when_finish"`
 }
 
-func TodoPostToBusinessTodo(request TodoRequest) Todo {
-	return Todo{ID: request.ID, Name: request.Name, Description: request.Description, DueDate: request.DueDate}
+func TodoPostToBusinessTodo(request TodoRequest) structures.Todo {
+	return structures.Todo{ID: request.ID, Name: request.Name, Description: request.Description, DueDate: request.DueDate}
 }
 
-func (config TodoRestConfigurator) updateTodo(c *gin.Context) {
+func (config todoRestConfigurator) updateTodo(c *gin.Context) {
 	var request TodoRequest
-	var todo *Todo
+	var todo *structures.Todo
 
 	if c.ShouldBind(&request) == nil {
 		todo = config.handler.Update(TodoPostToBusinessTodo(request))
 	} else {
 		// handle validation case
+		println("Validation case")
 	}
 
 	c.String(http.StatusOK, fmt.Sprintf("Update was successful for TODO with name: %s", todo.Name))
 }
 
-func (config TodoRestConfigurator) deleteTodo(c *gin.Context) {
+func (config todoRestConfigurator) deleteTodo(c *gin.Context) {
 	id := c.Param("id")
 	success := config.handler.Delete(id)
 	c.String(http.StatusOK, fmt.Sprintf("Delete was successful %t", success))

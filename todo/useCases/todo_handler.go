@@ -1,4 +1,4 @@
-package use_cases
+package useCases
 
 import (
 	. "github.com/bixlabs/go-layout/todo/structures"

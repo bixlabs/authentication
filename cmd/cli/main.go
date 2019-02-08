@@ -2,7 +2,7 @@
 package main
 
 import (
-	. "github.com/bixlabs/go-layout/todo/use_cases"
+	. "github.com/bixlabs/go-layout/todo/useCases"
 	. "github.com/bixlabs/go-layout/todo/structures"
 )
 
