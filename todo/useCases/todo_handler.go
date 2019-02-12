@@ -2,6 +2,8 @@ package useCases
 
 import (
 	. "github.com/bixlabs/go-layout/todo/structures"
+	"github.com/bixlabs/go-layout/tools"
+	"github.com/sirupsen/logrus"
 )
 
 type TodoOperations interface {
@@ -30,21 +32,21 @@ func NewTodoOperationsHandler() TodoOperationsHandler {
 }
 
 func (handler TodoOperationsHandler) Create(todo Todo) *Todo {
-	println("A Todo was created")
+	tools.Log().WithFields(logrus.Fields{"ID": todo.ID, "Name": todo.Name}).Info("A todo was created")
 	return &todo
 }
 
 func (handler TodoOperationsHandler) Read(id string) *Todo {
-	println("A Todo was retrieved")
+	tools.Log().WithFields(logrus.Fields{"ID": id}).Info("A todo was retrieved")
 	return &Todo{ID:id}
 }
 
 func (handler TodoOperationsHandler) Update(todo Todo) *Todo {
-	println("A Todo was updated")
+	tools.Log().WithFields(logrus.Fields{"ID": todo.ID, "Name": todo.Name}).Info("A todo was updated")
 	return &todo
 }
 
 func (handler TodoOperationsHandler) Delete(id string) bool {
-	println("A Todo was deleted")
+	tools.Log().WithFields(logrus.Fields{"ID": id}).Info("A todo was deleted")
 	return true
 }

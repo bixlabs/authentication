@@ -2,6 +2,8 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"github.com/bixlabs/go-layout/tools"
 	"net/http"
 	"github.com/bixlabs/go-layout/todo/useCases"
 	"github.com/bixlabs/go-layout/todo/structures"
@@ -13,7 +15,6 @@ type todoRestConfigurator struct {
 	handler useCases.TodoOperations
 }
 
-// NewTodoRestConfigurator: constructor
 func NewTodoRestConfigurator(handler useCases.TodoOperations) {
 	todoOperations := todoRestConfigurator{handler}
 	// Disable Console Color
@@ -46,7 +47,7 @@ func (config todoRestConfigurator) createTodo(c *gin.Context) {
 	var todo *structures.Todo
 
 	if err := c.ShouldBind(&request); err == nil {
-		fmt.Printf("%s", request)
+		tools.Log().WithFields(logrus.Fields{"Request": request}).Info("A request object was received")
 		todo = config.handler.Create(TodoPostToBusinessTodo(request))
 		c.String(http.StatusOK, fmt.Sprintf("Create was successful for TODO with name: %s", todo.Name))
 	} else {
@@ -80,7 +81,7 @@ func (config todoRestConfigurator) updateTodo(c *gin.Context) {
 		todo = config.handler.Update(TodoPostToBusinessTodo(request))
 	} else {
 		// handle validation case
-		println("Validation case")
+		tools.Log().Info("Validation case")
 	}
 
 	c.String(http.StatusOK, fmt.Sprintf("Update was successful for TODO with name: %s", todo.Name))
