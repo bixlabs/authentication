@@ -29,6 +29,9 @@ run-dev:
 run:
 		make format && go run cmd/api/main.go
 
+run-cli:
+		make format && go run cmd/cli/main.go
+
 deps:
 		sh ./scripts/install_dep.sh
 		sh ./scripts/install_air.sh
