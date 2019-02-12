@@ -66,6 +66,12 @@
 * After you install everything with dep you should be able to do `$ make test` or `$ go test -cover -v ./...` this will run all the test files in the project.
 * Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
 
+## How to see test coverage
+* `make test` will show information about the coverage.
+* `make coverage` if you want to only see the test coverage information (without the tests logs)
+* `make coverage-html` if you want to see the coverage in detail in a browser.
+* For knowing how are we generating test coverage please check [this](https://blog.golang.org/cover)
+
 ## TL;DR How to run/build
 * Build:  `$ make build` or `$ go build -o <destination_of_executable_relative_to_root> <path_of_main_file_relative_to_root>`
 * Run:

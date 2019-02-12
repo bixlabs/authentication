@@ -77,7 +77,7 @@ func Test(t *testing.T) {
 			g.It("Should delete a todo", func() {
 				id := "1"
 				result := operationHandler.Delete(id)
-				g.Assert(false).Equal(result)
+				g.Assert(true).Equal(result)
 			})
 		})
 	})

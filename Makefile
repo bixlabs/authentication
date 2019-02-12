@@ -3,7 +3,13 @@
 all: clean test build
 
 test:
-		go test -v ./...
+		go test -v -covermode=count -coverprofile=coverage.out ./...
+
+coverage:
+		go test -covermode=count -coverprofile=coverage.out ./...
+
+coverage-html:
+		make coverage && go tool cover -html=coverage.out
 
 format:
 		go vet ./... && go fmt ./...

@@ -20,3 +20,4 @@ tmp
 
 .idea
 .env
+coverage.out
