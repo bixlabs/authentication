@@ -1,8 +1,8 @@
 package tools
 
 import (
-	"os"
 	"github.com/sirupsen/logrus"
+	"os"
 )
 
 // For more information: https://github.com/sirupsen/logrus/blob/master/example_basic_test.go
@@ -12,7 +12,7 @@ var log *logrus.Logger
 func InitializeLogger() {
 	log = logrus.New()
 	//log.Formatter = new(logrus.JSONFormatter)
-	log.Formatter = new(logrus.TextFormatter)                     //default
+	log.Formatter = new(logrus.TextFormatter) //default
 	log.Level = logrus.TraceLevel
 	log.Out = os.Stdout
 

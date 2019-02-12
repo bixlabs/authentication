@@ -39,6 +39,10 @@
     * `chmod +x ~/.air`
 * To run the project with hot reload: `$ make run-dev` or `~/.air -c .air.config`
 
+## How to run format
+* We use `go vet` and `go fmt` for simple linter and formatting, running `make format` will do.
+* This commands are run also when we run the project, you can check the [Makefile](./Makefile) to know exactly in which commands is used.
+
 ## How to run the linter
 * For the linter we are using [golangci-lint](https://github.com/golangci/golangci-lint)
 * To run it you can either use `make lint` or `golangci-lint run`.

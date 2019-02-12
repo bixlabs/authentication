@@ -7,9 +7,7 @@ import (
 )
 
 func main() {
-        tools.InitializeLogger()
+	tools.InitializeLogger()
 	todoOperations := useCases.NewTodoOperationsHandler()
 	api.NewTodoRestConfigurator(todoOperations)
 }
-
-

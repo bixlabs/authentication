@@ -38,7 +38,7 @@ func (handler TodoOperationsHandler) Create(todo Todo) *Todo {
 
 func (handler TodoOperationsHandler) Read(id string) *Todo {
 	tools.Log().WithFields(logrus.Fields{"ID": id}).Info("A todo was retrieved")
-	return &Todo{ID:id}
+	return &Todo{ID: id}
 }
 
 func (handler TodoOperationsHandler) Update(todo Todo) *Todo {

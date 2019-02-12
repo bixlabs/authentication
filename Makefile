@@ -5,8 +5,11 @@ all: clean test build
 test:
 		go test -v ./...
 
+format:
+		go vet ./... && go fmt ./...
+
 build:
-		go build -o ./tmp/web-server ./cmd/api/main.go
+		make format && go build -o ./tmp/web-server ./cmd/api/main.go
 
 clean:
 		rm -r -f ./tmp
@@ -15,10 +18,10 @@ lint:
 		golangci-lint run
 
 run-dev:
-		~/.air -c .air.config
+		make format && ~/.air -c .air.config
 
 run:
-		$ go run cmd/api/main.go
+		make format && go run cmd/api/main.go
 
 deps:
 		sh ./scripts/install_dep.sh

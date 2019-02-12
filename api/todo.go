@@ -1,13 +1,13 @@
 package api
 
 import (
+	"fmt"
+	"github.com/bixlabs/go-layout/todo/structures"
+	"github.com/bixlabs/go-layout/todo/useCases"
+	"github.com/bixlabs/go-layout/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/bixlabs/go-layout/tools"
 	"net/http"
-	"github.com/bixlabs/go-layout/todo/useCases"
-	"github.com/bixlabs/go-layout/todo/structures"
-	"fmt"
 	"time"
 )
 
@@ -41,7 +41,6 @@ func NewTodoRestConfigurator(handler useCases.TodoOperations) {
 	// router.Run(":3000") for a hard coded port
 }
 
-
 func (config todoRestConfigurator) createTodo(c *gin.Context) {
 	var request TodoRequest
 	var todo *structures.Todo
@@ -63,10 +62,10 @@ func (config todoRestConfigurator) readTodo(c *gin.Context) {
 }
 
 type TodoRequest struct {
-	ID string `json:"i_am"`
-	Name string `json:"title"`
-	Description string `json:"the_rest"`
-	DueDate time.Time `json:"when_finish"`
+	ID          string    `json:"i_am"`
+	Name        string    `json:"title"`
+	Description string    `json:"the_rest"`
+	DueDate     time.Time `json:"when_finish"`
 }
 
 func TodoPostToBusinessTodo(request TodoRequest) structures.Todo {
