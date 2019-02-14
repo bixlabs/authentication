@@ -25,7 +25,7 @@ $ go run cmd/api/main.go
     * Delete: $ curl -X DELETE "http://localhost:3000/todo/1"
 ```
 
-## How to generate API
+## How to generate API documentation
 * Initialize the documentation (this will generate a _docs_ folder in the root folder)
 ```bash
 $ swag init -g ./api/main.go
