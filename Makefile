@@ -27,7 +27,7 @@ run-dev:
 		make format && air -c .air.config
 
 run:
-		make format && go run cmd/api/main.go
+		make format && go run api/main.go
 
 run-cli:
 		make format && go run cmd/cli/main.go

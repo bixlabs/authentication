@@ -24,6 +24,14 @@ $ go run cmd/api/main.go
     * Update: $ curl -X PUT -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:3000/todo"
     * Delete: $ curl -X DELETE "http://localhost:3000/todo/1"
 ```
+
+## How to generate API
+* Initialize the documentation (this will generate a _docs_ folder in the root folder)
+```bash
+$ swag init -g ./api/main.go
+```
+* Then we need to run the project as a web server and go to [localhost:8080/swagger/](http://localhost:8080/swagger/index.html#)
+
     
 ## Running the project to show output in console
 
