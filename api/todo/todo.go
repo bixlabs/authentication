@@ -2,9 +2,9 @@ package todo
 
 import (
 	"fmt"
-	"github.com/bixlabs/go-layout/todo/structures"
-	"github.com/bixlabs/go-layout/todo/useCases"
-	"github.com/bixlabs/go-layout/tools"
+	"github.com/bixlabs/authentication/todo/structures"
+	"github.com/bixlabs/authentication/todo/useCases"
+	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -17,7 +17,7 @@ import (
 
 type todoRestConfigurator struct {
 	handler useCases.TodoOperations
-	Port    string `env:"WEB_SERVER_PORT" envDefault:"3000"`
+	Port    string `env:"WEB_SERVER_PORT" envDe.env-templatefault:"3000"`
 }
 
 func NewTodoRestConfigurator(handler useCases.TodoOperations) {

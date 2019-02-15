@@ -1,9 +1,9 @@
 package main
 
 import (
-	. "github.com/bixlabs/go-layout/todo/structures"
-	. "github.com/bixlabs/go-layout/todo/useCases"
-	"github.com/bixlabs/go-layout/tools"
+	. "github.com/bixlabs/authentication/todo/structures"
+	. "github.com/bixlabs/authentication/todo/useCases"
+	"github.com/bixlabs/authentication/tools"
 )
 
 func main() {
