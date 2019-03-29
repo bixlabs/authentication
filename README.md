@@ -2,20 +2,23 @@
 
 * go 1.11 or higher.
 
+## Installation
+
+```bash
+$ make test
+```
+* Running the tests will start downloading all the dependencies needed for the project (the same can be accomplish running or building the project).
+
 ## Go Modules
 * If you need more information about them please go [here](https://github.com/golang/go/wiki/Modules#how-to-define-a-module)
-* To install dependencies just use `go get`
+* To install new dependencies just use `go get`
 
 ## Creating an API through [gin-gonic](https://github.com/gin-gonic/gin)
 
 ```bash
 $ make run
 ```
-or 
 
-```bash
-$ go run cmd/api/main.go
-```
 * this will run an HTTP server in port 3000
 * For testing all the define endpoints you can try out these different CURL commands:
 ```bash
@@ -24,6 +27,18 @@ $ go run cmd/api/main.go
     * Update: $ curl -X PUT -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:3000/todo"
     * Delete: $ curl -X DELETE "http://localhost:3000/todo/1"
 ```
+
+## How to generate API documentation
+* Initialize the documentation (this will generate a _docs_ folder in the root folder)
+```bash
+$ make api-docs
+```
+or
+```bash
+$ swag init -g ./api/main.go
+```
+* Then we need to run the project as a web server and go to [localhost:8080/swagger/](http://localhost:8080/swagger/index.html#)
+
     
 ## Running the project to show output in console
 

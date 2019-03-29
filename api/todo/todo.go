@@ -1,4 +1,4 @@
-package api
+package todo
 
 import (
 	"fmt"
@@ -8,6 +8,9 @@ import (
 	"github.com/caarlos0/env"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+	_ "github.com/swaggo/swag/example/celler/httputil"
 	"net/http"
 	"time"
 )
@@ -30,12 +33,12 @@ func NewTodoRestConfigurator(handler useCases.TodoOperations) {
 	// logger and recovery (crash-free) middleware
 	router := gin.Default()
 
-	// Content-Type of "application/json" must be used for this endpoint handler
 	router.POST("/todo", todoRestConfig.createTodo)
 	router.GET("/todo/:id", todoRestConfig.readTodo)
 	// Content-Type of "application/json" must be used for this endpoint handler
 	router.PUT("/todo", todoRestConfig.updateTodo)
 	router.DELETE("/todo/:id", todoRestConfig.deleteTodo)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// By default it serves on :3000 unless a
 	// PORT environment variable was defined.
@@ -47,6 +50,17 @@ func NewTodoRestConfigurator(handler useCases.TodoOperations) {
 	// router.Run(":3000") for a hard coded port
 }
 
+// @Summary Create Todo
+// @Description Creates a todo given the correct JSON representation of it.
+// @Accept  json
+// @Produce  json
+// @Param todo body structures.Todo true "Todo structure"
+// @Success 200 {object} structures.Todo
+// @Header 200 {string} Token "qwerty"
+// @Failure 400 {object} httputil.HTTPError
+// @Failure 404 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
+// @Router /todo [post]
 func (config todoRestConfigurator) createTodo(c *gin.Context) {
 	var request TodoRequest
 	var todo *structures.Todo
