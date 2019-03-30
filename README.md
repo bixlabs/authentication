@@ -100,7 +100,7 @@ $ golangci-lint run
 * We are using [Logrus](https://github.com/sirupsen/logrus) as a logging framework
 * This is how we initialize the logger [here](./tools/logger.go), specifically `InitializeLogger`
 * We have to run `InitializeLogger` before using the `Log` function, [here's an example](./cmd/api/main.go)
-* Finally [examples of using the logger](./todo/use_cases/todo_handler.go)
+* Finally [examples of using the logger](todo/interactors/todo_handler.go)
 * visit their website for advance information on how to use it.
 * When using `make run-dev` we won't see the colors of the log message, with `make run` we will.
 
