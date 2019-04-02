@@ -1,7 +1,7 @@
 package data_mappers
 
 import (
-	"github.com/bixlabs/authentication/authentication/structures"
+	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/model"
 )
 

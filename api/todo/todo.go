@@ -2,8 +2,8 @@ package todo
 
 import (
 	"fmt"
-	"github.com/bixlabs/authentication/todo/structures"
 	"github.com/bixlabs/authentication/todo/interactors"
+	"github.com/bixlabs/authentication/todo/structures"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/gin-gonic/gin"

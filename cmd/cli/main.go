@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/bixlabs/authenticationt/todo/interactors"
+	"github.com/bixlabs/authentication/todo/interactors"
 	"github.com/bixlabs/authentication/todo/structures"
 	"github.com/bixlabs/authentication/tools"
 )

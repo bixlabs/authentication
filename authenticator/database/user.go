@@ -1,6 +1,6 @@
 package database
 
-import "github.com/bixlabs/authentication/authentication/structures"
+import "github.com/bixlabs/authentication/authenticator/structures"
 
 type UserRepository interface {
 	create(user structures.User) (error, structures.User)

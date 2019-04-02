@@ -1,6 +1,6 @@
-package useCases
+package interactors
 
-import "github.com/bixlabs/authentication/authentication/structures"
+import "github.com/bixlabs/authentication/authenticator/structures"
 
 type Authenticator interface {
 	Login(email, password string) (error, structures.LoginResponse)
