@@ -1,15 +1,15 @@
-package useCases
+package interactors
 
 import (
-	. "github.com/bixlabs/go-layout/todo/structures"
+	"github.com/bixlabs/go-layout/todo/structures"
 	"github.com/bixlabs/go-layout/tools"
-	. "github.com/franela/goblin"
+	"github.com/franela/goblin"
 	"github.com/sirupsen/logrus"
 	"testing"
 )
 
 func Test(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 	var operationHandler TodoOperations
 	tools.InitializeLogger()
 	// This line prevents the logs to appear in the tests.
@@ -38,7 +38,7 @@ func Test(t *testing.T) {
 
 		// Passing Tests
 		g.It("Should create a todo ", func() {
-			todo := Todo{ID: "1"}
+			todo := structures.Todo{ID: "1"}
 			result := operationHandler.Create(todo)
 			g.Assert(todo.ID).Equal(result.ID)
 		})
@@ -50,7 +50,7 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should update a todo ", func() {
-			todo := Todo{ID: "1"}
+			todo := structures.Todo{ID: "1"}
 			result := operationHandler.Update(todo)
 			g.Assert(todo.ID).Equal(result.ID)
 		})

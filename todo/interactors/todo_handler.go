@@ -1,27 +1,17 @@
-package useCases
+package interactors
 
 import (
-	. "github.com/bixlabs/go-layout/todo/structures"
+	"github.com/bixlabs/go-layout/todo/structures"
 	"github.com/bixlabs/go-layout/tools"
 	"github.com/sirupsen/logrus"
 )
 
 type TodoOperations interface {
-	Create(todo Todo) *Todo
-	Read(id string) *Todo
-	Update(todo Todo) *Todo
+	Create(todo structures.Todo) *structures.Todo
+	Read(id string) *structures.Todo
+	Update(todo structures.Todo) *structures.Todo
 	Delete(id string) bool
 }
-
-/*
-
-Using the import like this "github.com/bixlabs/go-layout/business/structures" (without the dot) this is how you will have to reference the To_do struct:
-
-type TodoOperations interface {
-	create(todo structures.Todo) structures.Todo
-}
-
-*/
 
 // TODO: open to discussion, I'm not sure where the implementation should be.
 
@@ -31,17 +21,17 @@ func NewTodoOperationsHandler() TodoOperationsHandler {
 	return TodoOperationsHandler{}
 }
 
-func (handler TodoOperationsHandler) Create(todo Todo) *Todo {
+func (handler TodoOperationsHandler) Create(todo structures.Todo) *structures.Todo {
 	tools.Log().WithFields(logrus.Fields{"ID": todo.ID, "Name": todo.Name}).Info("A todo was created")
 	return &todo
 }
 
-func (handler TodoOperationsHandler) Read(id string) *Todo {
+func (handler TodoOperationsHandler) Read(id string) *structures.Todo {
 	tools.Log().WithFields(logrus.Fields{"ID": id}).Info("A todo was retrieved")
-	return &Todo{ID: id}
+	return &structures.Todo{ID: id}
 }
 
-func (handler TodoOperationsHandler) Update(todo Todo) *Todo {
+func (handler TodoOperationsHandler) Update(todo structures.Todo) *structures.Todo {
 	tools.Log().WithFields(logrus.Fields{"ID": todo.ID, "Name": todo.Name}).Info("A todo was updated")
 	return &todo
 }
