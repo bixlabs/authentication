@@ -2,20 +2,25 @@
 
 * go 1.11 or higher.
 
+## Installation
+
+## Creating an API through [gin-gonic](https://github.com/gin-gonic/gin)
+
+```bash
+$ make test
+```
+* Running the tests will start downloading all the dependencies needed for the project (the same can be accomplish running or building the project).
+
 ## Go Modules
 * If you need more information about them please go [here](https://github.com/golang/go/wiki/Modules#how-to-define-a-module)
-* To install dependencies just use `go get`
+* To install new dependencies just use `go get`
 
 ## Creating an API through [gin-gonic](https://github.com/gin-gonic/gin)
 
 ```bash
 $ make run
 ```
-or 
 
-```bash
-$ go run cmd/api/main.go
-```
 * this will run an HTTP server in port 3000
 * For testing all the define endpoints you can try out these different CURL commands:
 ```bash
@@ -27,6 +32,10 @@ $ go run cmd/api/main.go
 
 ## How to generate API documentation
 * Initialize the documentation (this will generate a _docs_ folder in the root folder)
+```bash
+$ make api-docs
+```
+or
 ```bash
 $ swag init -g ./api/main.go
 ```
@@ -93,7 +102,7 @@ $ golangci-lint run
 * We are using [Logrus](https://github.com/sirupsen/logrus) as a logging framework
 * This is how we initialize the logger [here](./tools/logger.go), specifically `InitializeLogger`
 * We have to run `InitializeLogger` before using the `Log` function, [here's an example](./cmd/api/main.go)
-* Finally [examples of using the logger](./todo/use_cases/todo_handler.go)
+* Finally [examples of using the logger](todo/interactors/todo_handler.go)
 * visit their website for advance information on how to use it.
 * When using `make run-dev` we won't see the colors of the log message, with `make run` we will.
 
