@@ -1,4 +1,4 @@
-package todo
+package authentication
 
 import (
 	"fmt"
@@ -15,37 +15,45 @@ import (
 	"time"
 )
 
-type todoRestConfigurator struct {
+type authenticatorRESTConfigurator struct {
 	handler interactors.TodoOperations
 	Port    string `env:"WEB_SERVER_PORT" envDefault:"3000"`
 }
 
-func NewTodoRestConfigurator(handler interactors.TodoOperations) {
-	todoRestConfig := todoRestConfigurator{handler, ""}
+func NewAuthenticatorRESTConfigurator(handler interactors.TodoOperations) {
+	restConfig := getRestConfiguration(handler)
+	router := configureGinRouter(restConfig)
+	runGinRouter(router, restConfig.Port)
+}
 
-	err := env.Parse(&todoRestConfig)
+func getRestConfiguration(handler interactors.TodoOperations) authenticatorRESTConfigurator {
+	restConfig := authenticatorRESTConfigurator{handler, ""}
+	parseEnvVariables(&restConfig)
+	return restConfig
+}
+
+func parseEnvVariables(restConfig *authenticatorRESTConfigurator) {
+	err := env.Parse(restConfig)
 	if err != nil {
-		fmt.Printf("%+v\n", err)
+		tools.Log().Panic("parsing the env variables for the rest configuration threw an error", err)
 	}
+}
 
-	// Creates a gin router with default middleware:
-	// logger and recovery (crash-free) middleware
+func configureGinRouter(restConfig authenticatorRESTConfigurator) *gin.Engine {
 	router := gin.Default()
-
-	router.POST("/todo", todoRestConfig.createTodo)
-	router.GET("/todo/:id", todoRestConfig.readTodo)
-	router.PUT("/todo", todoRestConfig.updateTodo)
-	router.DELETE("/todo/:id", todoRestConfig.deleteTodo)
+	router.POST("/login", restConfig.login)
+	router.GET("/signup", restConfig.signup)
+	router.PUT("/change-password", restConfig.changePassword)
+	router.DELETE("/todo/:id", restConfig.resetPassword)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	return router
+}
 
-	// By default it serves on :3000 unless a
-	// PORT environment variable was defined.
-	err = router.Run(fmt.Sprintf(":%s", todoRestConfig.Port))
-
+func runGinRouter(router *gin.Engine, port string) {
+	err := router.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
 		panic(err)
 	}
-	// router.Run(":3000") for a hard coded port
 }
 
 // @Summary Create Todo
@@ -59,7 +67,7 @@ func NewTodoRestConfigurator(handler interactors.TodoOperations) {
 // @Failure 404 {object} httputil.HTTPError
 // @Failure 500 {object} httputil.HTTPError
 // @Router /todo [post]
-func (config todoRestConfigurator) createTodo(c *gin.Context) {
+func (config authenticatorRESTConfigurator) login(c *gin.Context) {
 	var request Request
 	var todo *structures.Todo
 
@@ -73,7 +81,7 @@ func (config todoRestConfigurator) createTodo(c *gin.Context) {
 
 }
 
-func (config todoRestConfigurator) readTodo(c *gin.Context) {
+func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
 	id := c.Param("id")
 	todo := config.handler.Read(id)
 	c.String(http.StatusOK, fmt.Sprintf("Read was successful for TODO with ID: %s", todo.ID))
@@ -90,7 +98,7 @@ func RequestToTodo(request Request) structures.Todo {
 	return structures.Todo{ID: request.ID, Name: request.Name, Description: request.Description, DueDate: request.DueDate}
 }
 
-func (config todoRestConfigurator) updateTodo(c *gin.Context) {
+func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 	var request Request
 	var todo *structures.Todo
 
@@ -104,7 +112,7 @@ func (config todoRestConfigurator) updateTodo(c *gin.Context) {
 	c.String(http.StatusOK, fmt.Sprintf("Update was successful for TODO with name: %s", todo.Name))
 }
 
-func (config todoRestConfigurator) deleteTodo(c *gin.Context) {
+func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 	id := c.Param("id")
 	success := config.handler.Delete(id)
 	c.String(http.StatusOK, fmt.Sprintf("Delete was successful %t", success))
