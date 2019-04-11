@@ -15,7 +15,7 @@ format:
 		go vet ./... && go fmt ./...
 
 build:
-		make format && go build -o ./tmp/web-server ./api/main.go
+		make api-docs && make format && go build -o ./tmp/web-server ./api/main.go
 
 clean:
 		rm -r -f ./tmp
