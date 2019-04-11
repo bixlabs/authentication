@@ -1,119 +1,101 @@
 package authentication
 
 import (
-	"fmt"
-	"github.com/bixlabs/authentication/todo/interactors"
-	"github.com/bixlabs/authentication/todo/structures"
-	"github.com/bixlabs/authentication/tools"
-	"github.com/caarlos0/env"
+	"github.com/bixlabs/authentication/api/authentication/structures/rest_change_password"
+	"github.com/bixlabs/authentication/api/authentication/structures/rest_login"
+	"github.com/bixlabs/authentication/api/authentication/structures/rest_reset_password"
+	"github.com/bixlabs/authentication/api/authentication/structures/rest_signup"
+	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
-	"github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
-	_ "github.com/swaggo/swag/example/celler/httputil"
 	"net/http"
-	"time"
 )
 
 type authenticatorRESTConfigurator struct {
-	handler interactors.TodoOperations
-	Port    string `env:"WEB_SERVER_PORT" envDefault:"3000"`
+	handler interactors.Authenticator
 }
 
-func NewAuthenticatorRESTConfigurator(handler interactors.TodoOperations) {
-	restConfig := getRestConfiguration(handler)
-	router := configureGinRouter(restConfig)
-	runGinRouter(router, restConfig.Port)
+func NewAuthenticatorRESTConfigurator(handler interactors.Authenticator, router *gin.Engine) {
+	configureAuthRoutes(authenticatorRESTConfigurator{handler}, router)
 }
 
-func getRestConfiguration(handler interactors.TodoOperations) authenticatorRESTConfigurator {
-	restConfig := authenticatorRESTConfigurator{handler, ""}
-	parseEnvVariables(&restConfig)
-	return restConfig
-}
-
-func parseEnvVariables(restConfig *authenticatorRESTConfigurator) {
-	err := env.Parse(restConfig)
-	if err != nil {
-		tools.Log().Panic("parsing the env variables for the rest configuration threw an error", err)
-	}
-}
-
-func configureGinRouter(restConfig authenticatorRESTConfigurator) *gin.Engine {
-	router := gin.Default()
+func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
+	router := r.Group("/user")
 	router.POST("/login", restConfig.login)
-	router.GET("/signup", restConfig.signup)
+	router.POST("/signup", restConfig.signup)
 	router.PUT("/change-password", restConfig.changePassword)
-	router.DELETE("/todo/:id", restConfig.resetPassword)
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	return router
+	router.PUT("/reset-password", restConfig.resetPassword)
+	return r
 }
 
-func runGinRouter(router *gin.Engine, port string) {
-	err := router.Run(fmt.Sprintf(":%s", port))
-	if err != nil {
-		panic(err)
-	}
-}
-
-// @Summary Create Todo
-// @Description Creates a todo given the correct JSON representation of it.
+// @Summary Login functionality
+// @Description Attempts to authenticate the user with the given credentials.
 // @Accept  json
 // @Produce  json
-// @Param todo body structures.Todo true "Todo structure"
-// @Success 200 {object} structures.Todo
-// @Header 200 {string} Token "qwerty"
-// @Failure 400 {object} httputil.HTTPError
-// @Failure 404 {object} httputil.HTTPError
-// @Failure 500 {object} httputil.HTTPError
-// @Router /todo [post]
+// @Param login body rest_login.Request true "Login Request"
+// @Success 200 {object} rest_login.Response
+// @Failure 400 {object} rest.ResponseWrapper
+// @Failure 401 {object} rest.ResponseWrapper
+// @Failure 403 {object} rest.ResponseWrapper
+// @Failure 404 {object} rest.ResponseWrapper
+// @Failure 405 {object} rest.ResponseWrapper
+// @Failure 408 {object} rest.ResponseWrapper
+// @Failure 500 {object} rest.ResponseWrapper
+// @Failure 504 {object} rest.ResponseWrapper
+// @Router /user/login [post]
 func (config authenticatorRESTConfigurator) login(c *gin.Context) {
-	var request Request
-	var todo *structures.Todo
-
-	if err := c.ShouldBind(&request); err == nil {
-		tools.Log().WithFields(logrus.Fields{"Request": request}).Info("A request object was received")
-		todo = config.handler.Create(RequestToTodo(request))
-		c.String(http.StatusOK, fmt.Sprintf("Create was successful for TODO with name: %s", todo.Name))
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-
+	//rest.NotImplemented(c)
+	c.JSON(http.StatusOK, rest_login.Response{})
 }
 
+// @Summary Signup functionality
+// @Description Attempts to create a user provided the correct information.
+// @Accept  json
+// @Produce  json
+// @Param signup body rest_signup.Request true "Signup Request"
+// @Success 201 {object} rest.ResponseWrapper
+// @Failure 400 {object} rest.ResponseWrapper
+// @Failure 404 {object} rest.ResponseWrapper
+// @Failure 408 {object} rest.ResponseWrapper
+// @Failure 500 {object} rest.ResponseWrapper
+// @Failure 504 {object} rest.ResponseWrapper
+// @Router /user/signup [post]
 func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
-	id := c.Param("id")
-	todo := config.handler.Read(id)
-	c.String(http.StatusOK, fmt.Sprintf("Read was successful for TODO with ID: %s", todo.ID))
+	//rest.NotImplemented(c)
+	c.JSON(http.StatusCreated, rest_signup.Response{})
 }
 
-type Request struct {
-	ID          string    `json:"i_am"`
-	Name        string    `json:"title"`
-	Description string    `json:"the_rest"`
-	DueDate     time.Time `json:"when_finish"`
-}
-
-func RequestToTodo(request Request) structures.Todo {
-	return structures.Todo{ID: request.ID, Name: request.Name, Description: request.Description, DueDate: request.DueDate}
-}
-
+// @Summary Change password functionality
+// @Description It changes the password provided the old one and a new password.
+// @Accept  json
+// @Produce  json
+// @Param changePassword body rest_change_password.Request true "Change password Request"
+// @Success 200 {object} rest_change_password.Response
+// @Failure 400 {object} rest.ResponseWrapper
+// @Failure 404 {object} rest.ResponseWrapper
+// @Failure 408 {object} rest.ResponseWrapper
+// @Failure 500 {object} rest.ResponseWrapper
+// @Failure 504 {object} rest.ResponseWrapper
+// @Router /user/change-password [put]
 func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
-	var request Request
-	var todo *structures.Todo
+	//rest.NotImplemented(c)
+	c.JSON(http.StatusOK, rest_change_password.Response{})
 
-	if c.ShouldBind(&request) == nil {
-		todo = config.handler.Update(RequestToTodo(request))
-	} else {
-		// handle validation case
-		tools.Log().Info("Validation case")
-	}
-
-	c.String(http.StatusOK, fmt.Sprintf("Update was successful for TODO with name: %s", todo.Name))
 }
 
+// @Summary Reset password functionality
+// @Description It resets your password and provide you with a flow to enter a new one.
+// @Accept  json
+// @Produce  json
+// @Param resetPassword body rest_reset_password.Request true "Reset password Request"
+// @Success 200 {object} rest_reset_password.Response
+// @Failure 400 {object} rest.ResponseWrapper
+// @Failure 404 {object} rest.ResponseWrapper
+// @Failure 408 {object} rest.ResponseWrapper
+// @Failure 500 {object} rest.ResponseWrapper
+// @Failure 504 {object} rest.ResponseWrapper
+// @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
-	id := c.Param("id")
-	success := config.handler.Delete(id)
-	c.String(http.StatusOK, fmt.Sprintf("Delete was successful %t", success))
+	//rest.NotImplemented(c)
+	c.JSON(http.StatusOK, rest_reset_password.Response{})
+
 }
