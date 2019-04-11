@@ -1,8 +1,8 @@
-package database
+package user
 
 import "github.com/bixlabs/authentication/authenticator/structures"
 
-type UserRepository interface {
+type Repository interface {
 	create(user structures.User) (error, structures.User)
 	verifyPassword(password string) (error, bool)
 	changePassword(password string) error
