@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/bixlabs/authentication/todo/interactors"
-	"github.com/bixlabs/authentication/todo/structures"
+	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/tools"
 )
 
 func main() {
 	tools.InitializeLogger()
-	todoOperations := interactors.NewTodoOperationsHandler()
+	authOperations := interactors.NewAuthenticator()
 
-	todoOperations.Create(structures.Todo{})
-	todoOperations.Read("1")
-	todoOperations.Update(structures.Todo{})
-	todoOperations.Delete("1")
+	_, _ = authOperations.Login("", "")
+	_, _ = authOperations.Signup(structures.User{})
+	_ = authOperations.ChangePassword("", "")
+	_ = authOperations.ResetPassword("")
 }
