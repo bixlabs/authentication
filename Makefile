@@ -15,7 +15,13 @@ format:
 		go vet ./... && go fmt ./...
 
 build:
-		make api-docs && make format && go build -o ./tmp/web-server ./api/main.go
+		make api-docs && make format && go build -o ./tmp/auth-server ./api/main.go
+
+build-for-mac:
+		GOOS=darwin GOARCH=amd64 make build
+
+build-for-windows:
+		GOOS=windows GOARCH=386 make api-docs && make format && go build -o ./tmp/auth-server.exe ./api/main.go
 
 clean:
 		rm -r -f ./tmp

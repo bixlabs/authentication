@@ -63,5 +63,5 @@ func getRestConfiguration() RestConfiguration {
 }
 
 type RestConfiguration struct {
-	Port string `env:"WEB_SERVER_PORT" envDefault:"8080"`
+	Port string `env:"AUTH_SERVER_PORT" envDefault:"8080"`
 }

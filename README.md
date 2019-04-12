@@ -21,13 +21,13 @@ $ make test
 $ make run
 ```
 
-* this will run an HTTP server in port 3000
+* this will run an HTTP server in port 8080, if you want to change this port you have to specify it through the environment variable (AUTH_SERVER_PORT) in the _.env_ file.
 * For testing all the define endpoints you can try out these different CURL commands:
 ```bash
-    * Create: $ curl -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:3000/todo"
-    * Read: $ curl -X GET "http://localhost:3000/todo/1"
-    * Update: $ curl -X PUT -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:3000/todo"
-    * Delete: $ curl -X DELETE "http://localhost:3000/todo/1"
+    * Create: $ curl -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"
+    * Read: $ curl -X GET "http://localhost:8080/todo/1"
+    * Update: $ curl -X PUT -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"
+    * Delete: $ curl -X DELETE "http://localhost:8080/todo/1"
 ```
 
 ## How to generate API documentation
@@ -39,7 +39,7 @@ or
 ```bash
 $ swag init -g ./api/main.go
 ```
-* Then we need to run the project as a web server and go to [localhost:8080/swagger/](http://localhost:8080/swagger/index.html#)
+* Then we need to run the project as a web server and go to [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html#)
 
     
 ## Running the project to show output in console
@@ -50,7 +50,7 @@ $ swag init -g ./api/main.go
 ```
 * You should see the output of the CRUD in your console.
 
-## How to make build of a main.go file and run it.
+## How to make build of a main.go file and run it on Linux.
 
 ```bash
 $ make build
@@ -58,13 +58,25 @@ $ make build
 or 
 
 ```bash
-$ go build -o ./tmp/web-server ./cmd/api/main.go
+$ go build -o ./tmp/auth-server ./cmd/api/main.go
 ```
-* The command above will create a file called `web-server` in folder _tmp_, that file is an executable with the main in _./cmd/api/main.go_
+* The command above will create a file called `auth-server` in folder _tmp_, that file is an executable with the main in _./cmd/api/main.go_
 * To run your executable you have to:
-    * Make it executable: `chmod +x ./tmp/web-server`
-    * Run it: `./tmp/web-server`
+    * Make it executable: `chmod +x ./tmp/auth-server`
+    * Run it: `./tmp/auth-server`
 * You can build whatever you want (it doesn't have to be a web-server), for example there is another main with which you can follow the same steps _./cmd/cli/main.go_
+
+## Building for MacOS
+```bash
+$ make build-for-mac
+```
+* Same steps as above, an executable will be created in _./tpm/_
+
+## Building for Windows
+```bash
+$ make build-for-windows
+```
+* Same steps as above, an executable will be created in _./tpm/_
 
 ## Hot reload for the Web Server
 
@@ -77,6 +89,7 @@ or
 ```bash
 $ air -c .air.config
 ```
+* IMPORTANT: Hot reload will not work in MacOS or windows, you have to change the configuration of `.air.config` to instead of using `make build` to use the correct build process depending on the OS you are. For windows you also have to change the _bin_ to have the _.exe_ extension.
 
 
 ## How to run format
