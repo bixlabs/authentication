@@ -58,9 +58,9 @@ $ make build
 or 
 
 ```bash
-$ go build -o ./tmp/auth-server ./cmd/api/main.go
+$ go build -o ./tmp/auth-server ./api/main.go
 ```
-* The command above will create a file called `auth-server` in folder _tmp_, that file is an executable with the main in _./cmd/api/main.go_
+* The command above will create a file called `auth-server` in folder _tmp_, that file is an executable with the main in _./api/main.go_
 * To run your executable you have to:
     * Make it executable: `chmod +x ./tmp/auth-server`
     * Run it: `./tmp/auth-server`
