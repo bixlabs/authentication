@@ -1,6 +1,7 @@
 # Requirements
 
 * go 1.11 or higher.
+* Make sure that you activate [Go Modules](https://github.com/golang/go/wiki/Modules#how-to-install-and-activate-module-support)
 
 ## Installation, please read this before running anything.
 
