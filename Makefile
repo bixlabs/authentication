@@ -2,6 +2,9 @@
 
 all: clean test build
 
+deps:
+		./deps.sh
+
 test:
 		go test -v -covermode=count -coverprofile=coverage.out ./...
 

@@ -2,14 +2,13 @@
 
 * go 1.11 or higher.
 
-## Installation
-
-## Creating an API through [gin-gonic](https://github.com/gin-gonic/gin)
+## Installation, please read this before running anything.
 
 ```bash
-$ make test
+$ make deps
 ```
-* Running the tests will start downloading all the dependencies needed for the project (the same can be accomplish running or building the project).
+
+* Through this we install some binaries and all the go libraries that the project needs.
 
 ## Go Modules
 * If you need more information about them please go [here](https://github.com/golang/go/wiki/Modules#how-to-define-a-module)
