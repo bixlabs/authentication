@@ -1,4 +1,4 @@
-package authenticator
+package interactors
 
 import (
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -7,7 +7,7 @@ import (
 
 type Authenticator interface {
 	Login(email, password string) (error, login.Response)
-	Signup(user structures.User) error
+	Signup(user structures.User) (error, structures.User)
 	ChangePassword(oldPassword, newPassword string) error
 	ResetPassword(email string) error
 }

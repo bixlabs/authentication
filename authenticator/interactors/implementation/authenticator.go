@@ -27,24 +27,34 @@ func (auth authenticator) Login(email, password string) (error, login.Response) 
 	return nil, login.Response{}
 }
 
-func (auth authenticator) Signup(user structures.User) error {
+func (auth authenticator) Signup(user structures.User) (error, structures.User) {
+	if err := auth.hasValidationIssue(user); err != nil {
+		return err, user
+	}
+	err, user := auth.repository.Create(user)
 
+	if err != nil {
+		return err, user
+	}
+	tools.Log().Info("A user was created")
+	return nil, user
+
+}
+
+func (auth authenticator) hasValidationIssue(user structures.User) error {
 	if err, isAvailable := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
+		tools.Log().Debug("A duplicated email was provided")
 		return errors.New(signupDuplicateEmailMessage)
 	}
-
 	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, user.Email); !isValidEmail {
+		tools.Log().Debug("An invalid email was provided: " + user.Email)
 		return errors.New(signupInvalidEmailMessage)
 	}
-
 	if len(user.Password) < 8 {
+		tools.Log().Debug("A password with incorrect length was provided")
 		return errors.New(signupPasswordLengthMessage)
 	}
-
-	_, _ =auth.repository.Create(user)
-	tools.Log().Info("A user was created")
 	return nil
-
 }
 
 func (auth authenticator) ChangePassword(oldPassword, newPassword string) error {

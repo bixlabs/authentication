@@ -5,16 +5,16 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_login"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_reset_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_signup"
-	"github.com/bixlabs/authentication/authenticator/interactors/authenticator"
+	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type authenticatorRESTConfigurator struct {
-	handler authenticator.Authenticator
+	handler interactors.Authenticator
 }
 
-func NewAuthenticatorRESTConfigurator(handler authenticator.Authenticator, router *gin.Engine) {
+func NewAuthenticatorRESTConfigurator(handler interactors.Authenticator, router *gin.Engine) {
 	configureAuthRoutes(authenticatorRESTConfigurator{handler}, router)
 }
 
@@ -52,7 +52,7 @@ func (config authenticatorRESTConfigurator) login(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param signup body rest_signup.Request true "Signup Request"
-// @Success 201 {object} rest.ResponseWrapper
+// @Success 201 {object} rest_signup.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 404 {object} rest.ResponseWrapper
 // @Failure 408 {object} rest.ResponseWrapper
