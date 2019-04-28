@@ -10,6 +10,8 @@ type UserRepo struct {
 	users  map[string]structures.User
 }
 
+// We don't use data mappers here because this implementation is merely for testing purpose.
+// and the things we are going to do here are trivial
 func NewUserRepo() *UserRepo {
 	return &UserRepo{0, make(map[string]structures.User)}
 }
