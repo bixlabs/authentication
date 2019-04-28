@@ -5,16 +5,16 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_login"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_reset_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_signup"
-	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/authenticator/interactors/authenticator"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type authenticatorRESTConfigurator struct {
-	handler interactors.Authenticator
+	handler authenticator.Authenticator
 }
 
-func NewAuthenticatorRESTConfigurator(handler interactors.Authenticator, router *gin.Engine) {
+func NewAuthenticatorRESTConfigurator(handler authenticator.Authenticator, router *gin.Engine) {
 	configureAuthRoutes(authenticatorRESTConfigurator{handler}, router)
 }
 
