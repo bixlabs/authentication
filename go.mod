@@ -29,13 +29,14 @@ require (
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/onsi/gomega v1.4.2
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/sirupsen/logrus v1.3.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/swaggo/gin-swagger v1.1.0
 	github.com/swaggo/swag v1.4.1
 	github.com/ugorji/go v1.1.2-0.20180831062425-e253f1f20942 // indirect
-	golang.org/x/crypto v0.0.0-20190417174047-f416ebab96af // indirect
+	golang.org/x/crypto v0.0.0-20190417174047-f416ebab96af
 	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2 // indirect
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
 	golang.org/x/sys v0.0.0-20190416152802-12500544f89f // indirect
