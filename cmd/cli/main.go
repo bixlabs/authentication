@@ -12,7 +12,7 @@ func main() {
 	authOperations := implementation.NewAuthenticator(in_memory.NewUserRepo())
 
 	_, _ = authOperations.Login("", "")
-	_, _ = authOperations.Signup(structures.User{})
+	_, _ = authOperations.Signup(structures.User{Email: "email@bixlabs.com", Password: "secured_password"})
 	_ = authOperations.ChangePassword("", "")
 	_ = authOperations.ResetPassword("")
 }
