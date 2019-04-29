@@ -16,30 +16,30 @@ func NewUserRepo() *UserRepo {
 	return &UserRepo{0, make(map[string]structures.User)}
 }
 
-func (u *UserRepo) Create(user structures.User) (error, structures.User) {
+func (u *UserRepo) Create(user structures.User) (structures.User, error) {
 	u.lastId = u.lastId + 1
 	user.ID = strconv.Itoa(u.lastId)
 	u.users[user.Email] = user
-	return nil, user
+	return user, nil
 }
 
-func (u UserRepo) IsEmailAvailable(email string) (error, bool) {
+func (u *UserRepo) IsEmailAvailable(email string) (bool, error) {
 	_, isUsed := u.users[email]
-	return nil, !isUsed
+	return !isUsed, nil
 }
 
-func (u UserRepo) VerifyPassword(password string) (error, bool) {
+func (u *UserRepo) VerifyPassword(password string) (bool, error) {
 	panic("implement me")
 }
 
-func (u UserRepo) ChangePassword(password string) error {
+func (u *UserRepo) VerifyResetPasswordToken(token string) (bool, error) {
 	panic("implement me")
 }
 
-func (u UserRepo) SaveResetPasswordToken(token string) error {
+func (u *UserRepo) ChangePassword(password string) error {
 	panic("implement me")
 }
 
-func (u UserRepo) VerifyResetPasswordToken(token string) (error, bool) {
+func (u *UserRepo) SaveResetPasswordToken(token string) error {
 	panic("implement me")
 }

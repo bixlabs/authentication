@@ -6,8 +6,8 @@ import (
 )
 
 type Authenticator interface {
-	Login(email, password string) (error, login.Response)
-	Signup(user structures.User) (error, structures.User)
+	Login(email, password string) (login.Response, error)
+	Signup(user structures.User) (structures.User, error)
 	ChangePassword(oldPassword, newPassword string) error
 	ResetPassword(email string) error
 }

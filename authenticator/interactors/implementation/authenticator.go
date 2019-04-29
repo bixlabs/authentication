@@ -24,33 +24,33 @@ func NewAuthenticator(repository user.Repository) *authenticator {
 	return &authenticator{repository}
 }
 
-func (auth authenticator) Login(email, password string) (error, login.Response) {
+func (auth authenticator) Login(email, password string) (login.Response, error) {
 	tools.Log().Warn("Login: Not Implemented yet")
-	return nil, login.Response{}
+	return login.Response{}, nil
 }
 
-func (auth authenticator) Signup(user structures.User) (error, structures.User) {
+func (auth authenticator) Signup(user structures.User) (structures.User, error) {
 	if err := auth.hasValidationIssue(user); err != nil {
-		return err, user
+		return user, err
 	}
 
-	err, hashedPassword := auth.hashPassword(user.Password)
+	hashedPassword, err := auth.hashPassword(user.Password)
 	if err != nil {
-		return err, user
+		return user, err
 	}
 	user.Password = hashedPassword
 
-	err, user = auth.repository.Create(user)
+	user, err = auth.repository.Create(user)
 	if err != nil {
-		return err, user
+		return user, err
 	}
 
 	tools.Log().Info("A user was created")
-	return nil, user
+	return user, nil
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
-	if err, isAvailable := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
+	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
 		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
 		return errors.New(signupDuplicateEmailMessage)
 	}
@@ -65,15 +65,15 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	return nil
 }
 
-func (auth authenticator) hashPassword(password string) (error, string) {
+func (auth authenticator) hashPassword(password string) (string, error) {
 	pass := []byte(password)
 
 	hashedPassword, err := bcrypt.GenerateFromPassword(pass, bcrypt.DefaultCost)
 	if err != nil {
 		tools.Log().WithField("error", err).Error("Password hash failed")
-		return err, ""
+		return "", err
 	}
-	return nil, string(hashedPassword)
+	return string(hashedPassword), nil
 }
 
 func (auth authenticator) ChangePassword(oldPassword, newPassword string) error {
