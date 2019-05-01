@@ -8,6 +8,7 @@ require (
 	github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3 // indirect
 	github.com/gin-gonic/gin v1.3.0
 	github.com/go-critic/checkers v0.0.0-20181204210945-97246d3b3c67 // indirect
+	github.com/go-critic/go-critic v0.0.0-20181204210945-ee9bf5809ead // indirect
 	github.com/go-openapi/jsonpointer v0.19.0 // indirect
 	github.com/go-openapi/jsonreference v0.19.0 // indirect
 	github.com/go-openapi/spec v0.19.0 // indirect
@@ -15,7 +16,7 @@ require (
 	github.com/go-toolsmith/pkgload v0.0.0-20181120203407-5122569a890b // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/golangci/go-tools v0.0.0-20190124090046-35a9f45a5db0 // indirect
-	github.com/golangci/golangci-lint v1.16.1-0.20190402065613-de1d1ad903cd // indirect
+	github.com/golangci/golangci-lint v1.16.1-0.20190425135923-692dacb773b7 // indirect
 	github.com/golangci/gosec v0.0.0-20180901114220-8afd9cbb6cfb // indirect
 	github.com/golangci/govet v0.0.0-20180818181408-44ddbe260190 // indirect
 	github.com/golangci/interfacer v0.0.0-20180902080945-01958817a6ec // indirect
@@ -36,10 +37,11 @@ require (
 	github.com/swaggo/gin-swagger v1.1.0
 	github.com/swaggo/swag v1.4.1
 	github.com/ugorji/go v1.1.2-0.20180831062425-e253f1f20942 // indirect
-	golang.org/x/crypto v0.0.0-20190417174047-f416ebab96af
-	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2 // indirect
-	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
-	golang.org/x/sys v0.0.0-20190416152802-12500544f89f // indirect
-	golang.org/x/tools v0.0.0-20190417223002-a5870b403859 // indirect
+	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734 // indirect
+	golang.org/x/net v0.0.0-20190501004415-9ce7a6920f09 // indirect
+	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 // indirect
+	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/tools v0.0.0-20190501045030-23463209683d // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	sourcegraph.com/sourcegraph/go-diff v0.5.1-0.20190210232911-dee78e514455 // indirect
 )
