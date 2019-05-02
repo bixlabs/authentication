@@ -139,6 +139,7 @@ $ go test -cover -v ./...
 ```
 * this will run all the test files in the project.
 * Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
+* Gomega is being used for improving assertion mechanism.
 
 ## How to see test coverage
 * will show information about the coverage: 
