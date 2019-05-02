@@ -52,7 +52,7 @@ func (config authenticatorRESTConfigurator) login(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param signup body rest_signup.Request true "Signup Request"
-// @Success 201 {object} rest.ResponseWrapper
+// @Success 201 {object} rest_signup.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 404 {object} rest.ResponseWrapper
 // @Failure 408 {object} rest.ResponseWrapper
