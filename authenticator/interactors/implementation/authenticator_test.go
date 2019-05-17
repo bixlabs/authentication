@@ -1,6 +1,7 @@
 package implementation
 
 import (
+	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/in_memory"
@@ -23,12 +24,14 @@ func Test(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
+	var repo user.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
+			repo = in_memory.NewUserRepo()
 			auth = NewAuthenticator(in_memory.NewUserRepo())
 		})
 
@@ -69,6 +72,29 @@ func Test(t *testing.T) {
 			user, _ = auth.Signup(user)
 			err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte("wrong_password"))
 			Expect(err).NotTo(BeNil())
+		})
+	})
+
+	g.Describe("Change password process", func() {
+		g.BeforeEach(func() {
+			auth = NewAuthenticator(in_memory.NewUserRepo())
+		})
+
+		g.It("Should return an error when old password doesn't match", func() {
+			user := structures.User{Email: email, Password: validPassword}
+			_, _ = auth.Signup(user)
+			user.Password = "anotherPassword"
+			err := auth.ChangePassword(user, "Asdqwe123")
+			Expect(err).NotTo(BeNil())
+		})
+
+		g.It("Should be able to change password in case the provided data is correct", func() {
+			user := structures.User{Email: email, Password: validPassword}
+			_, _ = auth.Signup(user)
+			_ = auth.ChangePassword(user, "12345678")
+			hashedPassword, _ := repo.GetHashPassword(user.Email)
+			err := verifyPassword(hashedPassword, "12345678")
+			Expect(err).To(BeNil())
 		})
 	})
 }

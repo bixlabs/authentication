@@ -3,6 +3,7 @@ package implementation
 import (
 	"errors"
 	"github.com/bixlabs/authentication/authenticator/database/user"
+	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/structures/login"
 	"github.com/bixlabs/authentication/tools"
@@ -20,7 +21,7 @@ type authenticator struct {
 	repository user.Repository
 }
 
-func NewAuthenticator(repository user.Repository) *authenticator {
+func NewAuthenticator(repository user.Repository) interactors.Authenticator {
 	return &authenticator{repository}
 }
 
@@ -34,7 +35,7 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 		return user, err
 	}
 
-	hashedPassword, err := auth.hashPassword(user.Password)
+	hashedPassword, err := hashPassword(user.Password)
 	if err != nil {
 		return user, err
 	}
@@ -58,6 +59,15 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
 		return errors.New(signupDuplicateEmailMessage)
 	}
+
+	if err := checkPasswordLength(user); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func checkPasswordLength(user structures.User) error {
 	if len(user.Password) < passwordMinLength {
 		tools.Log().Debug("A password with incorrect length was provided")
 		return errors.New(signupPasswordLengthMessage)
@@ -65,7 +75,7 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	return nil
 }
 
-func (auth authenticator) hashPassword(password string) (string, error) {
+func hashPassword(password string) (string, error) {
 	pass := []byte(password)
 
 	hashedPassword, err := bcrypt.GenerateFromPassword(pass, bcrypt.DefaultCost)
@@ -76,8 +86,35 @@ func (auth authenticator) hashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
-func (auth authenticator) ChangePassword(oldPassword, newPassword string) error {
-	tools.Log().Warn("ChangePassword: Not Implemented yet")
+func (auth authenticator) ChangePassword(user structures.User, newPassword string) error {
+	oldHashedPassword, err := auth.repository.GetHashPassword(user.Email)
+	if err != nil {
+		return err
+	}
+
+	err = verifyPassword(oldHashedPassword, user.Password)
+
+	if err != nil {
+		return err
+	}
+
+	if err := checkPasswordLength(user); err != nil {
+		return err
+	}
+
+	hashedPassword, err := hashPassword(newPassword)
+
+	if err != nil {
+		return err
+	}
+
+	return auth.repository.ChangePassword(user.Email, hashedPassword)
+}
+
+func verifyPassword(oldHashedPassword, plainPassword string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(oldHashedPassword), []byte(plainPassword)); err != nil {
+		return errors.New("wrong old password")
+	}
 	return nil
 }
 
