@@ -1,7 +1,6 @@
 package implementation
 
 import (
-	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/in_memory"
@@ -24,14 +23,14 @@ func Test(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
-	var repo user.Repository
+	//var repo user.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
-			repo = in_memory.NewUserRepo()
+			//repo = in_memory.NewUserRepo()
 			auth = NewAuthenticator(in_memory.NewUserRepo())
 		})
 
@@ -88,13 +87,37 @@ func Test(t *testing.T) {
 			Expect(err).NotTo(BeNil())
 		})
 
-		g.It("Should be able to change password in case the provided data is correct", func() {
+		//g.It("Should be able to change password in case the provided data is correct", func() {
+		//	user := structures.User{Email: email, Password: validPassword}
+		//	_, _ = auth.Signup(user)
+		//	_ = auth.ChangePassword(user, "12345678")
+		//	hashedPassword, _ := repo.GetHashPassword(user.Email)
+		//	err := verifyPassword(hashedPassword, "12345678")
+		//	Expect(err).To(BeNil())
+		//})
+	})
+
+	g.Describe("Login process", func() {
+		g.BeforeEach(func() {
+			auth = NewAuthenticator(in_memory.NewUserRepo())
+		})
+
+		g.It("Should validate the provided email", func() {
+			_, err := auth.Login("wrong_email", "")
+			Expect(err.Error()).To(Equal(signupInvalidEmailMessage))
+		})
+
+		g.It("Should validate password length", func() {
+			_, err := auth.Login("test@test.com", "123456")
+			Expect(err.Error()).To(Equal("Password should have at least 8 characters"))
+		})
+
+		g.It("Should login if the provided credentials are correct", func() {
 			user := structures.User{Email: email, Password: validPassword}
 			_, _ = auth.Signup(user)
-			_ = auth.ChangePassword(user, "12345678")
-			hashedPassword, _ := repo.GetHashPassword(user.Email)
-			err := verifyPassword(hashedPassword, "12345678")
-			Expect(err).To(BeNil())
+			response, _ := auth.Login(email, validPassword)
+			Expect(response.User.Email).To(Equal(email))
 		})
+
 	})
 }

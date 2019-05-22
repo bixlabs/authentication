@@ -14,7 +14,7 @@ import (
 const signupDuplicateEmailMessage = "Email is already taken"
 const emailValidationRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\\])"
 const signupInvalidEmailMessage = "Email is not valid"
-const signupPasswordLengthMessage = "Password should be at least 8 characters"
+const signupPasswordLengthMessage = "Password should have at least 8 characters"
 const passwordMinLength = 8
 
 type authenticator struct {
@@ -26,8 +26,25 @@ func NewAuthenticator(repository user.Repository) interactors.Authenticator {
 }
 
 func (auth authenticator) Login(email, password string) (login.Response, error) {
-	tools.Log().Warn("Login: Not Implemented yet")
-	return login.Response{}, nil
+	if err := validateEmail(email); err != nil {
+		return login.Response{}, err
+	}
+
+	if err := checkPasswordLength(password); err != nil {
+		return login.Response{}, err
+	}
+
+	currentUser, err := auth.repository.Find(email)
+
+	if err != nil {
+		return login.Response{}, err
+	}
+
+	if err := verifyPassword(currentUser.Password, password); err != nil {
+		return login.Response{}, err
+	}
+
+	return login.Response{User: currentUser}, nil
 }
 
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
@@ -51,24 +68,33 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
-	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, user.Email); !isValidEmail {
-		tools.Log().Debug("An invalid email was provided: " + user.Email)
-		return errors.New(signupInvalidEmailMessage)
+	err := validateEmail(user.Email)
+	if err != nil {
+		return err
 	}
+
 	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
 		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
 		return errors.New(signupDuplicateEmailMessage)
 	}
 
-	if err := checkPasswordLength(user); err != nil {
+	if err := checkPasswordLength(user.Password); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func checkPasswordLength(user structures.User) error {
-	if len(user.Password) < passwordMinLength {
+func validateEmail(email string) error {
+	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, email); !isValidEmail {
+		tools.Log().Debug("An invalid email was provided: " + email)
+		return errors.New(signupInvalidEmailMessage)
+	}
+	return nil
+}
+
+func checkPasswordLength(password string) error {
+	if len(password) < passwordMinLength {
 		tools.Log().Debug("A password with incorrect length was provided")
 		return errors.New(signupPasswordLengthMessage)
 	}
@@ -98,7 +124,7 @@ func (auth authenticator) ChangePassword(user structures.User, newPassword strin
 		return err
 	}
 
-	if err := checkPasswordLength(user); err != nil {
+	if err := checkPasswordLength(user.Password); err != nil {
 		return err
 	}
 

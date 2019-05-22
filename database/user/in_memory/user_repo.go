@@ -12,6 +12,10 @@ type UserRepo struct {
 	users  map[string]structures.User
 }
 
+func (u *UserRepo) Find(email string) (structures.User, error) {
+	return u.users[email], nil
+}
+
 // We don't use data mappers here because this implementation is merely for testing purpose.
 // and the things we are going to do here are trivial
 func NewUserRepo() user.Repository {
