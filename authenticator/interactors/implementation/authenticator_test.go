@@ -36,8 +36,11 @@ func Test(t *testing.T) {
 
 		g.It("Should check for email duplication ", func() {
 			user := structures.User{Email: email, Password: validPassword}
-			_, _ = auth.Signup(user)
 			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			_, err = auth.Signup(user)
 			g.Assert(err.Error()).Equal(signupDuplicateEmailMessage)
 		})
 
@@ -55,21 +58,30 @@ func Test(t *testing.T) {
 
 		g.It("Should create a user with an ID in it", func() {
 			user := structures.User{Email: email, Password: validPassword}
-			user, _ = auth.Signup(user)
+			user, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
 			g.Assert(user.ID).Equal("1")
 		})
 
 		g.It("Should hash the password of the user", func() {
 			user := structures.User{Email: email, Password: validPassword}
-			user, _ = auth.Signup(user)
-			err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(validPassword))
+			user, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(validPassword))
 			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should hash the password and not be able to match when given a wrong one", func() {
 			user := structures.User{Email: email, Password: validPassword}
-			user, _ = auth.Signup(user)
-			err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte("wrong_password"))
+			user, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte("wrong_password"))
 			Expect(err).NotTo(BeNil())
 		})
 	})
@@ -81,9 +93,12 @@ func Test(t *testing.T) {
 
 		g.It("Should return an error when old password doesn't match", func() {
 			user := structures.User{Email: email, Password: validPassword}
-			_, _ = auth.Signup(user)
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
 			user.Password = "anotherPassword"
-			err := auth.ChangePassword(user, "Asdqwe123")
+			err = auth.ChangePassword(user, "Asdqwe123")
 			Expect(err).NotTo(BeNil())
 		})
 
@@ -114,9 +129,28 @@ func Test(t *testing.T) {
 
 		g.It("Should login if the provided credentials are correct", func() {
 			user := structures.User{Email: email, Password: validPassword}
-			_, _ = auth.Signup(user)
-			response, _ := auth.Login(email, validPassword)
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			response, err := auth.Login(email, validPassword)
+			if err != nil {
+				panic(err)
+			}
 			Expect(response.User.Email).To(Equal(email))
+		})
+
+		g.It("Should provide a JWT token after successful login", func() {
+			user := structures.User{Email: email, Password: validPassword}
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			response, err := auth.Login(email, validPassword)
+			if err != nil {
+				panic(err)
+			}
+			Expect(response.Token).ToNot(Equal(""))
 		})
 
 	})
