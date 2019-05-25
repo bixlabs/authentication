@@ -1,6 +1,6 @@
-.PHONY: all test build
+all: deps lint
 
-all: clean test build
+.PHONY: test clean format lint coverage coverage-html build build-for-mac build-for-windows
 
 deps:
 		./deps.sh
@@ -43,3 +43,6 @@ run-cli:
 
 api-docs:
 		swag init -g api/main.go
+
+ci:
+		make all build
