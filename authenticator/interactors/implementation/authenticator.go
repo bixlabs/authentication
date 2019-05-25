@@ -74,8 +74,6 @@ func isValidEmail(email string) error {
 	return nil
 }
 
-
-
 func checkPasswordLength(password string) error {
 	if len(password) < passwordMinLength {
 		tools.Log().Debug("A password with incorrect length was provided")
@@ -118,6 +116,8 @@ func (auth authenticator) ChangePassword(user structures.User, newPassword strin
 	if err != nil {
 		return err
 	}
+
+	tools.Log().Debug("A User changed password")
 
 	return auth.repository.ChangePassword(user.Email, hashedPassword)
 }
