@@ -27,7 +27,7 @@ require (
 	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/kr/pty v1.1.4 // indirect
 	github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983 // indirect
-	github.com/mattn/go-isatty v0.0.7 // indirect
+	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/onsi/gomega v1.4.2
@@ -37,11 +37,11 @@ require (
 	github.com/swaggo/gin-swagger v1.1.0
 	github.com/swaggo/swag v1.4.1
 	github.com/ugorji/go v1.1.2-0.20180831062425-e253f1f20942 // indirect
-	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734 // indirect
-	golang.org/x/net v0.0.0-20190501004415-9ce7a6920f09 // indirect
-	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 // indirect
+	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
+	golang.org/x/net v0.0.0-20190522155817-f3200d17e092 // indirect
+	golang.org/x/sys v0.0.0-20190524152521-dbbf3f1254d4 // indirect
 	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/tools v0.0.0-20190501045030-23463209683d // indirect
+	golang.org/x/tools v0.0.0-20190524210228-3d17549cdc6b // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	sourcegraph.com/sourcegraph/go-diff v0.5.1-0.20190210232911-dee78e514455 // indirect
 )
