@@ -1,6 +1,6 @@
-.PHONY: all test lint build
+all: deps test lint build
 
-all: clean test build
+.PHONY: clean format lint
 
 deps:
 		./deps.sh
