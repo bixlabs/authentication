@@ -1,6 +1,6 @@
 all: deps test lint build
 
-.PHONY: test clean format lint coverage coverage-html
+.PHONY: test clean format lint coverage coverage-html build build-for-mac build-for-windows
 
 deps:
 		./deps.sh
