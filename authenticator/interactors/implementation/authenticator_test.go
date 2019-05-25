@@ -106,7 +106,7 @@ func Test(t *testing.T) {
 		//	user := structures.User{Email: email, Password: validPassword}
 		//	_, _ = auth.Signup(user)
 		//	_ = auth.ChangePassword(user, "12345678")
-		//	hashedPassword, _ := repo.GetHashPassword(user.Email)
+		//	hashedPassword, _ := repo.GetHashedPassword(user.Email)
 		//	err := verifyPassword(hashedPassword, "12345678")
 		//	Expect(err).To(BeNil())
 		//})

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/tools"
 	"strconv"
 )
 
@@ -13,7 +14,9 @@ type UserRepo struct {
 }
 
 func (u *UserRepo) Find(email string) (structures.User, error) {
-	return u.users[email], nil
+	user := u.users[email]
+	user.Password = ""
+	return user, nil
 }
 
 // We don't use data mappers here because this implementation is merely for testing purpose.
@@ -34,11 +37,12 @@ func (u *UserRepo) IsEmailAvailable(email string) (bool, error) {
 	return !isUsed, nil
 }
 
-func (u *UserRepo) GetHashPassword(email string) (string, error) {
+func (u *UserRepo) GetHashedPassword(email string) (string, error) {
 	if isAvailable, err := u.IsEmailAvailable(email); err == nil && !isAvailable {
 		user := u.users[email]
 		return user.Password, nil
 	}
+	tools.Log().Warn("A user couldn't be found when finding the hashed password of it")
 	return "", errors.New("user doesn't exist")
 }
 

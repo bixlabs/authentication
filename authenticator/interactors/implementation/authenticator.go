@@ -38,7 +38,7 @@ func NewAuthenticator(repository user.Repository) interactors.Authenticator {
 }
 
 func (auth authenticator) Login(email, password string) (*login.Response, error) {
-	if err := validateEmail(email); err != nil {
+	if err := isValidEmail(email); err != nil {
 		return nil, err
 	}
 
@@ -46,30 +46,25 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 		return nil, err
 	}
 
-	currentUser, err := auth.findUser(email)
+	hashedPassword, err := auth.repository.GetHashedPassword(email)
+
 	if err != nil {
 		return nil, wrongCredentialsError()
 	}
 
-	if err := verifyPassword(currentUser.Password, password); err != nil {
+	if err := verifyPassword(hashedPassword, password); err != nil {
 		return nil, err
 	}
 
-	currentUser.Password = ""
-
-	return generateJWT(currentUser, auth)
+	return generateJWT(email, auth)
 }
 
-func (auth authenticator) findUser(email string) (structures.User, error) {
+func generateJWT(email string, auth authenticator) (*login.Response, error) {
 	currentUser, err := auth.repository.Find(email)
 	if err != nil {
-		tools.Log().Debug("A wrong email was provided", err)
-		return structures.User{}, err
+		return nil, wrongCredentialsError()
 	}
-	return currentUser, nil
-}
 
-func generateJWT(currentUser structures.User, auth authenticator) (*login.Response, error) {
 	response := &login.Response{User: currentUser, IssuedAt: time.Now().Unix(), Expiration: time.Now().Add(time.Second * time.Duration(auth.ExpirationTime)).Unix()}
 
 	if err := setToken(response, auth.Secret); err != nil {
@@ -125,7 +120,7 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
-	err := validateEmail(user.Email)
+	err := isValidEmail(user.Email)
 	if err != nil {
 		return err
 	}
@@ -142,7 +137,7 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	return nil
 }
 
-func validateEmail(email string) error {
+func isValidEmail(email string) error {
 	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, email); !isValidEmail {
 		tools.Log().Debug("An invalid email was provided: " + email)
 		return errors.New(signupInvalidEmailMessage)
@@ -170,7 +165,7 @@ func hashPassword(password string) (string, error) {
 }
 
 func (auth authenticator) ChangePassword(user structures.User, newPassword string) error {
-	oldHashedPassword, err := auth.repository.GetHashPassword(user.Email)
+	oldHashedPassword, err := auth.repository.GetHashedPassword(user.Email)
 	if err != nil {
 		return err
 	}
