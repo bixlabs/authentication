@@ -31,7 +31,6 @@ func Test(t *testing.T) {
 
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
-			repo = in_memory.NewUserRepo()
 			auth = NewAuthenticator(in_memory.NewUserRepo())
 		})
 
@@ -77,7 +76,8 @@ func Test(t *testing.T) {
 
 	g.Describe("Change password process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(in_memory.NewUserRepo())
+			repo = in_memory.NewUserRepo()
+			auth = NewAuthenticator(repo)
 		})
 
 		g.It("Should return an error when old password doesn't match", func() {
@@ -90,11 +90,41 @@ func Test(t *testing.T) {
 
 		g.It("Should be able to change password in case the provided data is correct", func() {
 			user := structures.User{Email: email, Password: validPassword}
-			_, _ = auth.Signup(user)
-			_ = auth.ChangePassword(user, "12345678")
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			err = auth.ChangePassword(user, "12345678")
+			if err != nil {
+				panic(err)
+			}
 			hashedPassword, _ := repo.GetHashPassword(user.Email)
-			err := verifyPassword(hashedPassword, "12345678")
+			println(hashedPassword)
+			err = verifyPassword(hashedPassword, "12345678")
 			Expect(err).To(BeNil())
+		})
+
+		g.It("Should return an error when the email is an invalid one.", func() {
+			user := structures.User{Email: email, Password: validPassword}
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+
+			user.Email = badEmail
+			err = auth.ChangePassword(user, "12345678")
+			Expect(err.Error()).To(Equal(signupInvalidEmailMessage))
+		})
+
+		g.It("Should return an error when the new password is not at least 8 characters.", func() {
+			user := structures.User{Email: email, Password: validPassword}
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+
+			err = auth.ChangePassword(user, "123456")
+			Expect(err.Error()).To(Equal(signupPasswordLengthMessage))
 		})
 	})
 }

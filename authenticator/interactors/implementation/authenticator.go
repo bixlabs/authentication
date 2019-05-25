@@ -51,24 +51,33 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
-	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, user.Email); !isValidEmail {
-		tools.Log().Debug("An invalid email was provided: " + user.Email)
-		return errors.New(signupInvalidEmailMessage)
+	if err := isValidEmail(user.Email); err != nil {
+		return err
 	}
 	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
 		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
 		return errors.New(signupDuplicateEmailMessage)
 	}
 
-	if err := checkPasswordLength(user); err != nil {
+	if err := checkPasswordLength(user.Password); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func checkPasswordLength(user structures.User) error {
-	if len(user.Password) < passwordMinLength {
+func isValidEmail(email string) error {
+	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, email); !isValidEmail {
+		tools.Log().Debug("An invalid email was provided: " + email)
+		return errors.New(signupInvalidEmailMessage)
+	}
+	return nil
+}
+
+
+
+func checkPasswordLength(password string) error {
+	if len(password) < passwordMinLength {
 		tools.Log().Debug("A password with incorrect length was provided")
 		return errors.New(signupPasswordLengthMessage)
 	}
@@ -87,18 +96,20 @@ func hashPassword(password string) (string, error) {
 }
 
 func (auth authenticator) ChangePassword(user structures.User, newPassword string) error {
+	if err := isValidEmail(user.Email); err != nil {
+		return err
+	}
+
+	if err := checkPasswordLength(newPassword); err != nil {
+		return err
+	}
+
 	oldHashedPassword, err := auth.repository.GetHashPassword(user.Email)
 	if err != nil {
 		return err
 	}
 
-	err = verifyPassword(oldHashedPassword, user.Password)
-
-	if err != nil {
-		return err
-	}
-
-	if err := checkPasswordLength(user); err != nil {
+	if err := verifyPassword(oldHashedPassword, user.Password); err != nil {
 		return err
 	}
 
