@@ -8,7 +8,9 @@ import (
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/structures/login"
 	"github.com/bixlabs/authentication/tools"
+	"github.com/caarlos0/env"
 	"github.com/dgrijalva/jwt-go"
+	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
 	"time"
@@ -21,13 +23,18 @@ const signupPasswordLengthMessage = "Password should have at least 8 characters"
 const passwordMinLength = 8
 
 type authenticator struct {
-	repository user.Repository
-	ExpirationTime int `env:"TOKEN_EXPIRATION" envDefault:"3600"`
-	Secret string `env:"AUTH_SERVER_SECRET"`
+	repository     user.Repository
+	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
+	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
 func NewAuthenticator(repository user.Repository) interactors.Authenticator {
-	return &authenticator{repository:repository}
+	auth := &authenticator{repository: repository}
+	err := env.Parse(auth)
+	if err != nil {
+		tools.Log().Panic("Parsing the env variables for the authenticator failed", err)
+	}
+	return auth
 }
 
 func (auth authenticator) Login(email, password string) (*login.Response, error) {
@@ -39,10 +46,9 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 		return nil, err
 	}
 
-	currentUser, err := auth.repository.Find(email)
-
+	currentUser, err := auth.findUser(email)
 	if err != nil {
-		return nil, err
+		return nil, wrongCredentialsError()
 	}
 
 	if err := verifyPassword(currentUser.Password, password); err != nil {
@@ -54,22 +60,35 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 	return generateJWT(currentUser, auth)
 }
 
+func (auth authenticator) findUser(email string) (structures.User, error) {
+	currentUser, err := auth.repository.Find(email)
+	if err != nil {
+		tools.Log().Debug("A wrong email was provided", err)
+		return structures.User{}, err
+	}
+	return currentUser, nil
+}
+
 func generateJWT(currentUser structures.User, auth authenticator) (*login.Response, error) {
 	response := &login.Response{User: currentUser, IssuedAt: time.Now().Unix(), Expiration: time.Now().Add(time.Second * time.Duration(auth.ExpirationTime)).Unix()}
 
-	if err := generateTokenString(response, auth.Secret); err != nil {
-		return &login.Response{}, err
+	if err := setToken(response, auth.Secret); err != nil {
+		return nil, err
 	}
+
+	tools.Log().Info("A user logged in")
 	return response, nil
 }
 
-func generateTokenString(response *login.Response, secret string) error {
+func setToken(response *login.Response, secret string) error {
 	jsonUser, err := json.Marshal(response.User)
 	if err != nil {
+		tools.Log().Error("Parsing user json failed", err)
 		return err
 	}
 	tokenString, err := generateClaims(*response, string(jsonUser)).SignedString([]byte(secret))
 	if err != nil {
+		tools.Log().Error("Generating jwt signed token failed", err)
 		return err
 	}
 
@@ -177,9 +196,14 @@ func (auth authenticator) ChangePassword(user structures.User, newPassword strin
 
 func verifyPassword(hashedPassword, plainPassword string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword)); err != nil {
-		return errors.New("wrong password")
+		tools.Log().Debug("A wrong password was provided")
+		return wrongCredentialsError()
 	}
 	return nil
+}
+
+func wrongCredentialsError() error {
+	return errors.New("wrong credentials")
 }
 
 func (auth authenticator) ResetPassword(email string) error {

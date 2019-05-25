@@ -115,6 +115,11 @@ func Test(t *testing.T) {
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
 			auth = NewAuthenticator(in_memory.NewUserRepo())
+			user := structures.User{Email: email, Password: validPassword}
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
 		})
 
 		g.It("Should validate the provided email", func() {
@@ -128,11 +133,6 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should login if the provided credentials are correct", func() {
-			user := structures.User{Email: email, Password: validPassword}
-			_, err := auth.Signup(user)
-			if err != nil {
-				panic(err)
-			}
 			response, err := auth.Login(email, validPassword)
 			if err != nil {
 				panic(err)
@@ -141,16 +141,19 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should provide a JWT token after successful login", func() {
-			user := structures.User{Email: email, Password: validPassword}
-			_, err := auth.Signup(user)
-			if err != nil {
-				panic(err)
-			}
 			response, err := auth.Login(email, validPassword)
 			if err != nil {
 				panic(err)
 			}
 			Expect(response.Token).ToNot(Equal(""))
+		})
+
+		g.It("Should have an issuedAt and a Expiration date correctly set that are one hour apart", func() {
+			response, err := auth.Login(email, validPassword)
+			if err != nil {
+				panic(err)
+			}
+			Expect(response.Expiration - response.IssuedAt).To(Equal(int64(3600)))
 		})
 
 	})
