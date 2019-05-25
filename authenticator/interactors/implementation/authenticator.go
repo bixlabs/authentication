@@ -11,10 +11,10 @@ import (
 	"regexp"
 )
 
-const signupDuplicateEmailMessage = "Email is already taken"
+const duplicatedEmailMessage = "Email is already taken"
 const emailValidationRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\\])"
-const signupInvalidEmailMessage = "Email is not valid"
-const signupPasswordLengthMessage = "Password should be at least 8 characters"
+const invalidEmailMessage = "Email is not valid"
+const invalidPasswordLengthMessage = "Password should be at least 8 characters"
 const passwordMinLength = 8
 
 type authenticator struct {
@@ -56,7 +56,7 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	}
 	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
 		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
-		return errors.New(signupDuplicateEmailMessage)
+		return errors.New(duplicatedEmailMessage)
 	}
 
 	if err := checkPasswordLength(user.Password); err != nil {
@@ -69,7 +69,7 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 func isValidEmail(email string) error {
 	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, email); !isValidEmail {
 		tools.Log().Debug("An invalid email was provided: " + email)
-		return errors.New(signupInvalidEmailMessage)
+		return errors.New(invalidEmailMessage)
 	}
 	return nil
 }
@@ -79,7 +79,7 @@ func isValidEmail(email string) error {
 func checkPasswordLength(password string) error {
 	if len(password) < passwordMinLength {
 		tools.Log().Debug("A password with incorrect length was provided")
-		return errors.New(signupPasswordLengthMessage)
+		return errors.New(invalidPasswordLengthMessage)
 	}
 	return nil
 }

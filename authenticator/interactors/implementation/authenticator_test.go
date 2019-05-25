@@ -38,19 +38,19 @@ func Test(t *testing.T) {
 			user := structures.User{Email: email, Password: validPassword}
 			_, _ = auth.Signup(user)
 			_, err := auth.Signup(user)
-			g.Assert(err.Error()).Equal(signupDuplicateEmailMessage)
+			g.Assert(err.Error()).Equal(duplicatedEmailMessage)
 		})
 
 		g.It("Should check for invalid email ", func() {
 			user := structures.User{Email: badEmail, Password: validPassword}
 			_, err := auth.Signup(user)
-			g.Assert(err.Error()).Equal(signupInvalidEmailMessage)
+			g.Assert(err.Error()).Equal(invalidEmailMessage)
 		})
 
 		g.It("Should have a password of at least 8 characters ", func() {
 			user := structures.User{Email: email, Password: invalidPassword}
 			_, err := auth.Signup(user)
-			g.Assert(err.Error()).Equal(signupPasswordLengthMessage)
+			g.Assert(err.Error()).Equal(invalidPasswordLengthMessage)
 		})
 
 		g.It("Should create a user with an ID in it", func() {
@@ -113,7 +113,7 @@ func Test(t *testing.T) {
 
 			user.Email = badEmail
 			err = auth.ChangePassword(user, "12345678")
-			Expect(err.Error()).To(Equal(signupInvalidEmailMessage))
+			Expect(err.Error()).To(Equal(invalidEmailMessage))
 		})
 
 		g.It("Should return an error when the new password is not at least 8 characters.", func() {
@@ -124,7 +124,7 @@ func Test(t *testing.T) {
 			}
 
 			err = auth.ChangePassword(user, "123456")
-			Expect(err.Error()).To(Equal(signupPasswordLengthMessage))
+			Expect(err.Error()).To(Equal(invalidPasswordLengthMessage))
 		})
 	})
 }
