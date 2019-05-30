@@ -1,4 +1,4 @@
-all: deps test lint
+all: deps lint
 
 .PHONY: test clean format lint coverage coverage-html build build-for-mac build-for-windows
 
