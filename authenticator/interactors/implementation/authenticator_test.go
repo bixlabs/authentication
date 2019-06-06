@@ -174,8 +174,8 @@ func Test(t *testing.T) {
 
 		g.It("Should generate a code and send an email", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
-			_, err := auth.Signup(user)
-			err = auth.SendResetPasswordRequest(validEmail)
+			_, _ = auth.Signup(user)
+			err := auth.SendResetPasswordRequest(validEmail)
 			Expect(err).To(BeNil())
 		})
 	})
