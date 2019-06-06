@@ -24,14 +24,14 @@ const emailValidationRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'
 const signupInvalidEmailMessage = "Email is not valid"
 const signupPasswordLengthMessage = "Password should have at least 8 characters"
 const passwordMinLength = 8
-const maxNumberOfResetPasswordCodes = 99999
-const minNumberOfResetPasswordCodes = 10000
 
 type authenticator struct {
-	repository     user.Repository
-	sender         email.Sender
-	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
-	Secret         string `env:"AUTH_SERVER_SECRET"`
+	repository           user.Repository
+	sender               email.Sender
+	ExpirationTime       int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
+	Secret               string `env:"AUTH_SERVER_SECRET"`
+	ResetPasswordCodeMax int    `env:"AUTH_SERVER_RESET_PASSWORD_MAX" envDefault:"99999"`
+	ResetPasswordCodeMin int    `env:"AUTH_SERVER_RESET_PASSWORD_MIN" envDefault:"10000"`
 }
 
 func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {
@@ -124,8 +124,7 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
-	err := isValidEmail(user.Email)
-	if err != nil {
+	if err := isValidEmail(user.Email); err != nil {
 		return err
 	}
 
@@ -169,18 +168,20 @@ func hashPassword(password string) (string, error) {
 }
 
 func (auth authenticator) ChangePassword(user structures.User, newPassword string) error {
+	if err := isValidEmail(user.Email); err != nil {
+		return err
+	}
+
+	if err := checkPasswordLength(newPassword); err != nil {
+		return err
+	}
+
 	oldHashedPassword, err := auth.repository.GetHashedPassword(user.Email)
 	if err != nil {
 		return err
 	}
 
-	err = verifyPassword(oldHashedPassword, user.Password)
-
-	if err != nil {
-		return err
-	}
-
-	if err := checkPasswordLength(user.Password); err != nil {
+	if err := verifyPassword(oldHashedPassword, user.Password); err != nil {
 		return err
 	}
 
@@ -206,6 +207,7 @@ func wrongCredentialsError() error {
 }
 
 func (auth authenticator) ResetPassword(email string, code string, newPassword string) error {
+	tools.Log().Warn("ResetPassword: Not Implemented yet")
 	return nil
 }
 
@@ -228,7 +230,7 @@ func (auth authenticator) SendResetPasswordRequest(email string) error {
 }
 
 func (auth authenticator) generateCode(user structures.User) (string, error) {
-	code := generateRandomNumber()
+	code := auth.generateRandomNumber()
 	resetToken, err := hashPassword(code)
 	if err != nil {
 		return "", err
@@ -240,8 +242,8 @@ func (auth authenticator) generateCode(user structures.User) (string, error) {
 	return code, nil
 }
 
-func generateRandomNumber() string {
+func (auth authenticator) generateRandomNumber() string {
 	rand.Seed(time.Now().UnixNano())
-	return strconv.Itoa(rand.Intn(maxNumberOfResetPasswordCodes-minNumberOfResetPasswordCodes) +
-		minNumberOfResetPasswordCodes)
+	return strconv.Itoa(rand.Intn(auth.ResetPasswordCodeMax-auth.ResetPasswordCodeMin) +
+		auth.ResetPasswordCodeMin)
 }

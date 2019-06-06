@@ -8,6 +8,5 @@ type User struct {
 	SecondName       string `json:"secondName,omitempty"`
 	FamilyName       string `json:"familyName,omitempty"`
 	SecondFamilyName string `json:"secondFamilyName,omitempty"`
-
-	ResetToken string
+	ResetToken       string
 }
