@@ -172,7 +172,7 @@ func (auth authenticator) ChangePassword(user structures.User, newPassword strin
 		return err
 	}
 
-	oldHashedPassword, err := auth.repository.GetHashPassword(user.Email)
+	oldHashedPassword, err := auth.repository.GetHashedPassword(user.Email)
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,6 @@
 package implementation
 
 import (
-	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/in_memory"
@@ -24,7 +23,6 @@ func Test(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
-	var repo user.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
@@ -39,10 +37,6 @@ func Test(t *testing.T) {
 			user := structures.User{Email: email, Password: validPassword}
 			_, _ = auth.Signup(user)
 			_, err := auth.Signup(user)
-			if err != nil {
-				panic(err)
-			}
-			_, err = auth.Signup(user)
 			g.Assert(err.Error()).Equal(signupDuplicateEmailMessage)
 		})
 
