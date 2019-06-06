@@ -10,13 +10,14 @@ import (
 
 func main() {
 	tools.InitializeLogger()
-	authOperations := implementation.NewAuthenticator(in_memory.NewUserRepo())
+	authOperations := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
 
-	_, _ = authOperations.Login("", "")
 	_, _ = authOperations.Signup(structures.User{Email: "email@bixlabs.com", Password: "secured_password"})
 	user, _ := authOperations.Login("email@bixlabs.com", "secured_password")
 	jsonUser, _ := json.Marshal(user)
 	println(string(jsonUser))
 	_ = authOperations.ChangePassword(structures.User{Email: "email@bixlabs.com", Password: "secured_password"}, "secured_password2")
-	_ = authOperations.ResetPassword("")
+	_, _ = authOperations.Login("email@bixlabs.com", "secured_password2")
+	_ = authOperations.SendResetPasswordRequest("email@bixlabs.com")
+	_ = authOperations.ResetPassword("", "", "")
 }

@@ -13,8 +13,21 @@ type UserRepo struct {
 	users  map[string]structures.User
 }
 
+func (u *UserRepo) SaveResetToken(email, resetToken string) error {
+	user, err := u.Find(email)
+	if err != nil {
+		return err
+	}
+	user.ResetToken = resetToken
+	u.users[user.Email] = user
+	return nil
+}
+
 func (u *UserRepo) Find(email string) (structures.User, error) {
-	user := u.users[email]
+	user, exist := u.users[email]
+	if !exist {
+		return structures.User{}, errors.New("Email does not exist")
+	}
 	user.Password = ""
 	return user, nil
 }

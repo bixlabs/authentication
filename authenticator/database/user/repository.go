@@ -10,4 +10,5 @@ type Repository interface {
 	SaveResetPasswordToken(token string) error
 	VerifyResetPasswordToken(token string) (bool, error)
 	Find(email string) (structures.User, error)
+	SaveResetToken(email, resetToken string) error
 }
