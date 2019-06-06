@@ -29,7 +29,7 @@ const minNumberOfResetPasswordCodes = 10000
 
 type authenticator struct {
 	repository     user.Repository
-	sender email.Sender
+	sender         email.Sender
 	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
@@ -227,7 +227,7 @@ func (auth authenticator) SendResetPasswordRequest(email string) error {
 	return auth.sender.SendEmailPasswordRequest(userAccount, code)
 }
 
-func(auth authenticator) generateCode(user structures.User) (string, error) {
+func (auth authenticator) generateCode(user structures.User) (string, error) {
 	code := generateRandomNumber()
 	resetToken, err := hashPassword(code)
 	if err != nil {
@@ -237,12 +237,11 @@ func(auth authenticator) generateCode(user structures.User) (string, error) {
 		return "", err
 	}
 
-    return code, nil
+	return code, nil
 }
 
 func generateRandomNumber() string {
 	rand.Seed(time.Now().UnixNano())
-	return strconv.Itoa(rand.Intn(maxNumberOfResetPasswordCodes - minNumberOfResetPasswordCodes) +
+	return strconv.Itoa(rand.Intn(maxNumberOfResetPasswordCodes-minNumberOfResetPasswordCodes) +
 		minNumberOfResetPasswordCodes)
 }
-

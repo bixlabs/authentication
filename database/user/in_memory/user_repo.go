@@ -66,6 +66,7 @@ func (u *UserRepo) VerifyResetPasswordToken(token string) (bool, error) {
 func (u *UserRepo) ChangePassword(email, newPassword string) error {
 	user := u.users[email]
 	user.Password = newPassword
+	u.users[email] = user
 	return nil
 }
 
