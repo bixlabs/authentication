@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/structures/login"
@@ -12,26 +13,16 @@ import (
 	"github.com/caarlos0/env"
 	"github.com/dgrijalva/jwt-go"
 	_ "github.com/joho/godotenv/autoload"
-	"golang.org/x/crypto/bcrypt"
-	"math/rand"
-	"regexp"
-	"strconv"
 	"time"
 )
 
 const signupDuplicateEmailMessage = "Email is already taken"
-const emailValidationRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\\])"
-const signupInvalidEmailMessage = "Email is not valid"
-const signupPasswordLengthMessage = "Password should have at least 8 characters"
-const passwordMinLength = 8
 
 type authenticator struct {
-	repository           user.Repository
-	sender               email.Sender
-	ExpirationTime       int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
-	Secret               string `env:"AUTH_SERVER_SECRET"`
-	ResetPasswordCodeMax int    `env:"AUTH_SERVER_RESET_PASSWORD_MAX" envDefault:"99999"`
-	ResetPasswordCodeMin int    `env:"AUTH_SERVER_RESET_PASSWORD_MIN" envDefault:"10000"`
+	repository     user.Repository
+	sender         email.Sender
+	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
+	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
 func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {
@@ -44,21 +35,21 @@ func NewAuthenticator(repository user.Repository, sender email.Sender) interacto
 }
 
 func (auth authenticator) Login(email, password string) (*login.Response, error) {
-	if err := isValidEmail(email); err != nil {
+	if err := util.IsValidEmail(email); err != nil {
 		return nil, err
 	}
 
-	if err := checkPasswordLength(password); err != nil {
+	if err := util.CheckPasswordLength(password); err != nil {
 		return nil, err
 	}
 
 	hashedPassword, err := auth.repository.GetHashedPassword(email)
 
 	if err != nil {
-		return nil, wrongCredentialsError()
+		return nil, util.WrongCredentialsError()
 	}
 
-	if err := verifyPassword(hashedPassword, password); err != nil {
+	if err := util.VerifyPassword(hashedPassword, password); err != nil {
 		return nil, err
 	}
 
@@ -68,7 +59,7 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 func generateJWT(email string, auth authenticator) (*login.Response, error) {
 	currentUser, err := auth.repository.Find(email)
 	if err != nil {
-		return nil, wrongCredentialsError()
+		return nil, util.WrongCredentialsError()
 	}
 
 	response := &login.Response{User: currentUser, IssuedAt: time.Now().Unix(), Expiration: time.Now().Add(time.Second * time.Duration(auth.ExpirationTime)).Unix()}
@@ -109,7 +100,7 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 		return user, err
 	}
 
-	hashedPassword, err := hashPassword(user.Password)
+	hashedPassword, err := util.HashPassword(user.Password)
 	if err != nil {
 		return user, err
 	}
@@ -124,7 +115,7 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
-	if err := isValidEmail(user.Email); err != nil {
+	if err := util.IsValidEmail(user.Email); err != nil {
 		return err
 	}
 
@@ -133,117 +124,9 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 		return errors.New(signupDuplicateEmailMessage)
 	}
 
-	if err := checkPasswordLength(user.Password); err != nil {
+	if err := util.CheckPasswordLength(user.Password); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func isValidEmail(email string) error {
-	if isValidEmail, _ := regexp.MatchString(emailValidationRegex, email); !isValidEmail {
-		tools.Log().Debug("An invalid email was provided: " + email)
-		return errors.New(signupInvalidEmailMessage)
-	}
-	return nil
-}
-
-func checkPasswordLength(password string) error {
-	if len(password) < passwordMinLength {
-		tools.Log().Debug("A password with incorrect length was provided")
-		return errors.New(signupPasswordLengthMessage)
-	}
-	return nil
-}
-
-func hashPassword(password string) (string, error) {
-	pass := []byte(password)
-
-	hashedPassword, err := bcrypt.GenerateFromPassword(pass, bcrypt.DefaultCost)
-	if err != nil {
-		tools.Log().WithField("error", err).Error("Password hash failed")
-		return "", err
-	}
-	return string(hashedPassword), nil
-}
-
-func (auth authenticator) ChangePassword(user structures.User, newPassword string) error {
-	if err := isValidEmail(user.Email); err != nil {
-		return err
-	}
-
-	if err := checkPasswordLength(newPassword); err != nil {
-		return err
-	}
-
-	oldHashedPassword, err := auth.repository.GetHashedPassword(user.Email)
-	if err != nil {
-		return err
-	}
-
-	if err := verifyPassword(oldHashedPassword, user.Password); err != nil {
-		return err
-	}
-
-	hashedPassword, err := hashPassword(newPassword)
-
-	if err != nil {
-		return err
-	}
-
-	return auth.repository.ChangePassword(user.Email, hashedPassword)
-}
-
-func verifyPassword(hashedPassword, plainPassword string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword)); err != nil {
-		tools.Log().Debug("A wrong password was provided")
-		return wrongCredentialsError()
-	}
-	return nil
-}
-
-func wrongCredentialsError() error {
-	return errors.New("wrong credentials")
-}
-
-func (auth authenticator) ResetPassword(email string, code string, newPassword string) error {
-	tools.Log().Warn("ResetPassword: Not Implemented yet")
-	return nil
-}
-
-func (auth authenticator) SendResetPasswordRequest(email string) error {
-	if err := isValidEmail(email); err != nil {
-		return err
-	}
-
-	userAccount, err := auth.repository.Find(email)
-	if err != nil {
-		return err
-	}
-
-	code, err := auth.generateCode(userAccount)
-	if err != nil {
-		return err
-	}
-
-	return auth.sender.SendEmailPasswordRequest(userAccount, code)
-}
-
-func (auth authenticator) generateCode(user structures.User) (string, error) {
-	code := auth.generateRandomNumber()
-	resetToken, err := hashPassword(code)
-	if err != nil {
-		return "", err
-	}
-	if err := auth.repository.SaveResetToken(user.Email, resetToken); err != nil {
-		return "", err
-	}
-
-	return code, nil
-}
-
-func (auth authenticator) generateRandomNumber() string {
-	rand.Seed(time.Now().UnixNano())
-	return strconv.Itoa(rand.Intn(auth.ResetPasswordCodeMax-auth.ResetPasswordCodeMin) +
-		auth.ResetPasswordCodeMin)
 }

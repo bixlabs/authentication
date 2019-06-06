@@ -10,14 +10,16 @@ import (
 
 func main() {
 	tools.InitializeLogger()
-	authOperations := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+	userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+	passwordManager := implementation.NewPasswordManager(userRepo, sender)
+	auth := implementation.NewAuthenticator(userRepo, sender)
 
-	_, _ = authOperations.Signup(structures.User{Email: "email@bixlabs.com", Password: "secured_password"})
-	user, _ := authOperations.Login("email@bixlabs.com", "secured_password")
+	_, _ = auth.Signup(structures.User{Email: "email@bixlabs.com", Password: "secured_password"})
+	user, _ := auth.Login("email@bixlabs.com", "secured_password")
 	jsonUser, _ := json.Marshal(user)
 	println(string(jsonUser))
-	_ = authOperations.ChangePassword(structures.User{Email: "email@bixlabs.com", Password: "secured_password"}, "secured_password2")
-	_, _ = authOperations.Login("email@bixlabs.com", "secured_password2")
-	_ = authOperations.SendResetPasswordRequest("email@bixlabs.com")
-	_ = authOperations.ResetPassword("", "", "")
+	_ = passwordManager.ChangePassword(structures.User{Email: "email@bixlabs.com", Password: "secured_password"}, "secured_password2")
+	_, _ = auth.Login("email@bixlabs.com", "secured_password2")
+	_ = passwordManager.SendResetPasswordRequest("email@bixlabs.com")
+	_ = passwordManager.ResetPassword("", "", "")
 }

@@ -2,6 +2,7 @@ package implementation
 
 import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/in_memory"
 	"github.com/bixlabs/authentication/tools"
@@ -13,11 +14,11 @@ import (
 )
 
 const validEmail = "test@email.com"
-const badEmail = "invalid_email"
+const invalidEmail = "invalid_email"
 const validPassword = "secured_password"
 const invalidPassword = "07chars"
 
-func Test(t *testing.T) {
+func TestAuthenticator(t *testing.T) {
 	g := goblin.Goblin(t)
 	tools.InitializeLogger()
 	// This line prevents the logs to appear in the tests.
@@ -40,15 +41,15 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should check for invalid email ", func() {
-			user := structures.User{Email: badEmail, Password: validPassword}
+			user := structures.User{Email: invalidEmail, Password: validPassword}
 			_, err := auth.Signup(user)
-			g.Assert(err.Error()).Equal(signupInvalidEmailMessage)
+			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
 		})
 
 		g.It("Should have a password of at least 8 characters ", func() {
 			user := structures.User{Email: validEmail, Password: invalidPassword}
 			_, err := auth.Signup(user)
-			g.Assert(err.Error()).Equal(signupPasswordLengthMessage)
+			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
 		})
 
 		g.It("Should create a user with an ID in it", func() {
@@ -81,32 +82,6 @@ func Test(t *testing.T) {
 		})
 	})
 
-	g.Describe("Change password process", func() {
-		g.BeforeEach(func() {
-			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
-		})
-
-		g.It("Should return an error when old password doesn't match", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, err := auth.Signup(user)
-			if err != nil {
-				panic(err)
-			}
-			user.Password = "anotherPassword"
-			err = auth.ChangePassword(user, "Asdqwe123")
-			Expect(err).NotTo(BeNil())
-		})
-
-		//g.It("Should be able to change password in case the provided data is correct", func() {
-		//	user := structures.User{Email: email, Password: validPassword}
-		//	_, _ = auth.Signup(user)
-		//	_ = auth.ChangePassword(user, "12345678")
-		//	hashedPassword, _ := repo.GetHashedPassword(user.Email)
-		//	err := verifyPassword(hashedPassword, "12345678")
-		//	Expect(err).To(BeNil())
-		//})
-	})
-
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
 			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
@@ -119,7 +94,7 @@ func Test(t *testing.T) {
 
 		g.It("Should validate the provided email", func() {
 			_, err := auth.Login("wrong_email", "")
-			Expect(err.Error()).To(Equal(signupInvalidEmailMessage))
+			Expect(err.Error()).To(Equal(util.SignupInvalidEmailMessage))
 		})
 
 		g.It("Should validate password length", func() {
@@ -149,29 +124,6 @@ func Test(t *testing.T) {
 				panic(err)
 			}
 			Expect(response.Expiration - response.IssuedAt).To(Equal(int64(3600)))
-		})
-	})
-
-	g.Describe("Send Reset Password Request process", func() {
-		g.BeforeEach(func() {
-			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
-		})
-
-		g.It("Should return an error when an invalid email is provided", func() {
-			err := auth.SendResetPasswordRequest(badEmail)
-			Expect(err.Error()).To(Equal(signupInvalidEmailMessage))
-		})
-
-		g.It("Should return an error when the email is not present in the storage", func() {
-			err := auth.SendResetPasswordRequest(validEmail)
-			Expect(err.Error()).To(Equal("Email does not exist"))
-		})
-
-		g.It("Should generate a code and send an email", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, _ = auth.Signup(user)
-			err := auth.SendResetPasswordRequest(validEmail)
-			Expect(err).To(BeNil())
 		})
 	})
 }
