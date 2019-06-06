@@ -58,7 +58,7 @@ func getRestConfiguration() RestConfiguration {
 	result := RestConfiguration{}
 	err := env.Parse(&result)
 	if err != nil {
-		tools.Log().Panic("parsing the env variables for the rest configuration threw an error", err)
+		tools.Log().Panic("parsing the env variables for the rest configuration failed", err)
 	}
 	return result
 }
