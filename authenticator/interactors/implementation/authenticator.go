@@ -120,8 +120,7 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
-	err := isValidEmail(user.Email)
-	if err != nil {
+	if err := isValidEmail(user.Email); err != nil {
 		return err
 	}
 
@@ -165,18 +164,20 @@ func hashPassword(password string) (string, error) {
 }
 
 func (auth authenticator) ChangePassword(user structures.User, newPassword string) error {
+	if err := isValidEmail(user.Email); err != nil {
+		return err
+	}
+
+	if err := checkPasswordLength(newPassword); err != nil {
+		return err
+	}
+
 	oldHashedPassword, err := auth.repository.GetHashedPassword(user.Email)
 	if err != nil {
 		return err
 	}
 
-	err = verifyPassword(oldHashedPassword, user.Password)
-
-	if err != nil {
-		return err
-	}
-
-	if err := checkPasswordLength(user.Password); err != nil {
+	if err := verifyPassword(oldHashedPassword, user.Password); err != nil {
 		return err
 	}
 

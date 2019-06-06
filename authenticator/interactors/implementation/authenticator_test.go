@@ -23,7 +23,6 @@ func Test(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
-	//var repo user.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
@@ -36,11 +35,8 @@ func Test(t *testing.T) {
 
 		g.It("Should check for email duplication ", func() {
 			user := structures.User{Email: email, Password: validPassword}
+			_, _ = auth.Signup(user)
 			_, err := auth.Signup(user)
-			if err != nil {
-				panic(err)
-			}
-			_, err = auth.Signup(user)
 			g.Assert(err.Error()).Equal(signupDuplicateEmailMessage)
 		})
 
