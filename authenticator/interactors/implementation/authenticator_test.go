@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-const email = "test@email.com"
+const validEmail = "test@email.com"
 const badEmail = "invalid_email"
 const validPassword = "secured_password"
 const invalidPassword = "07chars"
@@ -31,11 +31,11 @@ func Test(t *testing.T) {
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
 			//repo = in_memory.NewUserRepo()
-			auth = NewAuthenticator(in_memory.NewUserRepo())
+			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
 		})
 
 		g.It("Should check for email duplication ", func() {
-			user := structures.User{Email: email, Password: validPassword}
+			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {
 				panic(err)
@@ -51,13 +51,13 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should have a password of at least 8 characters ", func() {
-			user := structures.User{Email: email, Password: invalidPassword}
+			user := structures.User{Email: validEmail, Password: invalidPassword}
 			_, err := auth.Signup(user)
 			g.Assert(err.Error()).Equal(signupPasswordLengthMessage)
 		})
 
 		g.It("Should create a user with an ID in it", func() {
-			user := structures.User{Email: email, Password: validPassword}
+			user := structures.User{Email: validEmail, Password: validPassword}
 			user, err := auth.Signup(user)
 			if err != nil {
 				panic(err)
@@ -66,7 +66,7 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should hash the password of the user", func() {
-			user := structures.User{Email: email, Password: validPassword}
+			user := structures.User{Email: validEmail, Password: validPassword}
 			user, err := auth.Signup(user)
 			if err != nil {
 				panic(err)
@@ -76,7 +76,7 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should hash the password and not be able to match when given a wrong one", func() {
-			user := structures.User{Email: email, Password: validPassword}
+			user := structures.User{Email: validEmail, Password: validPassword}
 			user, err := auth.Signup(user)
 			if err != nil {
 				panic(err)
@@ -88,11 +88,11 @@ func Test(t *testing.T) {
 
 	g.Describe("Change password process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(in_memory.NewUserRepo())
+			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
 		})
 
 		g.It("Should return an error when old password doesn't match", func() {
-			user := structures.User{Email: email, Password: validPassword}
+			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {
 				panic(err)
@@ -114,8 +114,8 @@ func Test(t *testing.T) {
 
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(in_memory.NewUserRepo())
-			user := structures.User{Email: email, Password: validPassword}
+			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {
 				panic(err)
@@ -133,15 +133,15 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should login if the provided credentials are correct", func() {
-			response, err := auth.Login(email, validPassword)
+			response, err := auth.Login(validEmail, validPassword)
 			if err != nil {
 				panic(err)
 			}
-			Expect(response.User.Email).To(Equal(email))
+			Expect(response.User.Email).To(Equal(validEmail))
 		})
 
 		g.It("Should provide a JWT token after successful login", func() {
-			response, err := auth.Login(email, validPassword)
+			response, err := auth.Login(validEmail, validPassword)
 			if err != nil {
 				panic(err)
 			}
@@ -149,12 +149,34 @@ func Test(t *testing.T) {
 		})
 
 		g.It("Should have an issuedAt and a Expiration date correctly set that are one hour apart", func() {
-			response, err := auth.Login(email, validPassword)
+			response, err := auth.Login(validEmail, validPassword)
 			if err != nil {
 				panic(err)
 			}
 			Expect(response.Expiration - response.IssuedAt).To(Equal(int64(3600)))
 		})
+	})
 
+	g.Describe("Send Reset Password Request process", func() {
+		g.BeforeEach(func() {
+			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+		})
+
+		g.It("Should return an error when an invalid email is provided", func() {
+			err := auth.SendResetPasswordRequest(badEmail)
+			Expect(err.Error()).To(Equal(signupInvalidEmailMessage))
+		})
+
+		g.It("Should return an error when the email is not present in the storage", func() {
+			err := auth.SendResetPasswordRequest(validEmail)
+			Expect(err.Error()).To(Equal("Email does not exist"))
+		})
+
+		g.It("Should generate a code and send an email", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Signup(user)
+			err = auth.SendResetPasswordRequest(validEmail)
+			Expect(err).To(BeNil())
+		})
 	})
 }

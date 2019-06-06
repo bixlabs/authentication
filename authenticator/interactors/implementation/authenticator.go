@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/structures/login"
 	"github.com/bixlabs/authentication/tools"
@@ -12,7 +13,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	_ "github.com/joho/godotenv/autoload"
 	"golang.org/x/crypto/bcrypt"
+	"math/rand"
 	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -21,15 +24,18 @@ const emailValidationRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'
 const signupInvalidEmailMessage = "Email is not valid"
 const signupPasswordLengthMessage = "Password should have at least 8 characters"
 const passwordMinLength = 8
+const maxNumberOfResetPasswordCodes = 99999
+const minNumberOfResetPasswordCodes = 10000
 
 type authenticator struct {
 	repository     user.Repository
+	sender email.Sender
 	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
-func NewAuthenticator(repository user.Repository) interactors.Authenticator {
-	auth := &authenticator{repository: repository}
+func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {
+	auth := &authenticator{repository: repository, sender: sender}
 	err := env.Parse(auth)
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the authenticator failed", err)
@@ -201,7 +207,44 @@ func wrongCredentialsError() error {
 	return errors.New("wrong credentials")
 }
 
-func (auth authenticator) ResetPassword(email string) error {
-	tools.Log().Warn("ResetPassword: Not Implemented yet")
+func (auth authenticator) ResetPassword(email string, code string, newPassword string) error {
 	return nil
 }
+
+func (auth authenticator) SendResetPasswordRequest(email string) error {
+	if err := isValidEmail(email); err != nil {
+		return err
+	}
+
+	userAccount, err := auth.repository.Find(email)
+	if err != nil {
+		return err
+	}
+
+	code, err := auth.generateCode(userAccount)
+	if err != nil {
+		return err
+	}
+
+	return auth.sender.SendEmailPasswordRequest(userAccount, code)
+}
+
+func(auth authenticator) generateCode(user structures.User) (string, error) {
+	code := generateRandomNumber()
+	resetToken, err := hashPassword(code)
+	if err != nil {
+		return "", err
+	}
+	if err := auth.repository.SaveResetToken(user.Email, resetToken); err != nil {
+		return "", err
+	}
+
+    return code, nil
+}
+
+func generateRandomNumber() string {
+	rand.Seed(time.Now().UnixNano())
+	return strconv.Itoa(rand.Intn(maxNumberOfResetPasswordCodes - minNumberOfResetPasswordCodes) +
+		minNumberOfResetPasswordCodes)
+}
+

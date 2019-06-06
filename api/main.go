@@ -30,7 +30,7 @@ import (
 func main() {
 	tools.InitializeLogger()
 	router := NewGinRouter()
-	authOperations := implementation.NewAuthenticator(in_memory.NewUserRepo())
+	authOperations := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
 	authentication.NewAuthenticatorRESTConfigurator(authOperations, router)
 	runGinRouter(router, getRestConfiguration().Port)
 }
