@@ -77,7 +77,6 @@ func generateJWT(email string, auth authenticator) (*login.Response, error) {
 		return nil, err
 	}
 
-	tools.Log().Info("A user logged in")
 	return response, nil
 }
 
@@ -121,7 +120,6 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 		return user, err
 	}
 
-	tools.Log().Info("A user was created")
 	return user, nil
 }
 

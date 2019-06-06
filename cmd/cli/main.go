@@ -18,4 +18,5 @@ func main() {
 	println(string(jsonUser))
 	_ = authOperations.ChangePassword(structures.User{}, "")
 	_ = authOperations.ResetPassword("", "", "")
+	_ = authOperations.SendResetPasswordRequest("email@bixlabs.com")
 }
