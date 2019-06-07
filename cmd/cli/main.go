@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
-	"github.com/bixlabs/authentication/database"
 	"github.com/bixlabs/authentication/database/user/in_memory"
+	"github.com/bixlabs/authentication/database/user/sqlite"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/gin-gonic/gin/json"
 )
@@ -29,6 +29,7 @@ func main() {
 	jsonUser, _ = json.Marshal(user)
 	println(string(jsonUser))
 
-	_ = database.NewSqliteStorage()
+	_, closeDB := sqlite.NewSqliteStorage()
+	defer closeDB()
 
 }

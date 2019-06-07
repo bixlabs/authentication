@@ -20,4 +20,4 @@ tmp
 .env
 coverage.out
 docs
-sqlite.db
+sqlite.s3db
