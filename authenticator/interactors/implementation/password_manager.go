@@ -8,10 +8,13 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/pkg/errors"
 	"math/rand"
 	"strconv"
 	"time"
 )
+
+const resetPasswordWrongCodeError = "Wrong reset password code"
 
 type passwordManager struct {
 	repository           user.Repository
@@ -56,22 +59,22 @@ func (pm passwordManager) ChangePassword(user structures.User, newPassword strin
 	return pm.repository.ChangePassword(user.Email, hashedPassword)
 }
 
-func (pm passwordManager) SendResetPasswordRequest(email string) error {
+func (pm passwordManager) SendResetPasswordRequest(email string) (string, error) {
 	if err := util.IsValidEmail(email); err != nil {
-		return err
+		return "", err
 	}
 
 	userAccount, err := pm.repository.Find(email)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	code, err := pm.generateCode(userAccount)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return pm.sender.SendEmailPasswordRequest(userAccount, code)
+	return code, pm.sender.SendEmailPasswordRequest(userAccount, code)
 }
 
 func (pm passwordManager) generateCode(user structures.User) (string, error) {
@@ -93,7 +96,30 @@ func (pm passwordManager) generateRandomNumber() string {
 		pm.ResetPasswordCodeMin)
 }
 
-func (passwordManager) ResetPassword(email string, code string, newPassword string) error {
-	tools.Log().Warn("ResetPassword: Not Implemented yet")
-	return nil
+func (pm passwordManager) ResetPassword(email string, code string, newPassword string) error {
+	if err := util.IsValidEmail(email); err != nil {
+		return err
+	}
+
+	if err := util.CheckPasswordLength(newPassword); err != nil {
+		return err
+	}
+
+	account, err := pm.repository.Find(email)
+
+	if err != nil {
+		return err
+	}
+
+	if err := util.VerifyPassword(account.ResetToken, code); err != nil {
+		return errors.New(resetPasswordWrongCodeError)
+	}
+
+	hashedPassword, err := util.HashPassword(newPassword)
+
+	if err != nil {
+		return err
+	}
+
+	return pm.repository.ChangePassword(email, hashedPassword)
 }
