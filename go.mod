@@ -29,6 +29,7 @@ require (
 	github.com/kr/pty v1.1.4 // indirect
 	github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983 // indirect
 	github.com/mattn/go-isatty v0.0.8 // indirect
+	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/onsi/gomega v1.4.2
