@@ -143,6 +143,7 @@ $ go test -cover -v ./...
 * Gomega is being used for improving assertion mechanism.
 
 ## How to see test coverage
+
 * will show information about the coverage: 
 ```bash
 $ make test
@@ -159,6 +160,13 @@ $ make coverage
 $ make coverage-html
 ```
 * For knowing how are we generating test coverage please check [this](https://blog.golang.org/cover)
+
+# Storage
+
+* This project uses an SQLite database as default storage, for now this will be the only storage capability of the project.
+Possibly in the future we will have different ways of providing external storage to the system.
+
+* We are also using an [ORM](https://gorm.io/) library.
 
 ## TL;DR How to run/build
 
