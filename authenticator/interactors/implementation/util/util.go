@@ -1,7 +1,6 @@
 package util
 
 import (
-	"errors"
 	"github.com/bixlabs/authentication/tools"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
@@ -15,17 +14,29 @@ const SignupPasswordLengthMessage = "Password should have at least 8 characters"
 func IsValidEmail(email string) error {
 	if isValidEmail, _ := regexp.MatchString(EmailValidationRegex, email); !isValidEmail {
 		tools.Log().Debug("An invalid email was provided: " + email)
-		return errors.New(SignupInvalidEmailMessage)
+		return InvalidEmailError{}
 	}
 	return nil
+}
+
+type InvalidEmailError struct{}
+
+func (e InvalidEmailError) Error() string {
+	return SignupInvalidEmailMessage
 }
 
 func CheckPasswordLength(password string) error {
 	if len(password) < PasswordManager {
 		tools.Log().Debug("A password with incorrect length was provided")
-		return errors.New(SignupPasswordLengthMessage)
+		return PasswordLengthError{}
 	}
 	return nil
+}
+
+type PasswordLengthError struct{}
+
+func (e PasswordLengthError) Error() string {
+	return SignupPasswordLengthMessage
 }
 
 func HashPassword(password string) (string, error) {
@@ -42,11 +53,13 @@ func HashPassword(password string) (string, error) {
 func VerifyPassword(hashedPassword, plainPassword string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword)); err != nil {
 		tools.Log().Debug("A wrong password was provided")
-		return WrongCredentialsError()
+		return WrongCredentialsError{}
 	}
 	return nil
 }
 
-func WrongCredentialsError() error {
-	return errors.New("wrong credentials")
+type WrongCredentialsError struct{}
+
+func (e WrongCredentialsError) Error() string {
+	return "wrong credentials"
 }
