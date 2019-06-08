@@ -7,8 +7,6 @@ type Repository interface {
 	IsEmailAvailable(email string) (bool, error)
 	GetHashedPassword(email string) (string, error)
 	ChangePassword(email, newPassword string) error
-	SaveResetPasswordToken(token string) error
-	VerifyResetPasswordToken(token string) (bool, error)
 	Find(email string) (structures.User, error)
 	SaveResetToken(email, resetToken string) error
 }

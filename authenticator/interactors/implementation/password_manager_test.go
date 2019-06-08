@@ -132,8 +132,8 @@ func TestPasswordManager(t *testing.T) {
 			_, _ = auth.Signup(user)
 			code, _ := passwordManager.SendResetPasswordRequest(validEmail)
 
-			_ = passwordManager.ResetPassword(validEmail, code, "secured_password")
-			_, err := auth.Login(user.Email, "secured_password")
+			_ = passwordManager.ResetPassword(validEmail, code, "secured_password2")
+			_, err := auth.Login(user.Email, "secured_password2")
 			Expect(err).To(BeNil())
 		})
 	})
