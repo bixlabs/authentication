@@ -1,4 +1,4 @@
-package rest_signup
+package signup
 
 //TODO: We could use nested struct promoted fields here but swaggo library is not generating correct documentation using that.
 type Response struct {

@@ -67,19 +67,19 @@ func TestRest(t *testing.T) {
 		})
 
 		g.It("should return 400 if email is invalid", func() {
-			code, _ := resetPasswordRequestHandler(invalidEmail, passwordManager)
+			code, _ := forgotPasswordHandler(invalidEmail, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 500 if email doesn't exist", func() {
-			code, _ := resetPasswordRequestHandler(validEmail, passwordManager)
+			code, _ := forgotPasswordHandler(validEmail, passwordManager)
 			Expect(code).To(Equal(http.StatusInternalServerError))
 		})
 
 		g.It("should return 202 if everything goes well", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := resetPasswordRequestHandler(validEmail, passwordManager)
+			code, _ := forgotPasswordHandler(validEmail, passwordManager)
 			Expect(code).To(Equal(http.StatusAccepted))
 		})
 	})

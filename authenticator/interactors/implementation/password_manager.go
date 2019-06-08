@@ -59,7 +59,7 @@ func (pm passwordManager) ChangePassword(user structures.User, newPassword strin
 	return pm.repository.ChangePassword(user.Email, hashedPassword)
 }
 
-func (pm passwordManager) SendResetPasswordRequest(email string) (string, error) {
+func (pm passwordManager) ForgotPassword(email string) (string, error) {
 	if err := util.IsValidEmail(email); err != nil {
 		return "", err
 	}

@@ -25,7 +25,7 @@ func main() {
 	user, _ = auth.Login("email@bixlabs.com", "secured_password2")
 	jsonUser, _ = json.Marshal(user)
 	println(string(jsonUser))
-	code, _ := passwordManager.SendResetPasswordRequest("email@bixlabs.com")
+	code, _ := passwordManager.ForgotPassword("email@bixlabs.com")
 	_ = passwordManager.ResetPassword("email@bixlabs.com", code, "secured_password3")
 	user, _ = auth.Login("email@bixlabs.com", "secured_password3")
 	jsonUser, _ = json.Marshal(user)
