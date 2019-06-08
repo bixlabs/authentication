@@ -46,7 +46,7 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 	hashedPassword, err := auth.repository.GetHashedPassword(email)
 
 	if err != nil {
-		return nil, util.WrongCredentialsError()
+		return nil, util.WrongCredentialsError{}
 	}
 
 	if err := util.VerifyPassword(hashedPassword, password); err != nil {
@@ -59,7 +59,7 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 func generateJWT(email string, auth authenticator) (*login.Response, error) {
 	currentUser, err := auth.repository.Find(email)
 	if err != nil {
-		return nil, util.WrongCredentialsError()
+		return nil, util.WrongCredentialsError{}
 	}
 
 	response := &login.Response{User: currentUser, IssuedAt: time.Now().Unix(), Expiration: time.Now().Add(time.Second * time.Duration(auth.ExpirationTime)).Unix()}
