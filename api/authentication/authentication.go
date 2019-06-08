@@ -7,8 +7,10 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_reset_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/database/user/in_memory"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -46,14 +48,15 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/login [post]
 func (config authenticatorRESTConfigurator) login(c *gin.Context) {
+	auth := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
 	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
-	_, _ = config.handler.Signup(user)
+	_, _ = auth.Signup(user)
 	var request rest_login.Request
 	if c.ShouldBindJSON(&request) != nil || request.Email == "" || request.Password == "" {
 		c.JSON(http.StatusBadRequest, rest_login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email or password missing")))
 	} else {
-		c.JSON(loginHandler(request.Email, request.Password, config.handler))
+		c.JSON(loginHandler(request.Email, request.Password, auth))
 	}
 }
 
