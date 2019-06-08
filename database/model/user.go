@@ -1,5 +1,19 @@
 package model
 
+import (
+	"time"
+)
+
 type User struct {
-	// TODO: this will depend on the structure of the database, it should be a map to that.
+	ID               uint `gorm:"primary_key"`
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        *time.Time `sql:"index"`
+	Email            string
+	Password         string
+	GivenName        string
+	SecondName       string
+	FamilyName       string
+	SecondFamilyName string
+	ResetToken       string
 }

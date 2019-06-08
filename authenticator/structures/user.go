@@ -1,9 +1,9 @@
 package structures
 
 type User struct {
-	ID               string `json:"id"` // I'm not sure we need this, I'm adding it for now and we might remove it later
+	ID               string `json:"id"`
 	Email            string `json:"email"`
-	Password         string `json:"password,omitempty"`
+	Password         string `json:"-"`
 	GivenName        string `json:"givenName,omitempty"`
 	SecondName       string `json:"secondName,omitempty"`
 	FamilyName       string `json:"familyName,omitempty"`

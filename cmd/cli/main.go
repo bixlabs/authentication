@@ -11,7 +11,9 @@ import (
 
 func main() {
 	tools.InitializeLogger()
-	userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+	userRepo, closeDB := sqlite.NewSqliteStorage()
+	defer closeDB()
+	sender := in_memory.DummySender{}
 	passwordManager := implementation.NewPasswordManager(userRepo, sender)
 	auth := implementation.NewAuthenticator(userRepo, sender)
 
@@ -28,8 +30,5 @@ func main() {
 	user, _ = auth.Login("email@bixlabs.com", "secured_password3")
 	jsonUser, _ = json.Marshal(user)
 	println(string(jsonUser))
-
-	_, closeDB := sqlite.NewSqliteStorage()
-	defer closeDB()
 
 }

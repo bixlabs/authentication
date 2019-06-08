@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/database/mappers"
+	"github.com/bixlabs/authentication/database/model"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/jinzhu/gorm"
@@ -25,14 +27,14 @@ func NewSqliteStorage() (user.Repository, func()) {
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the database failed", err)
 	}
-	return db, db.initialize()
+	closeDB := db.initialize()
+	return db, closeDB
 }
 
 func (storage *sqliteStorage) initialize() func() {
 	db := openDatabase(storage)
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&model.User{})
 	storage.db = db
-	storage.testDatabase()
 
 	return func() {
 		_ = storage.db.Close()
@@ -54,51 +56,64 @@ func (storage sqliteStorage) getConnectionString() string {
 		storage.Name, storage.User, storage.Password, storage.Salt)
 }
 
-func (storage sqliteStorage) testDatabase() {
-
-	// Create
-	storage.db.Create(&User{Email: "jarrieta", Password: "secured_password"})
-
-	// Read
-	var account User
-	storage.db.First(&account, 1)                       // find user with id 1
-	storage.db.First(&account, "email = ?", "jarrieta") // find user with email jarrieta
-
-	// Update - update user's Password to more_secured_password
-	storage.db.Model(&account).Update("Password", "more_secured_password")
-
-	// Delete - delete user
-	storage.db.Delete(&account)
-}
-
 func (storage sqliteStorage) Create(user structures.User) (structures.User, error) {
-	panic("implement me")
-}
+	modelForCreate := mappers.UserToDatabaseModel(user)
+	transaction := storage.db.Begin()
+	if err := transaction.Create(&modelForCreate).Error; err != nil {
+		transaction.Rollback()
+		return structures.User{}, err
+	}
 
-func (storage sqliteStorage) IsEmailAvailable(email string) (bool, error) {
-	panic("implement me")
-}
+	if err := transaction.Commit().Error; err != nil {
+		return structures.User{}, err
+	}
 
-func (storage sqliteStorage) GetHashedPassword(email string) (string, error) {
-	panic("implement me")
-}
+	return storage.Find(user.Email)
 
-func (storage sqliteStorage) ChangePassword(email, newPassword string) error {
-	panic("implement me")
-}
-
-func (storage sqliteStorage) SaveResetPasswordToken(token string) error {
-	panic("implement me")
-}
-
-func (storage sqliteStorage) VerifyResetPasswordToken(token string) (bool, error) {
-	panic("implement me")
 }
 
 func (storage sqliteStorage) Find(email string) (structures.User, error) {
-	panic("implement me")
+	var account model.User
+	if err := storage.db.First(&account, "email = ?", email).Error; err != nil {
+		return structures.User{}, err
+	}
+	return mappers.DatabaseModelToUser(account), nil
+}
+
+func (storage sqliteStorage) IsEmailAvailable(email string) (bool, error) {
+	_, err := storage.Find(email)
+	if gorm.IsRecordNotFoundError(err) {
+		return true, nil
+	}
+	return false, err
+}
+
+func (storage sqliteStorage) GetHashedPassword(email string) (string, error) {
+	account, err := storage.Find(email)
+	if err != nil {
+		return "", err
+	}
+
+	return account.Password, nil
+
+}
+
+func (storage sqliteStorage) ChangePassword(email, newPassword string) error {
+	transaction := storage.db.Begin()
+	if err := transaction.Model(&model.User{Email: email}).Update("password", newPassword).Error; err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	return transaction.Commit().Error
 }
 
 func (storage sqliteStorage) SaveResetToken(email, resetToken string) error {
-	panic("implement me")
+	transaction := storage.db.Begin()
+	if err := transaction.Model(&model.User{Email: email}).Update("reset_token", resetToken).Error; err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	return transaction.Commit().Error
 }

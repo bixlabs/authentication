@@ -121,5 +121,9 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 		return err
 	}
 
-	return pm.repository.ChangePassword(email, hashedPassword)
+	if err := pm.repository.ChangePassword(email, hashedPassword); err != nil {
+		return err
+	}
+
+	return pm.repository.SaveResetToken(email, "")
 }
