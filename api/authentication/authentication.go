@@ -52,7 +52,7 @@ func (config authenticatorRESTConfigurator) login(c *gin.Context) {
 	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
 	_, _ = auth.Signup(user)
 	var request rest_login.Request
-	if c.ShouldBindJSON(&request) != nil || request.Email == "" || request.Password == "" {
+	if isInvalidLoginRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, rest_login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email or password missing")))
 	} else {
@@ -60,22 +60,30 @@ func (config authenticatorRESTConfigurator) login(c *gin.Context) {
 	}
 }
 
+func isInvalidLoginRequest(c *gin.Context, request *rest_login.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Password == ""
+}
+
 func loginHandler(email, password string, handler interactors.Authenticator) (int, rest_login.Response) {
 	response, err := handler.Login(email, password)
 	if err != nil {
-		if _, ok := err.(util.InvalidEmailError); ok {
-			return http.StatusBadRequest, rest_login.NewErrorResponse(http.StatusBadRequest, err)
-		}
-		if _, ok := err.(util.PasswordLengthError); ok {
-			return http.StatusBadRequest, rest_login.NewErrorResponse(http.StatusBadRequest, err)
-		}
-		if _, ok := err.(util.WrongCredentialsError); ok {
-			return http.StatusUnauthorized, rest_login.NewErrorResponse(http.StatusBadRequest, err)
-		}
-		return http.StatusInternalServerError, rest_login.NewErrorResponse(http.StatusBadRequest, err)
+		return handleLoginErrors(err)
 	}
 
 	return http.StatusOK, rest_login.NewResponse(http.StatusOK, response)
+}
+
+func handleLoginErrors(err error) (int, rest_login.Response) {
+	if _, ok := err.(util.InvalidEmailError); ok {
+		return http.StatusBadRequest, rest_login.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	if _, ok := err.(util.PasswordLengthError); ok {
+		return http.StatusBadRequest, rest_login.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	if _, ok := err.(util.WrongCredentialsError); ok {
+		return http.StatusUnauthorized, rest_login.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	return http.StatusInternalServerError, rest_login.NewErrorResponse(http.StatusBadRequest, err)
 }
 
 // @Summary Signup functionality
