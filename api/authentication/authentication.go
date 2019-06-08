@@ -5,6 +5,7 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_change_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_login"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_reset_password"
+	"github.com/bixlabs/authentication/api/authentication/structures/rest_reset_password_request"
 	"github.com/bixlabs/authentication/api/authentication/structures/rest_signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
@@ -16,11 +17,12 @@ import (
 )
 
 type authenticatorRESTConfigurator struct {
-	handler interactors.Authenticator
+	handler         interactors.Authenticator
+	passwordManager interactors.PasswordManager
 }
 
-func NewAuthenticatorRESTConfigurator(handler interactors.Authenticator, router *gin.Engine) {
-	configureAuthRoutes(authenticatorRESTConfigurator{handler}, router)
+func NewAuthenticatorRESTConfigurator(handler interactors.Authenticator, pm interactors.PasswordManager, router *gin.Engine) {
+	configureAuthRoutes(authenticatorRESTConfigurator{handler, pm}, router)
 }
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
@@ -29,6 +31,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 	router.POST("/signup", restConfig.signup)
 	router.PUT("/change-password", restConfig.changePassword)
 	router.PUT("/reset-password", restConfig.resetPassword)
+	router.PUT("/reset-password-request", restConfig.resetPasswordRequest)
 	return r
 }
 
@@ -122,7 +125,7 @@ func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 }
 
 // @Summary Reset password functionality
-// @Description It resets your password and provide you with a flow to enter a new one.
+// @Description It resets your password given the correct code and new password.
 // @Accept  json
 // @Produce  json
 // @Param resetPassword body rest_reset_password.Request true "Reset password Request"
@@ -137,4 +140,47 @@ func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 	//rest.NotImplemented(c)
 	c.JSON(http.StatusOK, rest_reset_password.Response{})
 
+}
+
+// @Summary Reset password request functionality
+// @Description It enters into the flow of reset password sending an email with instructions
+// @Accept  json
+// @Produce  json
+// @Param resetPassword body rest_reset_password_request.Request true "Reset password Request"
+// @Success 202 {object} rest_reset_password_request.Response
+// @Failure 400 {object} rest.ResponseWrapper
+// @Failure 404 {object} rest.ResponseWrapper
+// @Failure 408 {object} rest.ResponseWrapper
+// @Failure 500 {object} rest.ResponseWrapper
+// @Failure 504 {object} rest.ResponseWrapper
+// @Router /user/reset-password-request [put]
+func (config authenticatorRESTConfigurator) resetPasswordRequest(c *gin.Context) {
+	userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+	auth := implementation.NewAuthenticator(userRepo, sender)
+	passwordManager := implementation.NewPasswordManager(userRepo, in_memory.DummySender{})
+	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
+	_, _ = auth.Signup(user)
+	var request rest_reset_password_request.Request
+	if isInvalidResetPasswordRequest(c, &request) {
+		c.JSON(http.StatusBadRequest, rest_reset_password_request.NewErrorResponse(http.StatusBadRequest,
+			errors.New("email is required")))
+	} else {
+		c.JSON(resetPasswordRequestHandler(request.Email, passwordManager))
+	}
+}
+
+func isInvalidResetPasswordRequest(c *gin.Context, request *rest_reset_password_request.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == ""
+}
+
+func resetPasswordRequestHandler(email string, handler interactors.PasswordManager) (int, rest_reset_password_request.Response) {
+	_, err := handler.SendResetPasswordRequest(email)
+	if err != nil {
+		if _, ok := err.(util.InvalidEmailError); ok {
+			return http.StatusBadRequest, rest_reset_password_request.NewErrorResponse(http.StatusBadRequest, err)
+		}
+		return http.StatusInternalServerError, rest_reset_password_request.NewErrorResponse(http.StatusInternalServerError, err)
+	}
+
+	return http.StatusAccepted, rest_reset_password_request.NewResponse(http.StatusAccepted, &rest_reset_password_request.Result{Success: true})
 }

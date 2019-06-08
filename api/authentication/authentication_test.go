@@ -24,13 +24,15 @@ func TestRest(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
+	var passwordManager interactors.PasswordManager
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Login rest handler", func() {
 		g.BeforeEach(func() {
-			auth = implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
 		g.It("should return 400 if email is invalid", func() {
@@ -54,6 +56,31 @@ func TestRest(t *testing.T) {
 			code, response := loginHandler(validEmail, validPassword, auth)
 			Expect(code).To(Equal(http.StatusOK))
 			Expect(response.Result.User.Email).To(Equal(validEmail))
+		})
+	})
+
+	g.Describe("Reset password request rest handler", func() {
+		g.BeforeEach(func() {
+			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
+			passwordManager = implementation.NewPasswordManager(userRepo, sender)
+		})
+
+		g.It("should return 400 if email is invalid", func() {
+			code, _ := resetPasswordRequestHandler(invalidEmail, passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 500 if email doesn't exist", func() {
+			code, _ := resetPasswordRequestHandler(validEmail, passwordManager)
+			Expect(code).To(Equal(http.StatusInternalServerError))
+		})
+
+		g.It("should return 202 if everything goes well", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Signup(user)
+			code, _ := resetPasswordRequestHandler(validEmail, passwordManager)
+			Expect(code).To(Equal(http.StatusAccepted))
 		})
 	})
 }
