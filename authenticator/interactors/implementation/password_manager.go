@@ -83,7 +83,7 @@ func (pm passwordManager) generateCode(user structures.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := pm.repository.SaveResetToken(user.Email, resetToken); err != nil {
+	if err := pm.repository.UpdateResetToken(user.Email, resetToken); err != nil {
 		return "", err
 	}
 
@@ -125,5 +125,5 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 		return err
 	}
 
-	return pm.repository.SaveResetToken(email, "")
+	return pm.repository.UpdateResetToken(email, "")
 }

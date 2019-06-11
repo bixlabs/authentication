@@ -11,7 +11,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 )
-import _ "github.com/mattn/go-sqlite3"
 
 type sqliteStorage struct {
 	db       *gorm.DB
@@ -108,7 +107,7 @@ func (storage sqliteStorage) ChangePassword(email, newPassword string) error {
 	return transaction.Commit().Error
 }
 
-func (storage sqliteStorage) SaveResetToken(email, resetToken string) error {
+func (storage sqliteStorage) UpdateResetToken(email, resetToken string) error {
 	transaction := storage.db.Begin()
 	if err := transaction.Model(&model.User{Email: email}).Update("reset_token", resetToken).Error; err != nil {
 		transaction.Rollback()
