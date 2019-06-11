@@ -84,19 +84,19 @@ func TestPasswordManager(t *testing.T) {
 		})
 
 		g.It("Should return an error when an invalid email is provided", func() {
-			_, err := passwordManager.SendResetPasswordRequest(invalidEmail)
+			_, err := passwordManager.ForgotPassword(invalidEmail)
 			Expect(err.Error()).To(Equal(util.SignupInvalidEmailMessage))
 		})
 
 		g.It("Should return an error when the email is not present in the storage", func() {
-			_, err := passwordManager.SendResetPasswordRequest(validEmail)
+			_, err := passwordManager.ForgotPassword(validEmail)
 			Expect(err.Error()).To(Equal("Email does not exist"))
 		})
 
 		g.It("Should generate a code and send an email", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			_, err := passwordManager.SendResetPasswordRequest(validEmail)
+			_, err := passwordManager.ForgotPassword(validEmail)
 			Expect(err).To(BeNil())
 		})
 	})
@@ -121,7 +121,7 @@ func TestPasswordManager(t *testing.T) {
 		g.It("Should return an error if the provided code is not correct", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			_, _ = passwordManager.SendResetPasswordRequest(validEmail)
+			_, _ = passwordManager.ForgotPassword(validEmail)
 
 			err := passwordManager.ResetPassword(validEmail, "0", validPassword)
 			Expect(err.Error()).To(Equal(resetPasswordWrongCodeError))
@@ -130,7 +130,7 @@ func TestPasswordManager(t *testing.T) {
 		g.It("Should change the password given the correct code", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := passwordManager.SendResetPasswordRequest(validEmail)
+			code, _ := passwordManager.ForgotPassword(validEmail)
 
 			_ = passwordManager.ResetPassword(validEmail, code, "secured_password2")
 			_, err := auth.Login(user.Email, "secured_password2")
