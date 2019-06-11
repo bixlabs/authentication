@@ -13,25 +13,6 @@ type UserRepo struct {
 	users  map[string]structures.User
 }
 
-func (u *UserRepo) SaveResetToken(email, resetToken string) error {
-	user, err := u.Find(email)
-	if err != nil {
-		return err
-	}
-	user.ResetToken = resetToken
-	u.users[user.Email] = user
-	return nil
-}
-
-func (u *UserRepo) Find(email string) (structures.User, error) {
-	user, exist := u.users[email]
-	if !exist {
-		return structures.User{}, errors.New("Email does not exist")
-	}
-	user.Password = ""
-	return user, nil
-}
-
 // We don't use data mappers here because this implementation is merely for testing purpose.
 // and the things we are going to do here are trivial
 func NewUserRepo() user.Repository {
@@ -59,10 +40,6 @@ func (u *UserRepo) GetHashedPassword(email string) (string, error) {
 	return "", errors.New("user doesn't exist")
 }
 
-func (u *UserRepo) VerifyResetPasswordToken(token string) (bool, error) {
-	panic("implement me")
-}
-
 func (u *UserRepo) ChangePassword(email, newPassword string) error {
 	user := u.users[email]
 	user.Password = newPassword
@@ -70,6 +47,18 @@ func (u *UserRepo) ChangePassword(email, newPassword string) error {
 	return nil
 }
 
-func (u *UserRepo) SaveResetPasswordToken(token string) error {
-	panic("implement me")
+func (u *UserRepo) UpdateResetToken(email, resetToken string) error {
+	user := u.users[email]
+	user.ResetToken = resetToken
+	u.users[user.Email] = user
+	return nil
+}
+
+func (u *UserRepo) Find(email string) (structures.User, error) {
+	user, exist := u.users[email]
+	if !exist {
+		return structures.User{}, errors.New("Email does not exist")
+	}
+	user.Password = ""
+	return user, nil
 }

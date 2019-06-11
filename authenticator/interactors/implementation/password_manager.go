@@ -59,7 +59,7 @@ func (pm passwordManager) ChangePassword(user structures.User, newPassword strin
 	return pm.repository.ChangePassword(user.Email, hashedPassword)
 }
 
-func (pm passwordManager) SendResetPasswordRequest(email string) (string, error) {
+func (pm passwordManager) ForgotPassword(email string) (string, error) {
 	if err := util.IsValidEmail(email); err != nil {
 		return "", err
 	}
@@ -83,7 +83,7 @@ func (pm passwordManager) generateCode(user structures.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := pm.repository.SaveResetToken(user.Email, resetToken); err != nil {
+	if err := pm.repository.UpdateResetToken(user.Email, resetToken); err != nil {
 		return "", err
 	}
 
@@ -121,5 +121,9 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 		return err
 	}
 
-	return pm.repository.ChangePassword(email, hashedPassword)
+	if err := pm.repository.ChangePassword(email, hashedPassword); err != nil {
+		return err
+	}
+
+	return pm.repository.UpdateResetToken(email, "")
 }

@@ -18,7 +18,7 @@ format:
 		go vet ./... && go fmt ./...
 
 build:
-		make api-docs && make format && go build -o ./tmp/auth-server ./api/main.go
+		make api-docs && make format && go build --tags "sqlite_userauth" -o ./tmp/auth-server ./api/main.go
 
 build-for-mac:
 		GOOS=darwin GOARCH=amd64 make build
