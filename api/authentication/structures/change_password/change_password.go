@@ -1,4 +1,4 @@
-package rest_reset_password
+package change_password
 
 //TODO: We could use nested struct promoted fields here but the swaggo library is not generating correct documentation using that.
 type Response struct {
@@ -13,5 +13,6 @@ type Result struct {
 }
 
 type Request struct {
-	Email string `json:"email"`
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
 }

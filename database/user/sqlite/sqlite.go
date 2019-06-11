@@ -11,7 +11,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 )
-import _ "github.com/mattn/go-sqlite3"
 
 type sqliteStorage struct {
 	db       *gorm.DB
@@ -51,7 +50,7 @@ func openDatabase(storage *sqliteStorage) *gorm.DB {
 }
 
 func (storage sqliteStorage) getConnectionString() string {
-	// TODO: I'm not sure the authentication is working as we expect here, I'm sure in development this is not working but in the build it might be working as expected we need to ensure this later.
+	// TODO: I'm not sure the authentication is working as we expect here, I'm sure in development this is not working but when creating a build it might be working as expected we need to ensure this later.
 	return fmt.Sprintf("file:%s?_auth&_auth_user=%s&_auth_pass=%s&_auth_crypt=ssha512&_auth_salt=%s",
 		storage.Name, storage.User, storage.Password, storage.Salt)
 }
@@ -108,7 +107,7 @@ func (storage sqliteStorage) ChangePassword(email, newPassword string) error {
 	return transaction.Commit().Error
 }
 
-func (storage sqliteStorage) SaveResetToken(email, resetToken string) error {
+func (storage sqliteStorage) UpdateResetToken(email, resetToken string) error {
 	transaction := storage.db.Begin()
 	if err := transaction.Model(&model.User{Email: email}).Update("reset_token", resetToken).Error; err != nil {
 		transaction.Rollback()

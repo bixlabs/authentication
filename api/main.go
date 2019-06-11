@@ -34,7 +34,8 @@ func main() {
 	userRepo, closeDB := sqlite.NewSqliteStorage()
 	defer closeDB()
 	authOperations := implementation.NewAuthenticator(userRepo, in_memory.DummySender{})
-	authentication.NewAuthenticatorRESTConfigurator(authOperations, router)
+	passwordManager := implementation.NewPasswordManager(userRepo, in_memory.DummySender{})
+	authentication.NewAuthenticatorRESTConfigurator(authOperations, passwordManager, router)
 	runGinRouter(router, getRestConfiguration().Port)
 }
 

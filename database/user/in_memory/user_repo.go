@@ -47,7 +47,7 @@ func (u *UserRepo) ChangePassword(email, newPassword string) error {
 	return nil
 }
 
-func (u *UserRepo) SaveResetToken(email, resetToken string) error {
+func (u *UserRepo) UpdateResetToken(email, resetToken string) error {
 	user := u.users[email]
 	user.ResetToken = resetToken
 	u.users[user.Email] = user

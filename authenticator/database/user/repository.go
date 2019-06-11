@@ -8,5 +8,5 @@ type Repository interface {
 	GetHashedPassword(email string) (string, error)
 	ChangePassword(email, newPassword string) error
 	Find(email string) (structures.User, error)
-	SaveResetToken(email, resetToken string) error
+	UpdateResetToken(email, resetToken string) error
 }
