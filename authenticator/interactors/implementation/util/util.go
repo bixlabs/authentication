@@ -63,3 +63,11 @@ type WrongCredentialsError struct{}
 func (e WrongCredentialsError) Error() string {
 	return "wrong credentials"
 }
+
+const SignupDuplicateEmailMessage = "Email is already taken"
+
+type DuplicatedEmailError struct{}
+
+func (e DuplicatedEmailError) Error() string {
+	return SignupDuplicateEmailMessage
+}

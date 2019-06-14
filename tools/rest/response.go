@@ -7,7 +7,7 @@ import (
 type ResponseWrapper struct {
 	Status   string   `json:"status"`
 	Code     int      `json:"code"`
-	Messages []string `json:"messages"`
+	Messages []string `json:"messages,omitempty"`
 }
 
 func NewResponseWrapper(code int, err error) ResponseWrapper {

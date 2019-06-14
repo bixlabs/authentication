@@ -2,7 +2,6 @@ package implementation
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
@@ -15,8 +14,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"time"
 )
-
-const signupDuplicateEmailMessage = "Email is already taken"
 
 type authenticator struct {
 	repository     user.Repository
@@ -121,7 +118,7 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 
 	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
 		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
-		return errors.New(signupDuplicateEmailMessage)
+		return util.DuplicatedEmailError{}
 	}
 
 	if err := util.CheckPasswordLength(user.Password); err != nil {
