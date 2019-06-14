@@ -103,8 +103,37 @@ func handleLoginErrors(err error) (int, login.Response) {
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/signup [post]
 func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
-	//rest.NotImplemented(c)
+	//auth := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+	//var request signup.Request
+	//if isInvalidSignupRequest(c, &request) {
+	//	c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
+	//		errors.New("email or password missing")))
+	//} else {
+	//	c.JSON(signupHandler(request.Email, auth))
+	//}
 	c.JSON(http.StatusCreated, signup.Response{})
+}
+
+func isInvalidSignupRequest(c *gin.Context, request *signup.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Password == ""
+}
+
+func signupHandler(user structures.User, handler interactors.Authenticator) (int, signup.Response) {
+	user, err := handler.Signup(user)
+	if err != nil {
+		if _, ok := err.(util.InvalidEmailError); ok {
+			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
+		}
+
+		if _, ok := err.(util.PasswordLengthError); ok {
+			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
+		}
+
+		if _, ok := err.(util.DuplicatedEmailError); ok {
+			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
+		}
+	}
+	return http.StatusCreated, signup.NewResponse(http.StatusCreated, &signup.Result{Success: true})
 }
 
 // @Summary Change password functionality

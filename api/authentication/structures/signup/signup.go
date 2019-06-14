@@ -1,11 +1,26 @@
 package signup
 
+import "github.com/bixlabs/authentication/tools/rest"
+
 //TODO: We could use nested struct promoted fields here but swaggo library is not generating correct documentation using that.
 type Response struct {
-	Status   string   `json:"status"`
-	Code     int      `json:"code"`
-	Messages []string `json:"messages"`
-	Result   Result   `json:"result"`
+	rest.ResponseWrapper
+	Result *Result `json:"result"`
+}
+
+func newResponse(code int, result *Result, err error) Response {
+	r := Response{}
+	r.ResponseWrapper = rest.NewResponseWrapper(code, err)
+	r.Result = result
+	return r
+}
+
+func NewErrorResponse(code int, err error) Response {
+	return newResponse(code, nil, err)
+}
+
+func NewResponse(code int, result *Result) Response {
+	return newResponse(code, result, nil)
 }
 
 type Result struct {

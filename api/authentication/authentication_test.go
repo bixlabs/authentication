@@ -83,4 +83,36 @@ func TestRest(t *testing.T) {
 			Expect(code).To(Equal(http.StatusAccepted))
 		})
 	})
+
+	g.Describe("Sign up rest handler", func() {
+		g.BeforeEach(func() {
+			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
+		})
+
+		g.It("should return 400 if email is invalid", func() {
+			user := structures.User{Email: invalidEmail, Password: validPassword}
+			code, _ := signupHandler(user, auth)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 400 if password is invalid", func() {
+			user := structures.User{Email: validEmail, Password: invalidPassword}
+			code, _ := signupHandler(user, auth)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 400 if email is duplicated", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = signupHandler(user, auth)
+			code, _ := signupHandler(user, auth)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 201 if user is created successfully", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			code, _ := signupHandler(user, auth)
+			Expect(code).To(Equal(http.StatusCreated))
+		})
+	})
 }
