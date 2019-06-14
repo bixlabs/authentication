@@ -83,4 +83,41 @@ func TestRest(t *testing.T) {
 			Expect(code).To(Equal(http.StatusAccepted))
 		})
 	})
+
+	g.Describe("Change Password process", func() {
+		g.BeforeEach(func() {
+			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
+			passwordManager = implementation.NewPasswordManager(userRepo, sender)
+		})
+
+		g.It("Should return 400 if email is not valid", func() {
+			code, _ := changePasswordHandler(invalidEmail, "0", "", passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("Should return 400 if password length is less than 8", func() {
+			code, _ := changePasswordHandler(validEmail, "0", invalidPassword, passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("Should return 500 if we can't get the hashed password from db", func() {
+			code, _ := changePasswordHandler(validEmail, "0", validPassword, passwordManager)
+			Expect(code).To(Equal(http.StatusInternalServerError))
+		})
+
+		g.It("Should return 400 if user password is not valid", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Signup(user)
+			code, _ := changePasswordHandler(user.Email, "@", validPassword, passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("Should return 200 if user provides the correct information", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Signup(user)
+			code, _ := changePasswordHandler(user.Email, validPassword, "12345678", passwordManager)
+			Expect(code).To(Equal(http.StatusOK))
+		})
+	})
 }

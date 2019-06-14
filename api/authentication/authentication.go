@@ -13,6 +13,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/in_memory"
+	"github.com/bixlabs/authentication/database/user/sqlite"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -52,7 +53,9 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/login [post]
 func (config authenticatorRESTConfigurator) login(c *gin.Context) {
-	auth := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+	userRepo, closeDB := sqlite.NewSqliteStorage()
+	defer closeDB()
+	auth := implementation.NewAuthenticator(userRepo, in_memory.DummySender{})
 	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
 	_, _ = auth.Signup(user)
 	var request login.Request
@@ -71,23 +74,24 @@ func isInvalidLoginRequest(c *gin.Context, request *login.Request) bool {
 func loginHandler(email, password string, handler interactors.Authenticator) (int, login.Response) {
 	response, err := handler.Login(email, password)
 	if err != nil {
-		return handleLoginErrors(err)
+		code, err := handleBasicErrors(err)
+		return code, login.NewErrorResponse(code, err)
 	}
 
 	return http.StatusOK, login.NewResponse(http.StatusOK, mappers.LoginResponseToResult(*response))
 }
 
-func handleLoginErrors(err error) (int, login.Response) {
+func handleBasicErrors(err error) (int, error) {
 	if _, ok := err.(util.InvalidEmailError); ok {
-		return http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusBadRequest, err
 	}
 	if _, ok := err.(util.PasswordLengthError); ok {
-		return http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusBadRequest, err
 	}
 	if _, ok := err.(util.WrongCredentialsError); ok {
-		return http.StatusUnauthorized, login.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusUnauthorized, err
 	}
-	return http.StatusInternalServerError, login.NewErrorResponse(http.StatusBadRequest, err)
+	return http.StatusInternalServerError, err
 }
 
 // @Summary Signup functionality
@@ -122,7 +126,16 @@ func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
 func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 	//rest.NotImplemented(c)
 	c.JSON(http.StatusOK, change_password.Response{})
+}
 
+func changePasswordHandler(email, oldPassword, newPassword string, passwordManager interactors.PasswordManager) (int, change_password.Response) {
+	err := passwordManager.ChangePassword(structures.User{Email: email, Password: oldPassword}, newPassword)
+	if err != nil {
+		code, err := handleBasicErrors(err)
+		return code, change_password.NewErrorResponse(code, err)
+	}
+
+	return http.StatusOK, change_password.NewResponse(http.StatusOK, true)
 }
 
 // @Summary Reset password functionality
