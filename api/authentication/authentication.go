@@ -5,7 +5,7 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/change_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/forgot_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/login"
-	"github.com/bixlabs/authentication/api/authentication/structures/login/mappers"
+	"github.com/bixlabs/authentication/api/authentication/structures/mappers"
 	"github.com/bixlabs/authentication/api/authentication/structures/reset_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
@@ -124,12 +124,21 @@ func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/change-password [put]
 func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
-	//rest.NotImplemented(c)
-	c.JSON(http.StatusOK, change_password.Response{})
+	var request change_password.Request
+	if isInvalidChangePasswordRequest(c, &request) {
+		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
+			errors.New("email, old password or new password missing")))
+	} else {
+		c.JSON(changePasswordHandler(request, config.passwordManager))
+	}
 }
 
-func changePasswordHandler(email, oldPassword, newPassword string, passwordManager interactors.PasswordManager) (int, change_password.Response) {
-	err := passwordManager.ChangePassword(structures.User{Email: email, Password: oldPassword}, newPassword)
+func isInvalidChangePasswordRequest(c *gin.Context, request *change_password.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.OldPassword == "" || request.NewPassword == ""
+}
+
+func changePasswordHandler(request change_password.Request, passwordManager interactors.PasswordManager) (int, change_password.Response) {
+	err := passwordManager.ChangePassword(mappers.ChangePasswordRequestToUser(request), request.NewPassword)
 	if err != nil {
 		code, err := handleBasicErrors(err)
 		return code, change_password.NewErrorResponse(code, err)

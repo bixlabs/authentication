@@ -29,4 +29,5 @@ type Result struct {
 type Request struct {
 	OldPassword string `json:"oldPassword"`
 	NewPassword string `json:"newPassword"`
+	Email       string `json:"email"`
 }

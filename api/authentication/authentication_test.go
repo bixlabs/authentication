@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"github.com/bixlabs/authentication/api/authentication/structures/change_password"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -92,31 +93,36 @@ func TestRest(t *testing.T) {
 		})
 
 		g.It("Should return 400 if email is not valid", func() {
-			code, _ := changePasswordHandler(invalidEmail, "0", "", passwordManager)
+			request := change_password.Request{Email: invalidEmail}
+			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("Should return 400 if password length is less than 8", func() {
-			code, _ := changePasswordHandler(validEmail, "0", invalidPassword, passwordManager)
+			request := change_password.Request{Email: validEmail, NewPassword: invalidPassword}
+			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("Should return 500 if we can't get the hashed password from db", func() {
-			code, _ := changePasswordHandler(validEmail, "0", validPassword, passwordManager)
+			request := change_password.Request{Email: validEmail, NewPassword: validPassword}
+			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusInternalServerError))
 		})
 
 		g.It("Should return 400 if user password is not valid", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := changePasswordHandler(user.Email, "@", validPassword, passwordManager)
-			Expect(code).To(Equal(http.StatusBadRequest))
+			request := change_password.Request{Email: user.Email, NewPassword: validPassword}
+			code, _ := changePasswordHandler(request, passwordManager)
+			Expect(code).To(Equal(http.StatusUnauthorized))
 		})
 
 		g.It("Should return 200 if user provides the correct information", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := changePasswordHandler(user.Email, validPassword, "12345678", passwordManager)
+			request := change_password.Request{Email: user.Email, OldPassword: validPassword, NewPassword: "12345678"}
+			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusOK))
 		})
 	})
