@@ -13,18 +13,17 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/in_memory"
-	"github.com/bixlabs/authentication/database/user/sqlite"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type authenticatorRESTConfigurator struct {
-	handler         interactors.Authenticator
+	authenticator   interactors.Authenticator
 	passwordManager interactors.PasswordManager
 }
 
-func NewAuthenticatorRESTConfigurator(handler interactors.Authenticator, pm interactors.PasswordManager, router *gin.Engine) {
-	configureAuthRoutes(authenticatorRESTConfigurator{handler, pm}, router)
+func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interactors.PasswordManager, router *gin.Engine) {
+	configureAuthRoutes(authenticatorRESTConfigurator{auth, pm}, router)
 }
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
@@ -53,17 +52,12 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/login [post]
 func (config authenticatorRESTConfigurator) login(c *gin.Context) {
-	userRepo, closeDB := sqlite.NewSqliteStorage()
-	defer closeDB()
-	auth := implementation.NewAuthenticator(userRepo, in_memory.DummySender{})
-	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
-	_, _ = auth.Signup(user)
 	var request login.Request
 	if isInvalidLoginRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email or password missing")))
 	} else {
-		c.JSON(loginHandler(request.Email, request.Password, auth))
+		c.JSON(loginHandler(request.Email, request.Password, config.authenticator))
 	}
 }
 
@@ -184,7 +178,7 @@ func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
 	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
 	_, _ = auth.Signup(user)
 	var request forgot_password.Request
-	if isInvalidforgotPassword(c, &request) {
+	if isInvalidForgotPasswordRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email is required")))
 	} else {
@@ -192,7 +186,7 @@ func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
 	}
 }
 
-func isInvalidforgotPassword(c *gin.Context, request *forgot_password.Request) bool {
+func isInvalidForgotPasswordRequest(c *gin.Context, request *forgot_password.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == ""
 }
 
