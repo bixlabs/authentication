@@ -44,12 +44,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Success 200 {object} login.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
-// @Failure 403 {object} rest.ResponseWrapper
-// @Failure 404 {object} rest.ResponseWrapper
-// @Failure 405 {object} rest.ResponseWrapper
-// @Failure 408 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/login [post]
 func (config authenticatorRESTConfigurator) login(c *gin.Context) {
 	var request login.Request
@@ -112,10 +107,8 @@ func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
 // @Param changePassword body change_password.Request true "Change password Request"
 // @Success 200 {object} change_password.Response
 // @Failure 400 {object} rest.ResponseWrapper
-// @Failure 404 {object} rest.ResponseWrapper
-// @Failure 408 {object} rest.ResponseWrapper
+// @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/change-password [put]
 func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 	var request change_password.Request
@@ -166,10 +159,7 @@ func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 // @Param resetPassword body forgot_password.Request true "Forgot password request"
 // @Success 202 {object} forgot_password.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
-// @Failure 404 {object} rest.ResponseWrapper
-// @Failure 408 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/reset-password-request [put]
 func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
 	userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
