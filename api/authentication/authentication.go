@@ -9,10 +9,7 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/reset_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
-	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
-	"github.com/bixlabs/authentication/authenticator/structures"
-	"github.com/bixlabs/authentication/database/user/in_memory"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -162,17 +159,12 @@ func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/reset-password-request [put]
 func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
-	userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
-	auth := implementation.NewAuthenticator(userRepo, sender)
-	passwordManager := implementation.NewPasswordManager(userRepo, in_memory.DummySender{})
-	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
-	_, _ = auth.Signup(user)
 	var request forgot_password.Request
 	if isInvalidForgotPasswordRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email is required")))
 	} else {
-		c.JSON(forgotPasswordHandler(request.Email, passwordManager))
+		c.JSON(forgotPasswordHandler(request.Email, config.passwordManager))
 	}
 }
 
