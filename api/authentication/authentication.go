@@ -87,20 +87,16 @@ func handleBasicErrors(err error) (int, error) {
 // @Param signup body signup.Request true "Signup Request"
 // @Success 201 {object} signup.Response
 // @Failure 400 {object} rest.ResponseWrapper
-// @Failure 404 {object} rest.ResponseWrapper
-// @Failure 408 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/signup [post]
 func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
-	//auth := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
-	//var request signup.Request
-	//if isInvalidSignupRequest(c, &request) {
-	//	c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
-	//		errors.New("email or password missing")))
-	//} else {
-	//	c.JSON(signupHandler(request.Email, auth))
-	//}
+	var request signup.Request
+	if isInvalidSignupRequest(c, &request) {
+		c.JSON(http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest,
+			errors.New("email or password missing")))
+	} else {
+		c.JSON(signupHandler(request, config.authenticator))
+	}
 	c.JSON(http.StatusCreated, signup.Response{})
 }
 
@@ -108,8 +104,8 @@ func isInvalidSignupRequest(c *gin.Context, request *signup.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Password == ""
 }
 
-func signupHandler(user structures.User, handler interactors.Authenticator) (int, signup.Response) {
-	user, err := handler.Signup(user)
+func signupHandler(request signup.Request, handler interactors.Authenticator) (int, signup.Response) {
+	_, err := handler.Signup(mappers.SignupRequestToUser(request))
 	if err != nil {
 		if _, ok := err.(util.InvalidEmailError); ok {
 			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
@@ -122,6 +118,8 @@ func signupHandler(user structures.User, handler interactors.Authenticator) (int
 		if _, ok := err.(util.DuplicatedEmailError); ok {
 			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
 		}
+		return http.StatusInternalServerError, signup.NewErrorResponse(http.StatusInternalServerError, err)
+
 	}
 	return http.StatusCreated, signup.NewResponse(http.StatusCreated, &signup.Result{Success: true})
 }

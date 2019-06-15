@@ -2,6 +2,7 @@ package authentication
 
 import (
 	"github.com/bixlabs/authentication/api/authentication/structures/change_password"
+	"github.com/bixlabs/authentication/api/authentication/structures/signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -127,34 +128,34 @@ func TestRest(t *testing.T) {
 		})
 	})
 
-        g.Describe("Sign up rest handler", func() {
+	g.Describe("Sign up rest handler", func() {
 		g.BeforeEach(func() {
 			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
 		g.It("should return 400 if email is invalid", func() {
-			user := structures.User{Email: invalidEmail, Password: validPassword}
-			code, _ := signupHandler(user, auth)
+			request := signup.Request{Email: invalidEmail, Password: validPassword}
+			code, _ := signupHandler(request, auth)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 400 if password is invalid", func() {
-			user := structures.User{Email: validEmail, Password: invalidPassword}
-			code, _ := signupHandler(user, auth)
+			request := signup.Request{Email: validEmail, Password: invalidPassword}
+			code, _ := signupHandler(request, auth)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 400 if email is duplicated", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, _ = signupHandler(user, auth)
-			code, _ := signupHandler(user, auth)
+			request := signup.Request{Email: validEmail, Password: validPassword}
+			_, _ = signupHandler(request, auth)
+			code, _ := signupHandler(request, auth)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 201 if user is created successfully", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			code, _ := signupHandler(user, auth)
+			request := signup.Request{Email: validEmail, Password: validPassword}
+			code, _ := signupHandler(request, auth)
 			Expect(code).To(Equal(http.StatusCreated))
 		})
 	})
