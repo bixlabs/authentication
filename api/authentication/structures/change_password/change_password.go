@@ -31,3 +31,12 @@ type Request struct {
 	NewPassword string `json:"newPassword"`
 	Email       string `json:"email"`
 }
+
+// We need this because go-swag library doesn't support embedded struct and doesn't show all the attributes in
+// the documentation.
+type SwaggerResponse struct {
+	Status   string          `json:"status"`
+	Code     int             `json:"code"`
+	Messages []string        `json:"messages"`
+	Result   *Response `json:"result,omitempty"`
+}

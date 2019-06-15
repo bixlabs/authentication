@@ -85,7 +85,7 @@ func handleBasicErrors(err error) (int, error) {
 // @Accept  json
 // @Produce  json
 // @Param signup body signup.Request true "Signup Request"
-// @Success 201 {object} signup.Response
+// @Success 201 {object} signup.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/signup [post]
@@ -129,7 +129,7 @@ func signupHandler(request signup.Request, handler interactors.Authenticator) (i
 // @Accept  json
 // @Produce  json
 // @Param changePassword body change_password.Request true "Change password Request"
-// @Success 200 {object} change_password.Response
+// @Success 200 {object} change_password.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
