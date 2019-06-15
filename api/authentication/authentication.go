@@ -5,25 +5,22 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/change_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/forgot_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/login"
-	"github.com/bixlabs/authentication/api/authentication/structures/login/mappers"
+	"github.com/bixlabs/authentication/api/authentication/structures/mappers"
 	"github.com/bixlabs/authentication/api/authentication/structures/reset_password"
 	"github.com/bixlabs/authentication/api/authentication/structures/signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
-	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
-	"github.com/bixlabs/authentication/authenticator/structures"
-	"github.com/bixlabs/authentication/database/user/in_memory"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type authenticatorRESTConfigurator struct {
-	handler         interactors.Authenticator
+	authenticator   interactors.Authenticator
 	passwordManager interactors.PasswordManager
 }
 
-func NewAuthenticatorRESTConfigurator(handler interactors.Authenticator, pm interactors.PasswordManager, router *gin.Engine) {
-	configureAuthRoutes(authenticatorRESTConfigurator{handler, pm}, router)
+func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interactors.PasswordManager, router *gin.Engine) {
+	configureAuthRoutes(authenticatorRESTConfigurator{auth, pm}, router)
 }
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
@@ -44,23 +41,15 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Success 200 {object} login.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
-// @Failure 403 {object} rest.ResponseWrapper
-// @Failure 404 {object} rest.ResponseWrapper
-// @Failure 405 {object} rest.ResponseWrapper
-// @Failure 408 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/login [post]
 func (config authenticatorRESTConfigurator) login(c *gin.Context) {
-	auth := implementation.NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
-	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
-	_, _ = auth.Signup(user)
 	var request login.Request
 	if isInvalidLoginRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email or password missing")))
 	} else {
-		c.JSON(loginHandler(request.Email, request.Password, auth))
+		c.JSON(loginHandler(request.Email, request.Password, config.authenticator))
 	}
 }
 
@@ -71,23 +60,24 @@ func isInvalidLoginRequest(c *gin.Context, request *login.Request) bool {
 func loginHandler(email, password string, handler interactors.Authenticator) (int, login.Response) {
 	response, err := handler.Login(email, password)
 	if err != nil {
-		return handleLoginErrors(err)
+		code, err := handleBasicErrors(err)
+		return code, login.NewErrorResponse(code, err)
 	}
 
 	return http.StatusOK, login.NewResponse(http.StatusOK, mappers.LoginResponseToResult(*response))
 }
 
-func handleLoginErrors(err error) (int, login.Response) {
+func handleBasicErrors(err error) (int, error) {
 	if _, ok := err.(util.InvalidEmailError); ok {
-		return http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusBadRequest, err
 	}
 	if _, ok := err.(util.PasswordLengthError); ok {
-		return http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusBadRequest, err
 	}
 	if _, ok := err.(util.WrongCredentialsError); ok {
-		return http.StatusUnauthorized, login.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusUnauthorized, err
 	}
-	return http.StatusInternalServerError, login.NewErrorResponse(http.StatusBadRequest, err)
+	return http.StatusInternalServerError, err
 }
 
 // @Summary Signup functionality
@@ -143,15 +133,31 @@ func signupHandler(user structures.User, handler interactors.Authenticator) (int
 // @Param changePassword body change_password.Request true "Change password Request"
 // @Success 200 {object} change_password.Response
 // @Failure 400 {object} rest.ResponseWrapper
-// @Failure 404 {object} rest.ResponseWrapper
-// @Failure 408 {object} rest.ResponseWrapper
+// @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/change-password [put]
 func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
-	//rest.NotImplemented(c)
-	c.JSON(http.StatusOK, change_password.Response{})
+	var request change_password.Request
+	if isInvalidChangePasswordRequest(c, &request) {
+		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
+			errors.New("email, old password or new password missing")))
+	} else {
+		c.JSON(changePasswordHandler(request, config.passwordManager))
+	}
+}
 
+func isInvalidChangePasswordRequest(c *gin.Context, request *change_password.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.OldPassword == "" || request.NewPassword == ""
+}
+
+func changePasswordHandler(request change_password.Request, passwordManager interactors.PasswordManager) (int, change_password.Response) {
+	err := passwordManager.ChangePassword(mappers.ChangePasswordRequestToUser(request), request.NewPassword)
+	if err != nil {
+		code, err := handleBasicErrors(err)
+		return code, change_password.NewErrorResponse(code, err)
+	}
+
+	return http.StatusOK, change_password.NewResponse(http.StatusOK, true)
 }
 
 // @Summary Reset password functionality
@@ -179,27 +185,19 @@ func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 // @Param resetPassword body forgot_password.Request true "Forgot password request"
 // @Success 202 {object} forgot_password.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
-// @Failure 404 {object} rest.ResponseWrapper
-// @Failure 408 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/reset-password-request [put]
 func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
-	userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
-	auth := implementation.NewAuthenticator(userRepo, sender)
-	passwordManager := implementation.NewPasswordManager(userRepo, in_memory.DummySender{})
-	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
-	_, _ = auth.Signup(user)
 	var request forgot_password.Request
-	if isInvalidforgotPassword(c, &request) {
+	if isInvalidForgotPasswordRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email is required")))
 	} else {
-		c.JSON(forgotPasswordHandler(request.Email, passwordManager))
+		c.JSON(forgotPasswordHandler(request.Email, config.passwordManager))
 	}
 }
 
-func isInvalidforgotPassword(c *gin.Context, request *forgot_password.Request) bool {
+func isInvalidForgotPasswordRequest(c *gin.Context, request *forgot_password.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == ""
 }
 
