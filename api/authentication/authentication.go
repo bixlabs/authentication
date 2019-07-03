@@ -125,6 +125,28 @@ func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // @Summary Reset password functionality
 // @Description It resets your password given the correct code and new password.
 // @Accept  json
@@ -139,8 +161,30 @@ func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 // @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 	//rest.NotImplemented(c)
-	c.JSON(http.StatusOK, reset_password.Response{})
+	c.JSON(resetPasswordHandler(email, code, newPassword))
 
+}
+
+func resetPasswordHandler(email string, code int, newPassword string, handler interactors.PasswordManager ) (int, reset_password.Response ) {
+	err := handler.ResetPassword(email, code, newPassword)
+
+	if err != nil {
+		if _, ok := err.(util.InvalidEmailError); ok {
+			return http.StatusBadRequest, reset_password.Response{}
+		}
+
+		if _, ok := err.(util.PasswordLengthError); ok {
+			return http.StatusBadRequest, reset_password.Response{}
+		}
+
+		if _, ok := err.(util.InvalidResetPasswordCode); ok {
+			return http.StatusBadRequest, reset_password.Response{}
+		}
+		return http.StatusInternalServerError, reset_password.Response{}
+	}
+
+
+	return http.StatusNoContent, nil
 }
 
 // @Summary Forgot password request functionality

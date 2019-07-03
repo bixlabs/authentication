@@ -8,13 +8,10 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/pkg/errors"
 	"math/rand"
 	"strconv"
 	"time"
 )
-
-const resetPasswordWrongCodeError = "Wrong reset password code"
 
 type passwordManager struct {
 	repository           user.Repository
@@ -96,7 +93,7 @@ func (pm passwordManager) generateRandomNumber() string {
 		pm.ResetPasswordCodeMin)
 }
 
-func (pm passwordManager) ResetPassword(email string, code string, newPassword string) error {
+func (pm passwordManager) ResetPassword(email string, code int, newPassword string) error {
 	if err := util.IsValidEmail(email); err != nil {
 		return err
 	}
@@ -111,8 +108,8 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 		return err
 	}
 
-	if err := util.VerifyPassword(account.ResetToken, code); err != nil {
-		return errors.New(resetPasswordWrongCodeError)
+	if err := util.VerifyPassword(account.ResetToken, strconv.Itoa(code)); err != nil {
+		return util.InvalidResetPasswordCode{}
 	}
 
 	hashedPassword, err := util.HashPassword(newPassword)
@@ -127,3 +124,4 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 
 	return pm.repository.UpdateResetToken(email, "")
 }
+
