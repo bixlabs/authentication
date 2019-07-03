@@ -161,7 +161,7 @@ func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 // @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 	//rest.NotImplemented(c)
-	c.JSON(resetPasswordHandler(email, code, newPassword))
+	c.JSON(resetPasswordHandler(email, code, newPgstword))
 
 }
 
