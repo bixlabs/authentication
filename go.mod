@@ -28,7 +28,7 @@ require (
 	github.com/golangci/unparam v0.0.0-20180902112548-7ad9dbcccc16 // indirect
 	github.com/google/btree v1.0.0 // indirect
 	github.com/google/pprof v0.0.0-20190515194954-54271f7e092f // indirect
-	github.com/jinzhu/gorm v1.9.8
+	github.com/jinzhu/gorm v1.9.10
 	github.com/jinzhu/inflection v0.0.0-20190603042836-f5c5f50e6090 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.6 // indirect
