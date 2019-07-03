@@ -9,7 +9,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/franela/goblin v0.0.0-20180407132755-cd5d08fb4ede
 	github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3 // indirect
-	github.com/gin-gonic/gin v1.3.0
+	github.com/gin-gonic/gin v1.4.0
 	github.com/go-critic/checkers v0.0.0-20181204210945-97246d3b3c67 // indirect
 	github.com/go-critic/go-critic v0.0.0-20181204210945-ee9bf5809ead // indirect
 	github.com/go-openapi/jsonpointer v0.19.0 // indirect
