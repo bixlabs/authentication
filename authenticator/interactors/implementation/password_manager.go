@@ -93,7 +93,7 @@ func (pm passwordManager) generateRandomNumber() string {
 		pm.ResetPasswordCodeMin)
 }
 
-func (pm passwordManager) ResetPassword(email string, code int, newPassword string) error {
+func (pm passwordManager) ResetPassword(email string, code string, newPassword string) error {
 	if err := util.IsValidEmail(email); err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (pm passwordManager) ResetPassword(email string, code int, newPassword stri
 		return err
 	}
 
-	if err := util.VerifyPassword(account.ResetToken, strconv.Itoa(code)); err != nil {
+	if err := util.VerifyPassword(account.ResetToken, code); err != nil {
 		return util.InvalidResetPasswordCode{}
 	}
 

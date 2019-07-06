@@ -126,27 +126,6 @@ func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // @Summary Reset password functionality
 // @Description It resets your password given the correct code and new password.
 // @Accept  json
@@ -160,31 +139,43 @@ func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
-	//rest.NotImplemented(c)
-	c.JSON(resetPasswordHandler(email, code, newPgstword))
-
+	var request reset_password.Request
+	if isInvalidResetPassword(c, &request) {
+		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
+			errors.New("email or code missing")))
+	} else {
+		config.handleNoContentOrErrorResponse(request, c)
+	}
 }
 
-func resetPasswordHandler(email string, code int, newPassword string, handler interactors.PasswordManager ) (int, reset_password.Response ) {
+func isInvalidResetPassword(c *gin.Context, request *reset_password.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
+}
+
+func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, reset_password.Response ) {
 	err := handler.ResetPassword(email, code, newPassword)
 
 	if err != nil {
-		if _, ok := err.(util.InvalidEmailError); ok {
+		switch err.(type) {
+		case util.InvalidEmailError:
 			return http.StatusBadRequest, reset_password.Response{}
-		}
-
-		if _, ok := err.(util.PasswordLengthError); ok {
+		case util.PasswordLengthError:
 			return http.StatusBadRequest, reset_password.Response{}
-		}
-
-		if _, ok := err.(util.InvalidResetPasswordCode); ok {
+		case util.InvalidResetPasswordCode:
 			return http.StatusBadRequest, reset_password.Response{}
+		default:
+			return http.StatusInternalServerError, reset_password.Response{}
 		}
-		return http.StatusInternalServerError, reset_password.Response{}
 	}
+	return http.StatusNoContent, reset_password.Response{}
+}
 
-
-	return http.StatusNoContent, nil
+func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request reset_password.Request, c *gin.Context) {
+	if code, response := resetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent {
+		c.Status(http.StatusNoContent)
+	} else {
+		c.JSON(code, response)
+	}
 }
 
 // @Summary Forgot password request functionality
@@ -206,7 +197,7 @@ func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
 	user := structures.User{Email: "email@bixlabs.com", Password: "password1"}
 	_, _ = auth.Signup(user)
 	var request forgot_password.Request
-	if isInvalidforgotPassword(c, &request) {
+	if isInvalidForgotPassword(c, &request) {
 		c.JSON(http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email is required")))
 	} else {
@@ -214,7 +205,7 @@ func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
 	}
 }
 
-func isInvalidforgotPassword(c *gin.Context, request *forgot_password.Request) bool {
+func isInvalidForgotPassword(c *gin.Context, request *forgot_password.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == ""
 }
 
