@@ -1,0 +1,368 @@
+basePath: /
+definitions:
+  change_password.Request:
+    properties:
+      email:
+        type: string
+      newPassword:
+        type: string
+      oldPassword:
+        type: string
+    type: object
+  change_password.Response:
+    properties:
+      result:
+        $ref: '#/definitions/change_password.Result'
+        type: object
+    type: object
+  change_password.Result:
+    properties:
+      success:
+        type: boolean
+    type: object
+  change_password.SwaggerResponse:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/change_password.Response'
+        type: object
+      status:
+        type: string
+    type: object
+  forgot_password.Request:
+    properties:
+      email:
+        type: string
+    type: object
+  forgot_password.Result:
+    properties:
+      success:
+        type: boolean
+    type: object
+  forgot_password.SwaggerResponse:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/forgot_password.Result'
+        type: object
+      status:
+        type: string
+    type: object
+  login.Request:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  login.Response:
+    properties:
+      result:
+        $ref: '#/definitions/login.Result'
+        type: object
+    type: object
+  login.Result:
+    type: object
+  login.SwaggerResponse:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/login.Response'
+        type: object
+      status:
+        type: string
+    type: object
+  reset_password.Request:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+      newPassword:
+        type: string
+    type: object
+  reset_password.Response:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/reset_password.Result'
+        type: object
+      status:
+        type: string
+    type: object
+  reset_password.Result:
+    properties:
+      success:
+        type: boolean
+    type: object
+  rest.ResponseWrapper:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+    type: object
+  signup.Request:
+    properties:
+      email:
+        type: string
+      familyName:
+        type: string
+      givenName:
+        type: string
+      password:
+        type: string
+      secondFamilyName:
+        type: string
+      secondName:
+        type: string
+    type: object
+  signup.Response:
+    properties:
+      result:
+        $ref: '#/definitions/signup.Result'
+        type: object
+    type: object
+  signup.Result:
+    properties:
+      success:
+        type: boolean
+    type: object
+  signup.SwaggerResponse:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/signup.Response'
+        type: object
+      status:
+        type: string
+    type: object
+host: '{{.Host}}'
+info:
+  contact:
+    email: jarrieta@bixlabs.com
+    name: API Support
+    url: https://bixlabs.com/
+  description: Leverage of authentication functionality
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Go-Authenticator
+  version: "1.0"
+paths:
+  /user/change-password:
+    put:
+      consumes:
+      - application/json
+      description: It changes the password provided the old one and a new password.
+      parameters:
+      - description: Change password Request
+        in: body
+        name: changePassword
+        required: true
+        schema:
+          $ref: '#/definitions/change_password.Request'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/change_password.SwaggerResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+      summary: Change password functionality
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Attempts to authenticate the user with the given credentials.
+      parameters:
+      - description: Login Request
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/login.Request'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/login.SwaggerResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+      summary: Login functionality
+  /user/reset-password:
+    put:
+      consumes:
+      - application/json
+      description: It resets your password given the correct code and new password.
+      parameters:
+      - description: Reset password Request
+        in: body
+        name: resetPassword
+        required: true
+        schema:
+          $ref: '#/definitions/reset_password.Request'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/reset_password.Response'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "408":
+          description: Request Timeout
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+      summary: Reset password functionality
+  /user/reset-password-request:
+    put:
+      consumes:
+      - application/json
+      description: It enters into the flow of reset password sending an email with
+        instructions
+      parameters:
+      - description: Forgot password request
+        in: body
+        name: resetPassword
+        required: true
+        schema:
+          $ref: '#/definitions/forgot_password.Request'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/forgot_password.SwaggerResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+      summary: Forgot password request functionality
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: Attempts to create a user provided the correct information.
+      parameters:
+      - description: Signup Request
+        in: body
+        name: signup
+        required: true
+        schema:
+          $ref: '#/definitions/signup.Request'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/signup.SwaggerResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+            type: object
+      summary: Signup functionality
+swagger: "2.0"

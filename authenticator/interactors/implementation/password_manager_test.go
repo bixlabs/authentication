@@ -124,7 +124,7 @@ func TestPasswordManager(t *testing.T) {
 			_, _ = passwordManager.ForgotPassword(validEmail)
 
 			err := passwordManager.ResetPassword(validEmail, "0", validPassword)
-			Expect(err.Error()).To(Equal(resetPasswordWrongCodeError))
+			Expect(err.Error()).To(Equal(util.InvalidResetPasswordCode{}.Error()))
 		})
 
 		g.It("Should change the password given the correct code", func() {
@@ -137,4 +137,5 @@ func TestPasswordManager(t *testing.T) {
 			Expect(err).To(BeNil())
 		})
 	})
+
 }
