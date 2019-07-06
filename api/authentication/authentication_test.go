@@ -180,8 +180,8 @@ func TestRest(t *testing.T) {
 		g.It("should return 400 if reset token is invalid", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := forgotPasswordHandler(validEmail, passwordManager)
-			code, _ = resetPasswordHandler(validEmail, "23423423424", validPassword, passwordManager)
+			_, _ = forgotPasswordHandler(validEmail, passwordManager)
+			code, _ := resetPasswordHandler(validEmail, "23423423424", validPassword, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
