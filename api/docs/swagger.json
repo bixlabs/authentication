@@ -392,14 +392,20 @@
         "login.Response": {
             "type": "object",
             "properties": {
-                "result": {
+                "exp": {
+                    "type": "integer"
+                },
+                "iat": {
+                    "type": "integer"
+                },
+                "jwt": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "object",
-                    "$ref": "#/definitions/login.Result"
+                    "$ref": "#/definitions/structures.User"
                 }
             }
-        },
-        "login.Result": {
-            "type": "object"
         },
         "login.SwaggerResponse": {
             "type": "object",
@@ -539,6 +545,29 @@
                     "$ref": "#/definitions/signup.Response"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "structures.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "familyName": {
+                    "type": "string"
+                },
+                "givenName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "secondFamilyName": {
+                    "type": "string"
+                },
+                "secondName": {
                     "type": "string"
                 }
             }
