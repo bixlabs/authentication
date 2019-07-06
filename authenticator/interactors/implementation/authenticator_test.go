@@ -37,7 +37,7 @@ func TestAuthenticator(t *testing.T) {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
 			_, err := auth.Signup(user)
-			g.Assert(err.Error()).Equal(signupDuplicateEmailMessage)
+			g.Assert(err.Error()).Equal(util.SignupDuplicateEmailMessage)
 		})
 
 		g.It("Should check for invalid email ", func() {
