@@ -184,7 +184,7 @@ func isInvalidResetPassword(c *gin.Context, request *reset_password.Request) boo
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
 }
 
-func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, reset_password.Response ) {
+func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, reset_password.Response) {
 	err := handler.ResetPassword(email, code, newPassword)
 
 	if err != nil {

@@ -73,9 +73,8 @@ func (e DuplicatedEmailError) Error() string {
 	return SignupDuplicateEmailMessage
 }
 
-type InvalidResetPasswordCode struct {}
+type InvalidResetPasswordCode struct{}
 
 func (InvalidResetPasswordCode) Error() string {
 	return resetPasswordWrongCodeError
 }
-

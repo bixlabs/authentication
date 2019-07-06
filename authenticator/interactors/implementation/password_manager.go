@@ -124,4 +124,3 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 
 	return pm.repository.UpdateResetToken(email, "")
 }
-

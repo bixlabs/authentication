@@ -86,7 +86,7 @@ func TestRest(t *testing.T) {
 		})
 	})
 
-        g.Describe("Change Password process", func() {
+	g.Describe("Change Password process", func() {
 		g.BeforeEach(func() {
 			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)

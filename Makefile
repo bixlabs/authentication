@@ -42,7 +42,7 @@ run-cli:
 		make format && go run cmd/cli/main.go
 
 api-docs:
-		swag init -g api/main.go
+		swag init -g ./api/main.go -o ./api/docs
 
 ci:
 		make all build
