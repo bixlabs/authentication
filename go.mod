@@ -45,7 +45,7 @@ require (
 	github.com/sirupsen/logrus v1.3.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/swaggo/gin-swagger v1.1.0
-	github.com/swaggo/swag v1.4.1
+	github.com/swaggo/swag v1.6.1
 	github.com/ugorji/go v1.1.2-0.20180831062425-e253f1f20942 // indirect
 	go.opencensus.io v0.22.0 // indirect
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
