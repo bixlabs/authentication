@@ -30,7 +30,7 @@ clean:
 		rm -r -f ./tmp
 
 lint:
-		golangci-lint run
+		$(GOPATH)/bin/golangci-lint run
 
 run-dev:
 		make format && air -c .air.config
@@ -42,7 +42,7 @@ run-cli:
 		make format && go run cmd/cli/main.go
 
 api-docs:
-		swag init -g api/main.go
+		$(GOPATH)/bin/swag init -g ./api/main.go -o ./api/docs
 
 ci:
 		make all build
