@@ -1,12 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/in_memory"
 	"github.com/bixlabs/authentication/database/user/sqlite"
 	"github.com/bixlabs/authentication/tools"
-	"github.com/gin-gonic/gin/json"
 )
 
 func main() {

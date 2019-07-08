@@ -19,5 +19,6 @@ tmp
 .idea
 .env
 coverage.out
-docs
+# I would like to have docs ignore but it complicates the build process because docs is being imported in the code.
+#api/docs
 sqlite.s3db

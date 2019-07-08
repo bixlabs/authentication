@@ -8,13 +8,10 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/pkg/errors"
 	"math/rand"
 	"strconv"
 	"time"
 )
-
-const resetPasswordWrongCodeError = "Wrong reset password code"
 
 type passwordManager struct {
 	repository           user.Repository
@@ -112,7 +109,7 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 	}
 
 	if err := util.VerifyPassword(account.ResetToken, code); err != nil {
-		return errors.New(resetPasswordWrongCodeError)
+		return util.InvalidResetPasswordCode{}
 	}
 
 	hashedPassword, err := util.HashPassword(newPassword)

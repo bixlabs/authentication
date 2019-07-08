@@ -159,4 +159,38 @@ func TestRest(t *testing.T) {
 			Expect(code).To(Equal(http.StatusCreated))
 		})
 	})
+
+	g.Describe("Reset password rest handler", func() {
+		g.BeforeEach(func() {
+			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
+			passwordManager = implementation.NewPasswordManager(userRepo, sender)
+		})
+
+		g.It("should return 400 if email is invalid", func() {
+			code, _ := resetPasswordHandler(invalidEmail, "4000", validPassword, passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 400 if password length is not correct", func() {
+			code, _ := resetPasswordHandler(validEmail, "4000", invalidPassword, passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 400 if reset token is invalid", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Signup(user)
+			_, _ = forgotPasswordHandler(validEmail, passwordManager)
+			code, _ := resetPasswordHandler(validEmail, "23423423424", validPassword, passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 204 if password is changed successfully", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Signup(user)
+			code, _ := passwordManager.ForgotPassword(validEmail)
+			httpCode, _ := resetPasswordHandler(validEmail, code, validPassword, passwordManager)
+			Expect(httpCode).To(Equal(http.StatusNoContent))
+		})
+	})
 }

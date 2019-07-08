@@ -171,9 +171,43 @@ func changePasswordHandler(request change_password.Request, passwordManager inte
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
-	//rest.NotImplemented(c)
-	c.JSON(http.StatusOK, reset_password.Response{})
+	var request reset_password.Request
+	if isInvalidResetPassword(c, &request) {
+		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
+			errors.New("email or code missing")))
+	} else {
+		config.handleNoContentOrErrorResponse(request, c)
+	}
+}
 
+func isInvalidResetPassword(c *gin.Context, request *reset_password.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
+}
+
+func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, reset_password.Response) {
+	err := handler.ResetPassword(email, code, newPassword)
+
+	if err != nil {
+		switch err.(type) {
+		case util.InvalidEmailError:
+			return http.StatusBadRequest, reset_password.Response{}
+		case util.PasswordLengthError:
+			return http.StatusBadRequest, reset_password.Response{}
+		case util.InvalidResetPasswordCode:
+			return http.StatusBadRequest, reset_password.Response{}
+		default:
+			return http.StatusInternalServerError, reset_password.Response{}
+		}
+	}
+	return http.StatusNoContent, reset_password.Response{}
+}
+
+func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request reset_password.Request, c *gin.Context) {
+	if code, response := resetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent {
+		c.Status(http.StatusNoContent)
+	} else {
+		c.JSON(code, response)
+	}
 }
 
 // @Summary Forgot password request functionality
