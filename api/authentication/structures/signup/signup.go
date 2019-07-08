@@ -39,8 +39,8 @@ type Request struct {
 // We need this because go-swag library doesn't support embedded struct and doesn't show all the attributes in
 // the documentation.
 type SwaggerResponse struct {
-	Status   string          `json:"status"`
-	Code     int             `json:"code"`
-	Messages []string        `json:"messages"`
+	Status   string    `json:"status"`
+	Code     int       `json:"code"`
+	Messages []string  `json:"messages"`
 	Result   *Response `json:"result,omitempty"`
 }
