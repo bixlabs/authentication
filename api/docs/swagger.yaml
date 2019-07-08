@@ -67,11 +67,15 @@ definitions:
     type: object
   login.Response:
     properties:
-      result:
-        $ref: '#/definitions/login.Result'
+      exp:
+        type: integer
+      iat:
+        type: integer
+      jwt:
+        type: string
+      user:
+        $ref: '#/definitions/structures.User'
         type: object
-    type: object
-  login.Result:
     type: object
   login.SwaggerResponse:
     properties:
@@ -164,6 +168,21 @@ definitions:
         $ref: '#/definitions/signup.Response'
         type: object
       status:
+        type: string
+    type: object
+  structures.User:
+    properties:
+      email:
+        type: string
+      familyName:
+        type: string
+      givenName:
+        type: string
+      id:
+        type: string
+      secondFamilyName:
+        type: string
+      secondName:
         type: string
     type: object
 host: '{{.Host}}'
