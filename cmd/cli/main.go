@@ -30,5 +30,4 @@ func main() {
 	user, _ = auth.Login("email@bixlabs.com", "secured_password3")
 	jsonUser, _ = json.Marshal(user)
 	tools.Log().Info(string(jsonUser))
-
 }

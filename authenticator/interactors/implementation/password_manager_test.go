@@ -63,6 +63,17 @@ func TestPasswordManager(t *testing.T) {
 			Expect(err).NotTo(BeNil())
 		})
 
+		g.It("Should return an error in case newPassword is the same as old password", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			err = passwordManager.ChangePassword(user, validPassword)
+			_, ok := err.(util.SamePasswordChangeError)
+			Expect(true).To(Equal(ok))
+		})
+
 		g.It("Should end successfully when change password happened correctly", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
@@ -73,7 +84,6 @@ func TestPasswordManager(t *testing.T) {
 			_, err = auth.Login(user.Email, "Asdqwe123")
 			Expect(err).To(BeNil())
 		})
-
 	})
 
 	g.Describe("Send Reset Password Request process", func() {
@@ -123,8 +133,20 @@ func TestPasswordManager(t *testing.T) {
 			_, _ = auth.Signup(user)
 			_, _ = passwordManager.ForgotPassword(validEmail)
 
-			err := passwordManager.ResetPassword(validEmail, "0", validPassword)
+			err := passwordManager.ResetPassword(validEmail, "0", "secured_password2")
 			Expect(err.Error()).To(Equal(util.InvalidResetPasswordCode{}.Error()))
+		})
+
+		g.It("Should return an error in case newPassword is the same as old password", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Signup(user)
+			if err != nil {
+				panic(err)
+			}
+			code, _ := passwordManager.ForgotPassword(validEmail)
+			err = passwordManager.ResetPassword(validEmail, code, validPassword)
+			_, ok := err.(util.SamePasswordChangeError)
+			Expect(true).To(Equal(ok))
 		})
 
 		g.It("Should change the password given the correct code", func() {
@@ -132,10 +154,15 @@ func TestPasswordManager(t *testing.T) {
 			_, _ = auth.Signup(user)
 			code, _ := passwordManager.ForgotPassword(validEmail)
 
-			_ = passwordManager.ResetPassword(validEmail, code, "secured_password2")
-			_, err := auth.Login(user.Email, "secured_password2")
+			err := passwordManager.ResetPassword(validEmail, code, "secured_password2")
+			if err != nil {
+				panic(err)
+			}
+			_, err = auth.Login(user.Email, "secured_password2")
 			Expect(err).To(BeNil())
 		})
+
+
 	})
 
 }

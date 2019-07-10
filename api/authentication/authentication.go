@@ -77,6 +77,9 @@ func handleBasicErrors(err error) (int, error) {
 	if _, ok := err.(util.WrongCredentialsError); ok {
 		return http.StatusUnauthorized, err
 	}
+	if _, ok := err.(util.SamePasswordChangeError); ok {
+		return http.StatusBadRequest, err
+	}
 	return http.StatusInternalServerError, err
 }
 
@@ -188,18 +191,32 @@ func resetPasswordHandler(email string, code string, newPassword string, handler
 	err := handler.ResetPassword(email, code, newPassword)
 
 	if err != nil {
-		switch err.(type) {
-		case util.InvalidEmailError:
+		if isInvalidEmail(err) || isPasswordLength(err) || isInvalidCode(err) || isSamePasswordChange(err) {
 			return http.StatusBadRequest, reset_password.Response{}
-		case util.PasswordLengthError:
-			return http.StatusBadRequest, reset_password.Response{}
-		case util.InvalidResetPasswordCode:
-			return http.StatusBadRequest, reset_password.Response{}
-		default:
-			return http.StatusInternalServerError, reset_password.Response{}
 		}
+		return http.StatusInternalServerError, reset_password.Response{}
 	}
 	return http.StatusNoContent, reset_password.Response{}
+}
+
+func isInvalidEmail(err error) bool {
+	_, ok := err.(util.InvalidEmailError)
+	return ok
+}
+
+func isPasswordLength(err error) bool {
+	_, ok := err.(util.PasswordLengthError)
+	return ok
+}
+
+func isInvalidCode(err error) bool {
+	_, ok := err.(util.InvalidResetPasswordCode)
+	return ok
+}
+
+func isSamePasswordChange(err error) bool {
+	_, ok := err.(util.SamePasswordChangeError)
+	return ok
 }
 
 func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request reset_password.Request, c *gin.Context) {
