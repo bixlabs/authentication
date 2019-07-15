@@ -84,4 +84,3 @@ type SamePasswordChangeError struct{}
 func (SamePasswordChangeError) Error() string {
 	return "new password cannot be equal to the actual"
 }
-

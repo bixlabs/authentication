@@ -75,7 +75,6 @@ func (pm passwordManager) hashAndSavePassword(email, newPassword string) error {
 	return nil
 }
 
-
 func (pm passwordManager) ForgotPassword(email string) (string, error) {
 	if err := util.IsValidEmail(email); err != nil {
 		return "", err
