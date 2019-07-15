@@ -1,4 +1,4 @@
-package in_memory
+package memory
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 )
 
 type UserRepo struct {
-	lastId int
+	lastID int
 	users  map[string]structures.User
 }
 
@@ -20,8 +20,8 @@ func NewUserRepo() user.Repository {
 }
 
 func (u *UserRepo) Create(user structures.User) (structures.User, error) {
-	u.lastId = u.lastId + 1
-	user.ID = strconv.Itoa(u.lastId)
+	u.lastID++
+	user.ID = strconv.Itoa(u.lastID)
 	u.users[user.Email] = user
 	return user, nil
 }
@@ -57,7 +57,7 @@ func (u *UserRepo) UpdateResetToken(email, resetToken string) error {
 func (u *UserRepo) Find(email string) (structures.User, error) {
 	user, exist := u.users[email]
 	if !exist {
-		return structures.User{}, errors.New("Email does not exist")
+		return structures.User{}, errors.New("email does not exist")
 	}
 	user.Password = ""
 	return user, nil

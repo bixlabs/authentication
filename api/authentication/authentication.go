@@ -2,11 +2,11 @@ package authentication
 
 import (
 	"errors"
-	"github.com/bixlabs/authentication/api/authentication/structures/change_password"
-	"github.com/bixlabs/authentication/api/authentication/structures/forgot_password"
+	"github.com/bixlabs/authentication/api/authentication/structures/changepass"
+	"github.com/bixlabs/authentication/api/authentication/structures/forgotpass"
 	"github.com/bixlabs/authentication/api/authentication/structures/login"
 	"github.com/bixlabs/authentication/api/authentication/structures/mappers"
-	"github.com/bixlabs/authentication/api/authentication/structures/reset_password"
+	"github.com/bixlabs/authentication/api/authentication/structures/resetpass"
 	"github.com/bixlabs/authentication/api/authentication/structures/signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
@@ -19,8 +19,8 @@ type authenticatorRESTConfigurator struct {
 	passwordManager interactors.PasswordManager
 }
 
-func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interactors.PasswordManager, router *gin.Engine) {
-	configureAuthRoutes(authenticatorRESTConfigurator{auth, pm}, router)
+func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interactors.PasswordManager, r *gin.Engine) {
+	configureAuthRoutes(authenticatorRESTConfigurator{auth, pm}, r)
 }
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
@@ -138,14 +138,14 @@ func isDuplicatedEmail(err error) bool {
 // @Description It changes the password provided the old one and a new password.
 // @Accept  json
 // @Produce  json
-// @Param changePassword body change_password.Request true "Change password Request"
-// @Success 200 {object} change_password.SwaggerResponse
+// @Param changePassword body changepass.Request true "Change password Request"
+// @Success 200 {object} changepass.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/change-password [put]
 func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
-	var request change_password.Request
+	var request changepass.Request
 	if isInvalidChangePasswordRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email, old password or new password missing")))
@@ -154,25 +154,26 @@ func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 	}
 }
 
-func isInvalidChangePasswordRequest(c *gin.Context, request *change_password.Request) bool {
-	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.OldPassword == "" || request.NewPassword == ""
+func isInvalidChangePasswordRequest(c *gin.Context, request *changepass.Request) bool {
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.OldPassword == "" ||
+		request.NewPassword == ""
 }
 
-func changePasswordHandler(request change_password.Request, passwordManager interactors.PasswordManager) (int, change_password.Response) {
-	if err := passwordManager.ChangePassword(mappers.ChangePasswordRequestToUser(request), request.NewPassword); err != nil {
+func changePasswordHandler(request changepass.Request, pm interactors.PasswordManager) (int, changepass.Response) {
+	if err := pm.ChangePassword(mappers.ChangePasswordRequestToUser(request), request.NewPassword); err != nil {
 		return handleChangePasswordError(err)
 	}
-	return http.StatusOK, change_password.NewResponse(http.StatusOK, true)
+	return http.StatusOK, changepass.NewResponse(http.StatusOK, true)
 }
 
-func handleChangePasswordError(err error) (int, change_password.Response) {
+func handleChangePasswordError(err error) (int, changepass.Response) {
 	if isInvalidEmail(err) || isPasswordLength(err) || isSamePasswordChange(err) {
-		return http.StatusBadRequest, change_password.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusBadRequest, changepass.NewErrorResponse(http.StatusBadRequest, err)
 	}
 	if _, ok := err.(util.WrongCredentialsError); ok {
-		return http.StatusUnauthorized, change_password.NewErrorResponse(http.StatusUnauthorized, err)
+		return http.StatusUnauthorized, changepass.NewErrorResponse(http.StatusUnauthorized, err)
 	}
-	return http.StatusInternalServerError, change_password.NewErrorResponse(http.StatusInternalServerError, err)
+	return http.StatusInternalServerError, changepass.NewErrorResponse(http.StatusInternalServerError, err)
 }
 
 func isSamePasswordChange(err error) bool {
@@ -184,8 +185,8 @@ func isSamePasswordChange(err error) bool {
 // @Description It resets your password given the correct code and new password.
 // @Accept  json
 // @Produce  json
-// @Param resetPassword body reset_password.Request true "Reset password Request"
-// @Success 200 {object} reset_password.Response
+// @Param resetPassword body resetpass.Request true "Reset password Request"
+// @Success 200 {object} resetpass.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 404 {object} rest.ResponseWrapper
 // @Failure 408 {object} rest.ResponseWrapper
@@ -193,7 +194,7 @@ func isSamePasswordChange(err error) bool {
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
-	var request reset_password.Request
+	var request passreset.Request
 	if isInvalidResetPassword(c, &request) {
 		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email or code missing")))
@@ -202,30 +203,30 @@ func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 	}
 }
 
-func isInvalidResetPassword(c *gin.Context, request *reset_password.Request) bool {
+func isInvalidResetPassword(c *gin.Context, request *passreset.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
 }
 
-func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request reset_password.Request, c *gin.Context) {
-	if code, response := resetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent {
+func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request passreset.Request, c *gin.Context) {
+	if code, response := resetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent { //nolint
 		c.Status(http.StatusNoContent)
 	} else {
 		c.JSON(code, response)
 	}
 }
 
-func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, reset_password.Response) {
+func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, passreset.Response) { //nolint
 	if err := handler.ResetPassword(email, code, newPassword); err != nil {
 		return handleResetPasswordError(err)
 	}
-	return http.StatusNoContent, reset_password.Response{}
+	return http.StatusNoContent, passreset.Response{}
 }
 
-func handleResetPasswordError(err error) (int, reset_password.Response) {
+func handleResetPasswordError(err error) (int, passreset.Response) {
 	if isInvalidEmail(err) || isPasswordLength(err) || isInvalidCode(err) || isSamePasswordChange(err) {
-		return http.StatusBadRequest, reset_password.Response{}
+		return http.StatusBadRequest, passreset.Response{}
 	}
-	return http.StatusInternalServerError, reset_password.Response{}
+	return http.StatusInternalServerError, passreset.Response{}
 }
 
 func isInvalidCode(err error) bool {
@@ -237,36 +238,36 @@ func isInvalidCode(err error) bool {
 // @Description It enters into the flow of reset password sending an email with instructions
 // @Accept  json
 // @Produce  json
-// @Param resetPassword body forgot_password.Request true "Forgot password request"
-// @Success 202 {object} forgot_password.SwaggerResponse
+// @Param resetPassword body forgotpass.Request true "Forgot password request"
+// @Success 202 {object} forgotpass.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/reset-password-request [put]
 func (config authenticatorRESTConfigurator) forgotPassword(c *gin.Context) {
-	var request forgot_password.Request
+	var request forgotpass.Request
 	if isInvalidForgotPasswordRequest(c, &request) {
-		c.JSON(http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest,
+		c.JSON(http.StatusBadRequest, forgotpass.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email is required")))
 	} else {
 		c.JSON(forgotPasswordHandler(request.Email, config.passwordManager))
 	}
 }
 
-func isInvalidForgotPasswordRequest(c *gin.Context, request *forgot_password.Request) bool {
+func isInvalidForgotPasswordRequest(c *gin.Context, request *forgotpass.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == ""
 }
 
-func forgotPasswordHandler(email string, handler interactors.PasswordManager) (int, forgot_password.Response) {
+func forgotPasswordHandler(email string, handler interactors.PasswordManager) (int, forgotpass.Response) {
 	_, err := handler.ForgotPassword(email)
 	if err != nil {
 		return handleForgotPasswordError(err)
 	}
-	return http.StatusAccepted, forgot_password.NewResponse(http.StatusAccepted, &forgot_password.Result{Success: true})
+	return http.StatusAccepted, forgotpass.NewResponse(http.StatusAccepted, &forgotpass.Result{Success: true})
 }
 
-func handleForgotPasswordError(err error) (int, forgot_password.Response) {
+func handleForgotPasswordError(err error) (int, forgotpass.Response) {
 	if isInvalidEmail(err) {
-		return http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest, err)
+		return http.StatusBadRequest, forgotpass.NewErrorResponse(http.StatusBadRequest, err)
 	}
-	return http.StatusInternalServerError, forgot_password.NewErrorResponse(http.StatusInternalServerError, err)
+	return http.StatusInternalServerError, forgotpass.NewErrorResponse(http.StatusInternalServerError, err)
 }

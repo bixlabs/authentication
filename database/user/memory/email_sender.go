@@ -1,4 +1,4 @@
-package in_memory
+package memory
 
 import (
 	"github.com/bixlabs/authentication/authenticator/structures"
