@@ -34,10 +34,22 @@ func (pm passwordManager) ChangePassword(user structures.User, newPassword strin
 		return err
 	}
 
+	if user.Password == newPassword {
+		return util.SamePasswordChangeError{}
+	}
+
 	if err := util.CheckPasswordLength(newPassword); err != nil {
 		return err
 	}
 
+	if err := pm.isPasswordMatch(user); err != nil {
+		return err
+	}
+
+	return pm.hashAndSavePassword(user.Email, newPassword)
+}
+
+func (pm passwordManager) isPasswordMatch(user structures.User) error {
 	oldHashedPassword, err := pm.repository.GetHashedPassword(user.Email)
 	if err != nil {
 		return err
@@ -47,14 +59,22 @@ func (pm passwordManager) ChangePassword(user structures.User, newPassword strin
 		return err
 	}
 
+	return nil
+}
+
+func (pm passwordManager) hashAndSavePassword(email, newPassword string) error {
 	hashedPassword, err := util.HashPassword(newPassword)
 
 	if err != nil {
 		return err
 	}
 
-	return pm.repository.ChangePassword(user.Email, hashedPassword)
+	if err := pm.repository.ChangePassword(email, hashedPassword); err != nil {
+		return err
+	}
+	return nil
 }
+
 
 func (pm passwordManager) ForgotPassword(email string) (string, error) {
 	if err := util.IsValidEmail(email); err != nil {
@@ -102,6 +122,22 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 		return err
 	}
 
+	if err := pm.isValidCode(email, code); err != nil {
+		return err
+	}
+
+	if err := pm.isNewPasswordSameAsOld(email, newPassword); err != nil {
+		return err
+	}
+
+	if err := pm.hashAndSavePassword(email, newPassword); err != nil {
+		return err
+	}
+
+	return pm.repository.UpdateResetToken(email, "")
+}
+
+func (pm passwordManager) isValidCode(email, code string) error {
 	account, err := pm.repository.Find(email)
 
 	if err != nil {
@@ -112,15 +148,17 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 		return util.InvalidResetPasswordCode{}
 	}
 
-	hashedPassword, err := util.HashPassword(newPassword)
+	return nil
+}
 
+func (pm passwordManager) isNewPasswordSameAsOld(email, newPassword string) error {
+	oldHashedPassword, err := pm.repository.GetHashedPassword(email)
 	if err != nil {
 		return err
 	}
 
-	if err := pm.repository.ChangePassword(email, hashedPassword); err != nil {
-		return err
+	if err := util.VerifyPassword(oldHashedPassword, newPassword); err == nil {
+		return util.SamePasswordChangeError{}
 	}
-
-	return pm.repository.UpdateResetToken(email, "")
+	return nil
 }

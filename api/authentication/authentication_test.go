@@ -119,6 +119,14 @@ func TestRest(t *testing.T) {
 			Expect(code).To(Equal(http.StatusUnauthorized))
 		})
 
+		g.It("should return 400 if newPassword is the same as the actual one", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Signup(user)
+			request := change_password.Request{Email: user.Email, OldPassword: validPassword, NewPassword: validPassword}
+			code, _ := changePasswordHandler(request, passwordManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
 		g.It("Should return 200 if user provides the correct information", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
@@ -185,12 +193,21 @@ func TestRest(t *testing.T) {
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
-		g.It("should return 204 if password is changed successfully", func() {
+		g.It("should return 400 if newPassword is the same as the actual one", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
 			code, _ := passwordManager.ForgotPassword(validEmail)
 			httpCode, _ := resetPasswordHandler(validEmail, code, validPassword, passwordManager)
+			Expect(httpCode).To(Equal(http.StatusBadRequest))
+		})
+
+		g.It("should return 204 if password is changed successfully", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Signup(user)
+			code, _ := passwordManager.ForgotPassword(validEmail)
+			httpCode, _ := resetPasswordHandler(validEmail, code, "secured_password2", passwordManager)
 			Expect(httpCode).To(Equal(http.StatusNoContent))
 		})
+
 	})
 }

@@ -60,24 +60,24 @@ func isInvalidLoginRequest(c *gin.Context, request *login.Request) bool {
 func loginHandler(email, password string, handler interactors.Authenticator) (int, login.Response) {
 	response, err := handler.Login(email, password)
 	if err != nil {
-		code, err := handleBasicErrors(err)
-		return code, login.NewErrorResponse(code, err)
+		return handleLoginError(err)
 	}
-
 	return http.StatusOK, login.NewResponse(http.StatusOK, mappers.LoginResponseToResult(*response))
 }
 
-func handleBasicErrors(err error) (int, error) {
-	if _, ok := err.(util.InvalidEmailError); ok {
-		return http.StatusBadRequest, err
+func handleLoginError(err error) (int, login.Response) {
+	var code int
+	switch err.(type) {
+	case util.InvalidEmailError:
+		code = http.StatusBadRequest
+	case util.PasswordLengthError:
+		code = http.StatusBadRequest
+	case util.WrongCredentialsError:
+		code = http.StatusUnauthorized
+	default:
+		code = http.StatusInternalServerError
 	}
-	if _, ok := err.(util.PasswordLengthError); ok {
-		return http.StatusBadRequest, err
-	}
-	if _, ok := err.(util.WrongCredentialsError); ok {
-		return http.StatusUnauthorized, err
-	}
-	return http.StatusInternalServerError, err
+	return code, login.NewErrorResponse(code, err)
 }
 
 // @Summary Signup functionality
@@ -107,21 +107,31 @@ func isInvalidSignupRequest(c *gin.Context, request *signup.Request) bool {
 func signupHandler(request signup.Request, handler interactors.Authenticator) (int, signup.Response) {
 	_, err := handler.Signup(mappers.SignupRequestToUser(request))
 	if err != nil {
-		if _, ok := err.(util.InvalidEmailError); ok {
-			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
-		}
-
-		if _, ok := err.(util.PasswordLengthError); ok {
-			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
-		}
-
-		if _, ok := err.(util.DuplicatedEmailError); ok {
-			return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
-		}
-		return http.StatusInternalServerError, signup.NewErrorResponse(http.StatusInternalServerError, err)
-
+		return handleSignUpError(err)
 	}
 	return http.StatusCreated, signup.NewResponse(http.StatusCreated, &signup.Result{Success: true})
+}
+
+func handleSignUpError(err error) (int, signup.Response) {
+	if isInvalidEmail(err) || isPasswordLength(err) || isDuplicatedEmail(err) {
+		return http.StatusBadRequest, signup.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	return http.StatusInternalServerError, signup.NewErrorResponse(http.StatusInternalServerError, err)
+}
+
+func isInvalidEmail(err error) bool {
+	_, ok := err.(util.InvalidEmailError)
+	return ok
+}
+
+func isPasswordLength(err error) bool {
+	_, ok := err.(util.PasswordLengthError)
+	return ok
+}
+
+func isDuplicatedEmail(err error) bool {
+	_, ok := err.(util.DuplicatedEmailError)
+	return ok
 }
 
 // @Summary Change password functionality
@@ -149,13 +159,25 @@ func isInvalidChangePasswordRequest(c *gin.Context, request *change_password.Req
 }
 
 func changePasswordHandler(request change_password.Request, passwordManager interactors.PasswordManager) (int, change_password.Response) {
-	err := passwordManager.ChangePassword(mappers.ChangePasswordRequestToUser(request), request.NewPassword)
-	if err != nil {
-		code, err := handleBasicErrors(err)
-		return code, change_password.NewErrorResponse(code, err)
+	if err := passwordManager.ChangePassword(mappers.ChangePasswordRequestToUser(request), request.NewPassword); err != nil {
+		return handleChangePasswordError(err)
 	}
-
 	return http.StatusOK, change_password.NewResponse(http.StatusOK, true)
+}
+
+func handleChangePasswordError(err error) (int, change_password.Response) {
+	if isInvalidEmail(err) || isPasswordLength(err) || isSamePasswordChange(err) {
+		return http.StatusBadRequest, change_password.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	if _, ok := err.(util.WrongCredentialsError); ok {
+		return http.StatusUnauthorized, change_password.NewErrorResponse(http.StatusUnauthorized, err)
+	}
+	return http.StatusInternalServerError, change_password.NewErrorResponse(http.StatusInternalServerError, err)
+}
+
+func isSamePasswordChange(err error) bool {
+	_, ok := err.(util.SamePasswordChangeError)
+	return ok
 }
 
 // @Summary Reset password functionality
@@ -184,30 +206,31 @@ func isInvalidResetPassword(c *gin.Context, request *reset_password.Request) boo
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
 }
 
-func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, reset_password.Response) {
-	err := handler.ResetPassword(email, code, newPassword)
-
-	if err != nil {
-		switch err.(type) {
-		case util.InvalidEmailError:
-			return http.StatusBadRequest, reset_password.Response{}
-		case util.PasswordLengthError:
-			return http.StatusBadRequest, reset_password.Response{}
-		case util.InvalidResetPasswordCode:
-			return http.StatusBadRequest, reset_password.Response{}
-		default:
-			return http.StatusInternalServerError, reset_password.Response{}
-		}
-	}
-	return http.StatusNoContent, reset_password.Response{}
-}
-
 func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request reset_password.Request, c *gin.Context) {
 	if code, response := resetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent {
 		c.Status(http.StatusNoContent)
 	} else {
 		c.JSON(code, response)
 	}
+}
+
+func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, reset_password.Response) {
+	if err := handler.ResetPassword(email, code, newPassword); err != nil {
+		return handleResetPasswordError(err)
+	}
+	return http.StatusNoContent, reset_password.Response{}
+}
+
+func handleResetPasswordError(err error) (int, reset_password.Response) {
+	if isInvalidEmail(err) || isPasswordLength(err) || isInvalidCode(err) || isSamePasswordChange(err) {
+		return http.StatusBadRequest, reset_password.Response{}
+	}
+	return http.StatusInternalServerError, reset_password.Response{}
+}
+
+func isInvalidCode(err error) bool {
+	_, ok := err.(util.InvalidResetPasswordCode)
+	return ok
 }
 
 // @Summary Forgot password request functionality
@@ -236,11 +259,14 @@ func isInvalidForgotPasswordRequest(c *gin.Context, request *forgot_password.Req
 func forgotPasswordHandler(email string, handler interactors.PasswordManager) (int, forgot_password.Response) {
 	_, err := handler.ForgotPassword(email)
 	if err != nil {
-		if _, ok := err.(util.InvalidEmailError); ok {
-			return http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest, err)
-		}
-		return http.StatusInternalServerError, forgot_password.NewErrorResponse(http.StatusInternalServerError, err)
+		return handleForgotPasswordError(err)
 	}
-
 	return http.StatusAccepted, forgot_password.NewResponse(http.StatusAccepted, &forgot_password.Result{Success: true})
+}
+
+func handleForgotPasswordError(err error) (int, forgot_password.Response) {
+	if isInvalidEmail(err) {
+		return http.StatusBadRequest, forgot_password.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	return http.StatusInternalServerError, forgot_password.NewErrorResponse(http.StatusInternalServerError, err)
 }
