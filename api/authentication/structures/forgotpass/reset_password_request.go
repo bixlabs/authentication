@@ -1,4 +1,4 @@
-package forgot_password
+package forgotpass
 
 import (
 	"github.com/bixlabs/authentication/tools/rest"

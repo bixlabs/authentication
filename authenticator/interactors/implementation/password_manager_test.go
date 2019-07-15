@@ -4,7 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
-	"github.com/bixlabs/authentication/database/user/in_memory"
+	"github.com/bixlabs/authentication/database/user/memory"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -25,7 +25,7 @@ func TestPasswordManager(t *testing.T) {
 
 	g.Describe("Change password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})
@@ -88,7 +88,7 @@ func TestPasswordManager(t *testing.T) {
 
 	g.Describe("Send Reset Password Request process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})
@@ -100,7 +100,7 @@ func TestPasswordManager(t *testing.T) {
 
 		g.It("Should return an error when the email is not present in the storage", func() {
 			_, err := passwordManager.ForgotPassword(validEmail)
-			Expect(err.Error()).To(Equal("Email does not exist"))
+			Expect(err.Error()).To(Equal("email does not exist"))
 		})
 
 		g.It("Should generate a code and send an email", func() {
@@ -113,7 +113,7 @@ func TestPasswordManager(t *testing.T) {
 
 	g.Describe("Reset Password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})
@@ -161,8 +161,6 @@ func TestPasswordManager(t *testing.T) {
 			_, err = auth.Login(user.Email, "secured_password2")
 			Expect(err).To(BeNil())
 		})
-
-
 	})
 
 }

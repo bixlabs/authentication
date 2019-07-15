@@ -1,12 +1,12 @@
 package authentication
 
 import (
-	"github.com/bixlabs/authentication/api/authentication/structures/change_password"
+	"github.com/bixlabs/authentication/api/authentication/structures/changepass"
 	"github.com/bixlabs/authentication/api/authentication/structures/signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
-	"github.com/bixlabs/authentication/database/user/in_memory"
+	"github.com/bixlabs/authentication/database/user/memory"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -33,7 +33,7 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Login rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
@@ -63,7 +63,7 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Reset password request rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
@@ -88,25 +88,25 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Change Password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
 
 		g.It("Should return 400 if email is not valid", func() {
-			request := change_password.Request{Email: invalidEmail}
+			request := changepass.Request{Email: invalidEmail}
 			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("Should return 400 if password length is less than 8", func() {
-			request := change_password.Request{Email: validEmail, NewPassword: invalidPassword}
+			request := changepass.Request{Email: validEmail, NewPassword: invalidPassword}
 			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("Should return 500 if we can't get the hashed password from db", func() {
-			request := change_password.Request{Email: validEmail, NewPassword: validPassword}
+			request := changepass.Request{Email: validEmail, NewPassword: validPassword}
 			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusInternalServerError))
 		})
@@ -114,7 +114,7 @@ func TestRest(t *testing.T) {
 		g.It("Should return 400 if user password is not valid", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			request := change_password.Request{Email: user.Email, NewPassword: validPassword}
+			request := changepass.Request{Email: user.Email, NewPassword: validPassword}
 			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusUnauthorized))
 		})
@@ -122,7 +122,7 @@ func TestRest(t *testing.T) {
 		g.It("should return 400 if newPassword is the same as the actual one", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			request := change_password.Request{Email: user.Email, OldPassword: validPassword, NewPassword: validPassword}
+			request := changepass.Request{Email: user.Email, OldPassword: validPassword, NewPassword: validPassword}
 			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
@@ -130,7 +130,7 @@ func TestRest(t *testing.T) {
 		g.It("Should return 200 if user provides the correct information", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			request := change_password.Request{Email: user.Email, OldPassword: validPassword, NewPassword: "12345678"}
+			request := changepass.Request{Email: user.Email, OldPassword: validPassword, NewPassword: "12345678"}
 			code, _ := changePasswordHandler(request, passwordManager)
 			Expect(code).To(Equal(http.StatusOK))
 		})
@@ -138,7 +138,7 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Sign up rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
@@ -170,7 +170,7 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Reset password rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := in_memory.NewUserRepo(), in_memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})

@@ -1,6 +1,7 @@
-package reset_password
+package passreset
 
-//TODO: We could use nested struct promoted fields here but the swaggo library is not generating correct documentation using that.
+//TODO: We could use nested struct promoted fields here but the swaggo
+// library is not generating correct documentation using that.
 type Response struct {
 	Status   string   `json:"status"`
 	Code     int      `json:"code"`

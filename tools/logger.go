@@ -7,7 +7,7 @@ import (
 
 // For more information: https://github.com/sirupsen/logrus/blob/master/example_basic_test.go
 
-var log *logrus.Logger
+var log *logrus.Logger //nolint
 
 func InitializeLogger() {
 	log = logrus.New()
@@ -74,7 +74,8 @@ func InitializeLogger() {
 	// level=warning msg="The group's number increased tremendously!" number=122 omg=true
 	// level=debug msg="Temperature changes" temperature=-4
 	// level=panic msg="It's over 9000!" animal=orca size=9009
-	// level=error msg="The ice breaks!" err_animal=orca err_level=panic err_message="It's over 9000!" err_size=9009 number=100 omg=true
+	// level=error msg="The ice breaks!" err_animal=orca err_level=panic
+	// err_message="It's over 9000!" err_size=9009 number=100 omg=true
 }
 
 func Log() *logrus.Logger {

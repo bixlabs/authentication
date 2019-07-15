@@ -2,12 +2,12 @@ package implementation
 
 import (
 	"github.com/bixlabs/authentication/authenticator/database/user"
+	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
-	_ "github.com/joho/godotenv/autoload"
 	"math/rand"
 	"strconv"
 	"time"
@@ -20,7 +20,7 @@ type passwordManager struct {
 	ResetPasswordCodeMin int `env:"AUTH_SERVER_RESET_PASSWORD_MIN" envDefault:"10000"`
 }
 
-func NewPasswordManager(repository user.Repository, sender email.Sender) passwordManager {
+func NewPasswordManager(repository user.Repository, sender email.Sender) interactors.PasswordManager {
 	pm := passwordManager{repository: repository, sender: sender}
 	err := env.Parse(&pm)
 	if err != nil {
@@ -74,7 +74,6 @@ func (pm passwordManager) hashAndSavePassword(email, newPassword string) error {
 	}
 	return nil
 }
-
 
 func (pm passwordManager) ForgotPassword(email string) (string, error) {
 	if err := util.IsValidEmail(email); err != nil {

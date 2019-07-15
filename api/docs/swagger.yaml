@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  change_password.Request:
+  changepass.Request:
     properties:
       email:
         type: string
@@ -9,18 +9,18 @@ definitions:
       oldPassword:
         type: string
     type: object
-  change_password.Response:
+  changepass.Response:
     properties:
       result:
-        $ref: '#/definitions/change_password.Result'
+        $ref: '#/definitions/changepass.Result'
         type: object
     type: object
-  change_password.Result:
+  changepass.Result:
     properties:
       success:
         type: boolean
     type: object
-  change_password.SwaggerResponse:
+  changepass.SwaggerResponse:
     properties:
       code:
         type: integer
@@ -29,22 +29,22 @@ definitions:
           type: string
         type: array
       result:
-        $ref: '#/definitions/change_password.Response'
+        $ref: '#/definitions/changepass.Response'
         type: object
       status:
         type: string
     type: object
-  forgot_password.Request:
+  forgotpass.Request:
     properties:
       email:
         type: string
     type: object
-  forgot_password.Result:
+  forgotpass.Result:
     properties:
       success:
         type: boolean
     type: object
-  forgot_password.SwaggerResponse:
+  forgotpass.SwaggerResponse:
     properties:
       code:
         type: integer
@@ -53,7 +53,7 @@ definitions:
           type: string
         type: array
       result:
-        $ref: '#/definitions/forgot_password.Result'
+        $ref: '#/definitions/forgotpass.Result'
         type: object
       status:
         type: string
@@ -91,7 +91,7 @@ definitions:
       status:
         type: string
     type: object
-  reset_password.Request:
+  resetpass.Request:
     properties:
       code:
         type: string
@@ -100,7 +100,7 @@ definitions:
       newPassword:
         type: string
     type: object
-  reset_password.Response:
+  resetpass.Response:
     properties:
       code:
         type: integer
@@ -109,15 +109,9 @@ definitions:
           type: string
         type: array
       result:
-        $ref: '#/definitions/reset_password.Result'
-        type: object
+        type: Result
       status:
         type: string
-    type: object
-  reset_password.Result:
-    properties:
-      success:
-        type: boolean
     type: object
   rest.ResponseWrapper:
     properties:
@@ -209,7 +203,7 @@ paths:
         name: changePassword
         required: true
         schema:
-          $ref: '#/definitions/change_password.Request'
+          $ref: '#/definitions/changepass.Request'
           type: object
       produces:
       - application/json
@@ -217,7 +211,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/change_password.SwaggerResponse'
+            $ref: '#/definitions/changepass.SwaggerResponse'
             type: object
         "400":
           description: Bad Request
@@ -283,7 +277,7 @@ paths:
         name: resetPassword
         required: true
         schema:
-          $ref: '#/definitions/reset_password.Request'
+          $ref: '#/definitions/resetpass.Request'
           type: object
       produces:
       - application/json
@@ -291,7 +285,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/reset_password.Response'
+            $ref: '#/definitions/resetpass.Response'
             type: object
         "400":
           description: Bad Request
@@ -331,7 +325,7 @@ paths:
         name: resetPassword
         required: true
         schema:
-          $ref: '#/definitions/forgot_password.Request'
+          $ref: '#/definitions/forgotpass.Request'
           type: object
       produces:
       - application/json
@@ -339,7 +333,7 @@ paths:
         "202":
           description: Accepted
           schema:
-            $ref: '#/definitions/forgot_password.SwaggerResponse'
+            $ref: '#/definitions/forgotpass.SwaggerResponse'
             type: object
         "400":
           description: Bad Request

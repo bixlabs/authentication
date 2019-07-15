@@ -1,4 +1,4 @@
-package change_password
+package changepass
 
 import "github.com/bixlabs/authentication/tools/rest"
 

@@ -4,7 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
-	"github.com/bixlabs/authentication/database/user/in_memory"
+	"github.com/bixlabs/authentication/database/user/memory"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -30,7 +30,7 @@ func TestAuthenticator(t *testing.T) {
 
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
 		})
 
 		g.It("Should check for email duplication ", func() {
@@ -84,7 +84,7 @@ func TestAuthenticator(t *testing.T) {
 
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(in_memory.NewUserRepo(), in_memory.DummySender{})
+			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {

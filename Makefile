@@ -30,7 +30,7 @@ clean:
 		rm -r -f ./tmp
 
 lint:
-		$(GOPATH)/bin/golangci-lint run
+		$(GOPATH)/bin/golangci-lint run --enable-all --disable goimports
 
 run-dev:
 		make format && air -c .air.config

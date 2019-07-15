@@ -35,7 +35,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/change_password.Request"
+                            "$ref": "#/definitions/changepass.Request"
                         }
                     }
                 ],
@@ -44,7 +44,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/change_password.SwaggerResponse"
+                            "$ref": "#/definitions/changepass.SwaggerResponse"
                         }
                     },
                     "400": {
@@ -143,7 +143,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/reset_password.Request"
+                            "$ref": "#/definitions/resetpass.Request"
                         }
                     }
                 ],
@@ -152,7 +152,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/reset_password.Response"
+                            "$ref": "#/definitions/resetpass.Response"
                         }
                     },
                     "400": {
@@ -211,7 +211,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/forgot_password.Request"
+                            "$ref": "#/definitions/forgotpass.Request"
                         }
                     }
                 ],
@@ -220,7 +220,7 @@
                         "description": "Accepted",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/forgot_password.SwaggerResponse"
+                            "$ref": "#/definitions/forgotpass.SwaggerResponse"
                         }
                     },
                     "400": {
@@ -289,7 +289,7 @@
         }
     },
     "definitions": {
-        "change_password.Request": {
+        "changepass.Request": {
             "type": "object",
             "properties": {
                 "email": {
@@ -303,16 +303,16 @@
                 }
             }
         },
-        "change_password.Response": {
+        "changepass.Response": {
             "type": "object",
             "properties": {
                 "result": {
                     "type": "object",
-                    "$ref": "#/definitions/change_password.Result"
+                    "$ref": "#/definitions/changepass.Result"
                 }
             }
         },
-        "change_password.Result": {
+        "changepass.Result": {
             "type": "object",
             "properties": {
                 "success": {
@@ -320,7 +320,7 @@
                 }
             }
         },
-        "change_password.SwaggerResponse": {
+        "changepass.SwaggerResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -334,14 +334,14 @@
                 },
                 "result": {
                     "type": "object",
-                    "$ref": "#/definitions/change_password.Response"
+                    "$ref": "#/definitions/changepass.Response"
                 },
                 "status": {
                     "type": "string"
                 }
             }
         },
-        "forgot_password.Request": {
+        "forgotpass.Request": {
             "type": "object",
             "properties": {
                 "email": {
@@ -349,7 +349,7 @@
                 }
             }
         },
-        "forgot_password.Result": {
+        "forgotpass.Result": {
             "type": "object",
             "properties": {
                 "success": {
@@ -357,7 +357,7 @@
                 }
             }
         },
-        "forgot_password.SwaggerResponse": {
+        "forgotpass.SwaggerResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -371,7 +371,7 @@
                 },
                 "result": {
                     "type": "object",
-                    "$ref": "#/definitions/forgot_password.Result"
+                    "$ref": "#/definitions/forgotpass.Result"
                 },
                 "status": {
                     "type": "string"
@@ -428,7 +428,7 @@
                 }
             }
         },
-        "reset_password.Request": {
+        "resetpass.Request": {
             "type": "object",
             "properties": {
                 "code": {
@@ -442,7 +442,7 @@
                 }
             }
         },
-        "reset_password.Response": {
+        "resetpass.Response": {
             "type": "object",
             "properties": {
                 "code": {
@@ -455,19 +455,10 @@
                     }
                 },
                 "result": {
-                    "type": "object",
-                    "$ref": "#/definitions/reset_password.Result"
+                    "type": "Result"
                 },
                 "status": {
                     "type": "string"
-                }
-            }
-        },
-        "reset_password.Result": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "boolean"
                 }
             }
         },

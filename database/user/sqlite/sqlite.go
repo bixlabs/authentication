@@ -9,7 +9,6 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type sqliteStorage struct {
@@ -50,7 +49,8 @@ func openDatabase(storage *sqliteStorage) *gorm.DB {
 }
 
 func (storage sqliteStorage) getConnectionString() string {
-	// TODO: I'm not sure the authentication is working as we expect here, I'm sure in development this is not working but when creating a build it might be working as expected we need to ensure this later.
+	// TODO: I'm not sure the authentication is working as we expect here, I'm sure in development this is not
+	//  working but when creating a build it might be working as expected we need to ensure this later.
 	return fmt.Sprintf("file:%s?_auth&_auth_user=%s&_auth_pass=%s&_auth_crypt=ssha512&_auth_salt=%s",
 		storage.Name, storage.User, storage.Password, storage.Salt)
 }

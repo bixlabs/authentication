@@ -11,7 +11,6 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/dgrijalva/jwt-go"
-	_ "github.com/joho/godotenv/autoload"
 	"time"
 )
 
@@ -59,7 +58,8 @@ func generateJWT(email string, auth authenticator) (*login.Response, error) {
 		return nil, util.WrongCredentialsError{}
 	}
 
-	response := &login.Response{User: currentUser, IssuedAt: time.Now().Unix(), Expiration: time.Now().Add(time.Second * time.Duration(auth.ExpirationTime)).Unix()}
+	response := &login.Response{User: currentUser, IssuedAt: time.Now().Unix(),
+		Expiration: time.Now().Add(time.Second * time.Duration(auth.ExpirationTime)).Unix()}
 
 	if err := setToken(response, auth.Secret); err != nil {
 		return nil, err
