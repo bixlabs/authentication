@@ -161,7 +161,6 @@ func TestPasswordManager(t *testing.T) {
 			_, err = auth.Login(user.Email, "secured_password2")
 			Expect(err).To(BeNil())
 		})
-
 	})
 
 }
