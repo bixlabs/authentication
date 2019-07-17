@@ -4,6 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/authenticator/structures/login"
 	"github.com/bixlabs/authentication/database/user/memory"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
@@ -11,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"testing"
+	"time"
 )
 
 const validEmail = "test@email.com"
@@ -24,6 +26,7 @@ func TestAuthenticator(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
+	var internalAuth authenticator
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
@@ -124,6 +127,32 @@ func TestAuthenticator(t *testing.T) {
 				panic(err)
 			}
 			Expect(response.Expiration - response.IssuedAt).To(Equal(int64(3600)))
+		})
+	})
+
+	g.Describe("Verify JWT", func() {
+		g.BeforeEach(func() {
+			internalAuth = authenticator{repository: memory.NewUserRepo(), sender: memory.DummySender{}}
+		})
+
+		g.It("Should return an error in case the JWT token is invalid", func() {
+			_, err := auth.VerifyJWT("invalid_token")
+			_, ok := err.(util.InvalidJWTToken)
+			Expect(ok).To(Equal(true))
+		})
+
+		g.It("Should return an error in case the JWT token is expired", func() {
+			secret := "test"
+			internalAuth.Secret = secret
+			expiration := time.Now().Add(-1000 * time.Second)
+			tokenResponse := login.Response{Expiration: expiration.Unix()}
+			token, err := generateClaims(tokenResponse, "").SignedString([]byte(secret))
+			_, err = auth.VerifyJWT(token)
+			if err != nil {
+				panic(err)
+			}
+			_, ok := err.(util.ExpiredJWTToken)
+			Expect(ok).To(Equal(true))
 		})
 	})
 }

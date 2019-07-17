@@ -84,3 +84,21 @@ type SamePasswordChangeError struct{}
 func (SamePasswordChangeError) Error() string {
 	return "new password cannot be equal to the actual"
 }
+
+type InvalidJWTToken struct {}
+
+func (InvalidJWTToken) Error() string {
+	return "invalid token"
+}
+
+type ExpiredJWTToken struct {
+
+}
+
+func (ExpiredJWTToken) Error() string {
+	return "expired token"
+}
+
+
+
+

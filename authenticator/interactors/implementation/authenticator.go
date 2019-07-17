@@ -11,6 +11,7 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/tools/go/ssa/interp/testdata/src/strings"
 	"time"
 )
 
@@ -126,4 +127,26 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	}
 
 	return nil
+}
+
+func (auth authenticator) VerifyJWT(token string) (structures.User, error) {
+	jwtToken, err := jwt.ParseWithClaims(token, jwt.MapClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(auth.Secret), nil
+	})
+
+	if err != nil {
+		if strings.Contains(err.Error(), "token expired") {
+			return structures.User{}, util.ExpiredJWTToken{}
+		}
+		tools.Log().WithField("error", err).Panic("An error happened while validating the JWT token")
+		return structures.User{}, util.InvalidJWTToken{}
+	}
+
+	if _, ok := jwtToken.Claims.(*jwt.StandardClaims); ok && jwtToken.Valid {
+
+		//fmt.Printf("%v %v", claims.Foo, claims.StandardClaims.ExpiresAt)
+	} else {
+		return structures.User{}, util.InvalidJWTToken{}
+	}
+	return structures.User{}, nil
 }
