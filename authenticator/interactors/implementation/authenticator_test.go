@@ -9,8 +9,8 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	"os"
 	"testing"
 	"time"
 )
@@ -24,9 +24,8 @@ func TestAuthenticator(t *testing.T) {
 	g := goblin.Goblin(t)
 	tools.InitializeLogger()
 	// This line prevents the logs to appear in the tests.
-	tools.Log().Level = logrus.FatalLevel
+	//tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
-	var internalAuth authenticator
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
@@ -132,7 +131,10 @@ func TestAuthenticator(t *testing.T) {
 
 	g.Describe("Verify JWT", func() {
 		g.BeforeEach(func() {
-			internalAuth = authenticator{repository: memory.NewUserRepo(), sender: memory.DummySender{}}
+			secret := "test"
+			err := os.Setenv("AUTH_SERVER_SECRET", secret)
+			Expect(err).To(BeNil())
+			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
 		})
 
 		g.It("Should return an error in case the JWT token is invalid", func() {
@@ -141,18 +143,17 @@ func TestAuthenticator(t *testing.T) {
 			Expect(ok).To(Equal(true))
 		})
 
-		g.It("Should return an error in case the JWT token is expired", func() {
-			secret := "test"
-			internalAuth.Secret = secret
-			expiration := time.Now().Add(-1000 * time.Second)
-			tokenResponse := login.Response{Expiration: expiration.Unix()}
-			token, err := generateClaims(tokenResponse, "").SignedString([]byte(secret))
-			_, err = auth.VerifyJWT(token)
-			if err != nil {
-				panic(err)
-			}
-			_, ok := err.(util.ExpiredJWTToken)
-			Expect(ok).To(Equal(true))
+		g.It("Should return the user claim in case the JWT token is valid", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			response := login.Response{Expiration: time.Now().Add(1000 * time.Second).Unix(),
+				IssuedAt: time.Now().Unix(),
+				User: user}
+			aToken, err := generateClaims(response).SignedString([]byte("test"))
+			Expect(err).To(BeNil())
+			time.Sleep(100 *time.Millisecond)
+			result , err := auth.VerifyJWT(aToken)
+			Expect(err).To(BeNil())
+			Expect(result.Email).To(Equal(validEmail))
 		})
 	})
 }
