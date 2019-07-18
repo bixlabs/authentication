@@ -53,7 +53,8 @@ func TestIntegration(t *testing.T) {
 
 		g.It("Should be able to login after signup ", func() {
 			aUser := structures.User{Email: validEmail, Password: validPassword}
-			_, _ = auth.Signup(aUser)
+			_, err := auth.Signup(aUser)
+			Expect(err).To(BeNil())
 			response, err := auth.Login(aUser.Email, aUser.Password)
 			Expect(err).To(BeNil())
 			Expect(response.Token).ToNot(Equal(BeEmpty()))
@@ -62,8 +63,9 @@ func TestIntegration(t *testing.T) {
 
 		g.It("Should be able to change the password", func() {
 			aUser := structures.User{Email: validEmail, Password: validPassword}
-			_, _ = auth.Signup(aUser)
-			err := passwordManager.ChangePassword(aUser, newPassword)
+			_, err := auth.Signup(aUser)
+			Expect(err).To(BeNil())
+			err = passwordManager.ChangePassword(aUser, newPassword)
 			Expect(err).To(BeNil())
 			response, err := auth.Login(aUser.Email, newPassword)
 			Expect(err).To(BeNil())
@@ -73,7 +75,8 @@ func TestIntegration(t *testing.T) {
 
 		g.It("Should be able to forgot password and then reset the password ", func() {
 			aUser := structures.User{Email: validEmail, Password: validPassword}
-			_, _ = auth.Signup(aUser)
+			_, err := auth.Signup(aUser)
+			Expect(err).To(BeNil())
 			code, err := passwordManager.ForgotPassword(aUser.Email)
 			Expect(err).To(BeNil())
 			err = passwordManager.ResetPassword(aUser.Email, code, newPassword)
