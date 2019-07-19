@@ -86,6 +86,17 @@ func TestIntegration(t *testing.T) {
 			Expect(response.Token).ToNot(Equal(BeEmpty()))
 			Expect(response.User.Email).To(Equal(validEmail))
 		})
+
+		g.It("Should be able to login and verify the generated JWT successfully ", func() {
+			aUser := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Signup(aUser)
+			Expect(err).To(BeNil())
+			response, err := auth.Login(aUser.Email, aUser.Password)
+			Expect(err).To(BeNil())
+			aUser, err = auth.VerifyJWT(response.Token)
+			Expect(err).To(BeNil())
+			Expect(aUser.Email).To(Equal(validEmail))
+		})
 	})
 }
 
