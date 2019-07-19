@@ -94,6 +94,16 @@ type userClaims struct {
 	*jwt.StandardClaims
 }
 
+// TODO: This is a workaround because jwt-go is validating iat when it shouldn't (jwt specification doesn't say so)
+// let's remove this later when jwt-go removes the iat validation in v4.
+func (c *userClaims) Valid() error {
+	c.StandardClaims.IssuedAt /= 10
+	valid := c.StandardClaims.Valid()
+	c.StandardClaims.IssuedAt *= 10
+	return valid
+}
+
+
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
 	if err := auth.hasValidationIssue(user); err != nil {
 		return user, err
@@ -166,13 +176,4 @@ func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.U
 		return structures.User{}, util.InvalidJWTToken{}
 	}
 	return claims.User, nil
-}
-
-// TODO: This is a workaround because jwt-go is validating iat when it shouldn't (jwt specification doesn't say so)
-// let's remove this later when jwt-go removes the iat validation in v4.
-func (c *userClaims) Valid() error {
-	c.StandardClaims.IssuedAt /= 10
-	valid := c.StandardClaims.Valid()
-	c.StandardClaims.IssuedAt *= 10
-	return valid
 }
