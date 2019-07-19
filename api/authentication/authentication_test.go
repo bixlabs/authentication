@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"os"
 	"testing"
 )
 
@@ -209,5 +210,31 @@ func TestRest(t *testing.T) {
 			Expect(httpCode).To(Equal(http.StatusNoContent))
 		})
 
+	})
+
+	g.Describe("Verify JWT rest handler", func() {
+		g.BeforeEach(func() {
+			secret := "test"
+			err := os.Setenv("AUTH_SERVER_SECRET", secret)
+			Expect(err).To(BeNil())
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
+		})
+
+		g.It("should return 401 if the token is invalid", func() {
+			code, _ := verifyJWTHandler("invalid_token", auth)
+			Expect(code).To(Equal(http.StatusUnauthorized))
+		})
+
+		g.It("should return 200 if the token is valid", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Signup(user)
+			Expect(err).To(BeNil())
+			token, err := auth.Login(validEmail, validPassword)
+			Expect(err).To(BeNil())
+			code, result := verifyJWTHandler(token.Token, auth)
+			Expect(code).To(Equal(http.StatusOK))
+			Expect(result.Result.User.Email).To(Equal(validEmail))
+		})
 	})
 }
