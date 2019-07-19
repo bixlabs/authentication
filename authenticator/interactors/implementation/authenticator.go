@@ -103,7 +103,6 @@ func (c *userClaims) Valid() error {
 	return valid
 }
 
-
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
 	if err := auth.hasValidationIssue(user); err != nil {
 		return user, err
