@@ -82,7 +82,7 @@ func generateClaims(response login.Response) *jwt.Token {
 	c := userClaims{
 		User: response.User,
 		StandardClaims: &jwt.StandardClaims{
-			IssuedAt: response.IssuedAt,
+			IssuedAt:  response.IssuedAt,
 			ExpiresAt: response.Expiration,
 		},
 	}
@@ -91,7 +91,7 @@ func generateClaims(response login.Response) *jwt.Token {
 
 type userClaims struct {
 	User structures.User `json:"user,omitempty"`
-	* jwt.StandardClaims
+	*jwt.StandardClaims
 }
 
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
@@ -176,4 +176,3 @@ func (c *userClaims) Valid() error {
 	c.StandardClaims.IssuedAt *= 10
 	return valid
 }
-

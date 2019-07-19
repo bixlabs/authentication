@@ -147,11 +147,11 @@ func TestAuthenticator(t *testing.T) {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			response := login.Response{Expiration: time.Now().Add(1000 * time.Second).Unix(),
 				IssuedAt: time.Now().Unix(),
-				User: user}
+				User:     user}
 			aToken, err := generateClaims(response).SignedString([]byte("test"))
 			Expect(err).To(BeNil())
-			time.Sleep(100 *time.Millisecond)
-			result , err := auth.VerifyJWT(aToken)
+			time.Sleep(100 * time.Millisecond)
+			result, err := auth.VerifyJWT(aToken)
 			Expect(err).To(BeNil())
 			Expect(result.Email).To(Equal(validEmail))
 		})

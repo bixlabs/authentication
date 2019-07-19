@@ -287,7 +287,6 @@ func handleForgotPasswordError(err error) (int, forgotpass.Response) {
 // @Router /user/token/validate [get]
 func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
 	t, err := getTokenFromHeader(c)
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, token.NewErrorResponse(http.StatusBadRequest, err))
 	} else {
@@ -318,7 +317,7 @@ func verifyJWTHandler(t string, handler interactors.Authenticator) (int, token.R
 		return http.StatusInternalServerError, token.NewErrorResponse(http.StatusInternalServerError, err)
 	}
 
-	return http.StatusOK, token.NewResponse(http.StatusOK, &token.Result{User:user })
+	return http.StatusOK, token.NewResponse(http.StatusOK, &token.Result{User: user})
 }
 
 func isInvalidToken(err error) bool {
