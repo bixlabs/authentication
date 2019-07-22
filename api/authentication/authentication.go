@@ -8,10 +8,12 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/mappers"
 	"github.com/bixlabs/authentication/api/authentication/structures/resetpass"
 	"github.com/bixlabs/authentication/api/authentication/structures/signup"
+	"github.com/bixlabs/authentication/api/authentication/structures/token"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 type authenticatorRESTConfigurator struct {
@@ -30,6 +32,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 	router.PUT("/change-password", restConfig.changePassword)
 	router.PUT("/reset-password", restConfig.resetPassword)
 	router.PUT("/reset-password-request", restConfig.forgotPassword)
+	router.GET("token/validate", restConfig.verifyJWT)
 	return r
 }
 
@@ -270,4 +273,52 @@ func handleForgotPasswordError(err error) (int, forgotpass.Response) {
 		return http.StatusBadRequest, forgotpass.NewErrorResponse(http.StatusBadRequest, err)
 	}
 	return http.StatusInternalServerError, forgotpass.NewErrorResponse(http.StatusInternalServerError, err)
+}
+
+// @Summary Validates a JWT and returns the claims for it.
+// @Description If the JWT is valid this endpoint returns the user inside of the token.
+// @Accept  json
+// @Produce  json
+// @Param token header string true "Authorization: Bearer <jwtToken>"
+// @Success 200 {object} token.SwaggerResponse
+// @Failure 400 {object} rest.ResponseWrapper
+// @Failure 401 {object} rest.ResponseWrapper
+// @Failure 500 {object} rest.ResponseWrapper
+// @Router /user/token/validate [get]
+func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
+	t, err := getTokenFromHeader(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, token.NewErrorResponse(http.StatusBadRequest, err))
+	} else {
+		c.JSON(verifyJWTHandler(t, config.authenticator))
+	}
+}
+
+func getTokenFromHeader(c *gin.Context) (string, error) {
+	// TODO: Use ShouldBindHeader when gin framework releases the feature, it's in master but not release.
+	t := c.Request.Header.Get("Authorization")
+	if t == "" || strings.Contains(t, "Bearer") {
+		return "", errors.New("token missing or malformed")
+	}
+	headerSeparated := strings.Split(t, " ")
+	if len(headerSeparated) != 2 {
+		return "", errors.New("token missing or malformed")
+	}
+	return headerSeparated[1], nil
+}
+
+func verifyJWTHandler(t string, handler interactors.Authenticator) (int, token.Response) {
+	user, err := handler.VerifyJWT(t)
+	if err != nil {
+		if isInvalidToken(err) {
+			return http.StatusUnauthorized, token.NewErrorResponse(http.StatusUnauthorized, err)
+		}
+		return http.StatusInternalServerError, token.NewErrorResponse(http.StatusInternalServerError, err)
+	}
+	return http.StatusOK, token.NewResponse(http.StatusOK, &token.Result{User: user})
+}
+
+func isInvalidToken(err error) bool {
+	_, ok := err.(util.InvalidJWTToken)
+	return ok
 }

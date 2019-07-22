@@ -1,7 +1,6 @@
 package implementation
 
 import (
-	"encoding/json"
 	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
@@ -69,12 +68,7 @@ func generateJWT(email string, auth authenticator) (*login.Response, error) {
 }
 
 func setToken(response *login.Response, secret string) error {
-	jsonUser, err := json.Marshal(response.User)
-	if err != nil {
-		tools.Log().Error("Parsing user json failed", err)
-		return err
-	}
-	tokenString, err := generateClaims(*response, string(jsonUser)).SignedString([]byte(secret))
+	tokenString, err := generateClaims(*response).SignedString([]byte(secret))
 	if err != nil {
 		tools.Log().Error("Generating jwt signed token failed", err)
 		return err
@@ -84,12 +78,29 @@ func setToken(response *login.Response, secret string) error {
 	return nil
 }
 
-func generateClaims(response login.Response, jsonUser string) *jwt.Token {
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"iat":  response.IssuedAt,
-		"exp":  response.Expiration,
-		"user": jsonUser,
-	})
+func generateClaims(response login.Response) *jwt.Token {
+	c := userClaims{
+		User: response.User,
+		StandardClaims: &jwt.StandardClaims{
+			IssuedAt:  response.IssuedAt,
+			ExpiresAt: response.Expiration,
+		},
+	}
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, &c)
+}
+
+type userClaims struct {
+	User structures.User `json:"user,omitempty"`
+	*jwt.StandardClaims
+}
+
+// TODO: This is a workaround because jwt-go is validating iat when it shouldn't (jwt specification doesn't say so)
+// let's remove this later when jwt-go removes the iat validation in v4.
+func (c *userClaims) Valid() error {
+	c.StandardClaims.IssuedAt /= 10
+	valid := c.StandardClaims.Valid()
+	c.StandardClaims.IssuedAt *= 10
+	return valid
 }
 
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
@@ -126,4 +137,38 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	}
 
 	return nil
+}
+
+func (auth authenticator) VerifyJWT(token string) (structures.User, error) {
+	jwtToken, err := auth.parseJWTToken(token)
+	if err != nil {
+		return structures.User{}, err
+	}
+	return auth.validateAndObtainClaims(*jwtToken)
+}
+
+func (auth authenticator) parseJWTToken(token string) (*jwt.Token, error) {
+	jwtToken, err := jwt.ParseWithClaims(token, &userClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(auth.Secret), nil
+	})
+	if err != nil {
+		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		return jwtToken, util.InvalidJWTToken{}
+	}
+
+	return jwtToken, nil
+}
+
+func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.User, error) {
+	claims, ok := token.Claims.(*userClaims)
+	if !ok {
+		tools.Log().Info("Claims object is not of the correct type")
+		return structures.User{}, util.InvalidJWTToken{}
+	}
+
+	if err := claims.Valid(); err != nil {
+		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		return structures.User{}, util.InvalidJWTToken{}
+	}
+	return claims.User, nil
 }

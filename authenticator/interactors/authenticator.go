@@ -8,4 +8,5 @@ import (
 type Authenticator interface {
 	Login(email, password string) (*login.Response, error)
 	Signup(user structures.User) (structures.User, error)
+	VerifyJWT(jwt string) (structures.User, error)
 }
