@@ -141,11 +141,9 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 
 func (auth authenticator) VerifyJWT(token string) (structures.User, error) {
 	jwtToken, err := auth.parseJWTToken(token)
-
 	if err != nil {
 		return structures.User{}, err
 	}
-
 	return auth.validateAndObtainClaims(*jwtToken)
 }
 
@@ -153,7 +151,6 @@ func (auth authenticator) parseJWTToken(token string) (*jwt.Token, error) {
 	jwtToken, err := jwt.ParseWithClaims(token, &userClaims{}, func(t *jwt.Token) (interface{}, error) {
 		return []byte(auth.Secret), nil
 	})
-
 	if err != nil {
 		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
 		return jwtToken, util.InvalidJWTToken{}
@@ -164,7 +161,6 @@ func (auth authenticator) parseJWTToken(token string) (*jwt.Token, error) {
 
 func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.User, error) {
 	claims, ok := token.Claims.(*userClaims)
-
 	if !ok {
 		tools.Log().Info("Claims object is not of the correct type")
 		return structures.User{}, util.InvalidJWTToken{}

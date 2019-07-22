@@ -309,14 +309,12 @@ func getTokenFromHeader(c *gin.Context) (string, error) {
 
 func verifyJWTHandler(t string, handler interactors.Authenticator) (int, token.Response) {
 	user, err := handler.VerifyJWT(t)
-
 	if err != nil {
 		if isInvalidToken(err) {
 			return http.StatusUnauthorized, token.NewErrorResponse(http.StatusUnauthorized, err)
 		}
 		return http.StatusInternalServerError, token.NewErrorResponse(http.StatusInternalServerError, err)
 	}
-
 	return http.StatusOK, token.NewResponse(http.StatusOK, &token.Result{User: user})
 }
 

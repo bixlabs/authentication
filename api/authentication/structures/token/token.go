@@ -31,10 +31,6 @@ type Result struct {
 	User structures.User `json:"user"`
 }
 
-type Request struct {
-	Authorization string `header:"Authorization"`
-}
-
 // We need this because go-swag library doesn't support embedded struct and doesn't show all the attributes in
 // the documentation.
 type SwaggerResponse struct {
