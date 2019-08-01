@@ -159,7 +159,11 @@ func TestAuthenticator(t *testing.T) {
 
 	g.Describe("Create User process", func() {
 		g.It("Should return an error in case the email is invalid", func() {
+			user := structures.User{Email: invalidEmail}
+			user, err := auth.Create(user)
 
+			Expect(err).NotTo(BeNil())
+			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
 		})
 
 		g.It("Should check for email duplication", func() {
