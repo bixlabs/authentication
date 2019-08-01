@@ -156,4 +156,26 @@ func TestAuthenticator(t *testing.T) {
 			Expect(result.Email).To(Equal(validEmail))
 		})
 	})
+
+	g.Describe("Create User process", func() {
+		g.It("Should return an error in case the email is invalid", func() {
+
+		})
+
+		g.It("Should check for email duplication", func() {
+
+		})
+
+		g.It("Should have a password of at least 8 characters", func() {
+
+		})
+
+		g.It("Should hash the password of the user", func() {
+
+		})
+
+		g.It("Should hash the password and not be able to match when given a wrong one", func() {
+
+		})
+	})
 }
