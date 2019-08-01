@@ -167,19 +167,48 @@ func TestAuthenticator(t *testing.T) {
 		})
 
 		g.It("Should check for email duplication", func() {
+			user := structures.User{Email: validEmail}
+			_, _ = auth.Create(user)
+			_, err := auth.Create(user)
 
+			Expect(err).NotTo(BeNil())
+			g.Assert(err.Error()).Equal(util.SignupDuplicateEmailMessage)
 		})
 
 		g.It("Should have a password of at least 8 characters", func() {
+			user := structures.User{Email: validEmail, Password: invalidPassword}
+			_, err := auth.Create(user)
 
+			Expect(err).NotTo(BeNil())
+			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
+		})
+
+		g.It("Should create a user with an ID in it", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			user, err := auth.Create(user)
+
+			Expect(err).To(BeNil())
+			g.Assert(user.ID).Equal("1")
 		})
 
 		g.It("Should hash the password of the user", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Create(user)
 
+			Expect(err).To(BeNil())
+
+			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(validPassword))
+			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should hash the password and not be able to match when given a wrong one", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Create(user)
 
+			Expect(err).To(BeNil())
+
+			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(invalidPassword))
+			Expect(err).NotTo(BeNil())
 		})
 	})
 }
