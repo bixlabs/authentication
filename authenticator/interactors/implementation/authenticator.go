@@ -104,22 +104,7 @@ func (c *userClaims) Valid() error {
 }
 
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
-	if err := auth.hasValidationIssue(user); err != nil {
-		return user, err
-	}
-
-	hashedPassword, err := util.HashPassword(user.Password)
-	if err != nil {
-		return user, err
-	}
-	user.Password = hashedPassword
-
-	user, err = auth.repository.Create(user)
-	if err != nil {
-		return user, err
-	}
-
-	return user, nil
+	return auth.createUser(user)
 }
 
 func (auth authenticator) hasValidationIssue(user structures.User) error {
@@ -171,4 +156,47 @@ func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.U
 		return structures.User{}, util.InvalidJWTToken{}
 	}
 	return claims.User, nil
+}
+
+func (auth authenticator) Create(user structures.User) (structures.User, error) {
+	if user, err := auth.generatePasswordIfEmpty(&user); err != nil {
+		return user, err
+	}
+
+	return auth.createUser(user)
+}
+
+func (auth authenticator) createUser(user structures.User) (structures.User, error) {
+	if err := auth.hasValidationIssue(user); err != nil {
+		return user, err
+	}
+
+	hashedPassword, err := util.HashPassword(user.Password)
+	if err != nil {
+		return user, err
+	}
+	user.Password = hashedPassword
+
+	user, err = auth.repository.Create(user)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (auth authenticator) generatePasswordIfEmpty(user *structures.User) (structures.User, error) {
+	if user.Password != "" {
+		return *user, nil
+	}
+
+	var err error
+	user.GeneratedPassword, err = util.GenerateRandomPassword()
+	if err != nil {
+		return *user, err
+	}
+
+	user.Password = user.GeneratedPassword
+
+	return *user, nil
 }

@@ -1,6 +1,7 @@
 package implementation
 
 import (
+	databaseUserPackage "github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -26,6 +27,7 @@ func TestAuthenticator(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	//tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
+	var memoryRepo databaseUserPackage.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
@@ -69,6 +71,8 @@ func TestAuthenticator(t *testing.T) {
 			if err != nil {
 				panic(err)
 			}
+
+			// TODO: we should use an utility for this in the overall file
 			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(validPassword))
 			g.Assert(err).Equal(nil)
 		})
@@ -158,8 +162,13 @@ func TestAuthenticator(t *testing.T) {
 	})
 
 	g.Describe("Create User process", func() {
+		g.BeforeEach(func() {
+			memoryRepo = memory.NewUserRepo()
+			auth = NewAuthenticator(memoryRepo, memory.DummySender{})
+		})
+
 		g.It("Should return an error in case the email is invalid", func() {
-			user := structures.User{Email: invalidEmail}
+			user := structures.User{Email: invalidEmail, Password: validPassword}
 			user, err := auth.Create(user)
 
 			Expect(err).NotTo(BeNil())
@@ -167,7 +176,7 @@ func TestAuthenticator(t *testing.T) {
 		})
 
 		g.It("Should check for email duplication", func() {
-			user := structures.User{Email: validEmail}
+			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Create(user)
 			_, err := auth.Create(user)
 
@@ -183,7 +192,7 @@ func TestAuthenticator(t *testing.T) {
 			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
 		})
 
-		g.It("Should create a user with an ID in it", func() {
+		g.It("Should create a user with an ID", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			user, err := auth.Create(user)
 
@@ -191,9 +200,21 @@ func TestAuthenticator(t *testing.T) {
 			g.Assert(user.ID).Equal("1")
 		})
 
+		g.It("Should create a random password if not provided", func() {
+			user := structures.User{Email: validEmail}
+			user, err := auth.Create(user)
+
+			Expect(err).To(BeNil())
+
+			savedUser, _ := memoryRepo.Find(user.Email)
+
+			err = bcrypt.CompareHashAndPassword([]byte(savedUser.Password), []byte(user.GeneratedPassword))
+			g.Assert(err).Equal(nil)
+		})
+
 		g.It("Should hash the password of the user", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
-			_, err := auth.Create(user)
+			user, err := auth.Create(user)
 
 			Expect(err).To(BeNil())
 
@@ -203,7 +224,7 @@ func TestAuthenticator(t *testing.T) {
 
 		g.It("Should hash the password and not be able to match when given a wrong one", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
-			_, err := auth.Create(user)
+			user, err := auth.Create(user)
 
 			Expect(err).To(BeNil())
 

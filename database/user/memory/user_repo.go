@@ -59,6 +59,5 @@ func (u *UserRepo) Find(email string) (structures.User, error) {
 	if !exist {
 		return structures.User{}, errors.New("email does not exist")
 	}
-	user.Password = ""
 	return user, nil
 }

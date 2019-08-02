@@ -2,10 +2,12 @@ package util
 
 import (
 	"github.com/bixlabs/authentication/tools"
+	"github.com/sethvargo/go-password/password"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
 )
 
+// TODO: This variable name is not descriptive
 const PasswordManager = 8
 const EmailValidationRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\\])" //nolint
 const SignupInvalidEmailMessage = "Email is not valid"
@@ -38,6 +40,10 @@ type PasswordLengthError struct{}
 
 func (e PasswordLengthError) Error() string {
 	return SignupPasswordLengthMessage
+}
+
+func GenerateRandomPassword() (string, error) {
+	return password.Generate(10, 2, 2, false, false)
 }
 
 func HashPassword(password string) (string, error) {
