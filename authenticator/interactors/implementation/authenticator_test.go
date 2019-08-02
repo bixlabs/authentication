@@ -172,16 +172,9 @@ func TestAuthenticator(t *testing.T) {
 			user, err := auth.Create(user)
 
 			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
 			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
-		})
-
-		g.It("Should check for email duplication", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, _ = auth.Create(user)
-			_, err := auth.Create(user)
-
-			Expect(err).NotTo(BeNil())
-			g.Assert(err.Error()).Equal(util.SignupDuplicateEmailMessage)
 		})
 
 		g.It("Should have a password of at least 8 characters", func() {
@@ -189,6 +182,8 @@ func TestAuthenticator(t *testing.T) {
 			_, err := auth.Create(user)
 
 			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
 			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
 		})
 
@@ -230,6 +225,59 @@ func TestAuthenticator(t *testing.T) {
 
 			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(invalidPassword))
 			Expect(err).NotTo(BeNil())
+		})
+
+		g.It("Should check for email duplication", func() {
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, _ = auth.Create(user)
+			_, err := auth.Create(user)
+
+			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
+			g.Assert(err.Error()).Equal(util.SignupDuplicateEmailMessage)
+		})
+	})
+
+	g.Describe("Delete User process", func() {
+		g.BeforeEach(func() {
+			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Create(user)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		g.It("Should return an error in case the email is invalid", func() {
+			err := auth.Delete(invalidEmail)
+
+			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
+			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+		})
+
+		g.It("Should return an error in case the user does not exist", func() {
+			err := auth.Delete("nonexistingemail@example.com")
+
+			Expect(err).NotTo(BeNil())
+			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
+		})
+
+		g.It("Should delete a valid user", func() {
+			_ = auth.Delete(validEmail)
+			err := auth.Delete(validEmail)
+			Expect(err).NotTo(BeNil())
+		})
+
+		g.It("Should return an error in case the user was already deleted", func() {
+			_ = auth.Delete(validEmail)
+			err := auth.Delete(validEmail)
+
+			Expect(err).NotTo(BeNil())
+			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
 		})
 	})
 }

@@ -116,3 +116,13 @@ func (storage sqliteStorage) UpdateResetToken(email, resetToken string) error {
 
 	return transaction.Commit().Error
 }
+
+func (storage sqliteStorage) Delete(user structures.User) error {
+	transaction := storage.db.Begin()
+	if err := transaction.Delete(&user).Error; err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	return transaction.Commit().Error
+}

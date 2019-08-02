@@ -6,6 +6,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/tools"
 	"strconv"
+	"time"
 )
 
 type UserRepo struct {
@@ -43,6 +44,8 @@ func (u *UserRepo) GetHashedPassword(email string) (string, error) {
 func (u *UserRepo) ChangePassword(email, newPassword string) error {
 	user := u.users[email]
 	user.Password = newPassword
+
+	// FIXME: we are inserting the user if it does not exist
 	u.users[email] = user
 	return nil
 }
@@ -56,8 +59,18 @@ func (u *UserRepo) UpdateResetToken(email, resetToken string) error {
 
 func (u *UserRepo) Find(email string) (structures.User, error) {
 	user, exist := u.users[email]
-	if !exist {
+	if !exist || user.DeletedAt != nil {
 		return structures.User{}, errors.New("email does not exist")
 	}
 	return user, nil
+}
+
+func (u *UserRepo) Delete(user structures.User) error {
+	deletedAt := time.Now()
+	user.DeletedAt = &deletedAt
+
+	// FIXME: we are inserting the user if it does not exist
+	u.users[user.Email] = user
+
+	return nil
 }

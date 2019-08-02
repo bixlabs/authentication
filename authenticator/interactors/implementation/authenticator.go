@@ -200,3 +200,16 @@ func (auth authenticator) generatePasswordIfEmpty(user *structures.User) (struct
 
 	return *user, nil
 }
+
+func (auth authenticator) Delete(email string) error {
+	if err := util.IsValidEmail(email); err != nil {
+		return err
+	}
+
+	userToRemove, err := auth.repository.Find(email)
+	if err != nil {
+		return util.UserNotFoundError{}
+	}
+
+	return auth.repository.Delete(userToRemove)
+}

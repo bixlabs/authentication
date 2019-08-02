@@ -12,4 +12,5 @@ type Authenticator interface {
 
 	// TODO: Maybe we should move this to another interface for Users
 	Create(user structures.User) (structures.User, error)
+	Delete(email string) error
 }
