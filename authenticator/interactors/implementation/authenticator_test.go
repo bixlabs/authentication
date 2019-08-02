@@ -280,4 +280,39 @@ func TestAuthenticator(t *testing.T) {
 			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
 		})
 	})
+
+	g.Describe("Find User process", func() {
+		g.Before(func() {
+			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Create(user)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		g.It("Should return an error in case the email is invalid", func() {
+			_, err := auth.Find(invalidEmail)
+
+			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
+			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+		})
+
+		g.It("Should return an error in case the user does not exist", func() {
+			_, err := auth.Find("nonexistingemail@example.com")
+
+			Expect(err).NotTo(BeNil())
+			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
+		})
+
+		g.It("Should find a valid user", func() {
+			user, err := auth.Find(validEmail)
+
+			Expect(err).To(BeNil())
+			g.Assert(user.Email).Equal(validEmail)
+		})
+	})
 }

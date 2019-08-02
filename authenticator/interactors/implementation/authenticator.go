@@ -213,3 +213,16 @@ func (auth authenticator) Delete(email string) error {
 
 	return auth.repository.Delete(userToRemove)
 }
+
+func (auth authenticator) Find(email string) (structures.User, error) {
+	if err := util.IsValidEmail(email); err != nil {
+		return structures.User{}, err
+	}
+
+	user, err := auth.repository.Find(email)
+	if err != nil {
+		return structures.User{}, util.UserNotFoundError{}
+	}
+
+	return user, nil
+}
