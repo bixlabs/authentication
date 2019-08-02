@@ -7,6 +7,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/structures/login"
+	"github.com/bixlabs/authentication/authenticator/structures/mappers"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/dgrijalva/jwt-go"
@@ -225,4 +226,44 @@ func (auth authenticator) Find(email string) (structures.User, error) {
 	}
 
 	return user, nil
+}
+
+func (auth authenticator) Update(email string, updateAttrs structures.UserUpdate) (structures.User, error) {
+	if err := util.IsValidEmail(email); err != nil {
+		return structures.User{}, err
+	}
+
+	if updateAttrs.Email != "" {
+		if err := util.IsValidEmail(updateAttrs.Email); err != nil {
+			return structures.User{}, err
+		}
+	}
+
+	if updateAttrs.Password != "" {
+		if err := util.CheckPasswordLength(updateAttrs.Password); err != nil {
+			return structures.User{}, err
+		}
+	}
+
+	user, err := auth.repository.Find(email)
+	if err != nil {
+		return user, util.UserNotFoundError{}
+	}
+
+	if updateAttrs.Email != user.Email {
+		if isAvailable, err := auth.repository.IsEmailAvailable(updateAttrs.Email); err != nil || !isAvailable {
+			tools.Log().WithField("error", err).Debug("A duplicated email was provided")
+			return user, util.DuplicatedEmailError{}
+		}
+	}
+
+	if updateAttrs.Password != "" {
+		hashedPassword, err := util.HashPassword(updateAttrs.Password)
+		if err != nil {
+			return user, err
+		}
+		user.Password = hashedPassword
+	}
+
+	return auth.repository.Update(user.Email, mappers.AssignUserUpdateToUser(user, updateAttrs))
 }

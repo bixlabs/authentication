@@ -126,3 +126,15 @@ func (storage sqliteStorage) Delete(user structures.User) error {
 
 	return transaction.Commit().Error
 }
+
+func (storage sqliteStorage) Update(email string, user structures.User) (structures.User, error) {
+	transaction := storage.db.Begin()
+	modelForUpdate := mappers.UserToDatabaseModel(user)
+
+	if err := transaction.Save(&modelForUpdate).Error; err != nil {
+		transaction.Rollback()
+		return structures.User{}, err
+	}
+
+	return mappers.DatabaseModelToUser(modelForUpdate), nil
+}

@@ -74,3 +74,20 @@ func (u *UserRepo) Delete(user structures.User) error {
 
 	return nil
 }
+
+func (u *UserRepo) Update(email string, updateAttrs structures.User) (structures.User, error) {
+	_, err := u.Find(email)
+
+	if err != nil {
+		return structures.User{}, err
+	}
+
+	if email != updateAttrs.Email {
+		delete(u.users, email)
+		email = updateAttrs.Email
+	}
+
+	u.users[email] = updateAttrs
+
+	return updateAttrs, nil
+}

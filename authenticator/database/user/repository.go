@@ -10,4 +10,5 @@ type Repository interface {
 	Find(email string) (structures.User, error)
 	UpdateResetToken(email, resetToken string) error
 	Delete(user structures.User) error
+	Update(email string, user structures.User) (structures.User, error)
 }

@@ -315,4 +315,78 @@ func TestAuthenticator(t *testing.T) {
 			g.Assert(user.Email).Equal(validEmail)
 		})
 	})
+
+	g.Describe("Update User process", func() {
+		g.Before(func() {
+			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+
+			user := structures.User{Email: validEmail, Password: validPassword}
+			_, err := auth.Create(user)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		g.It("Should return an error in case the email is invalid", func() {
+			updateAttrs := structures.UserUpdate{GivenName: "GivenName"}
+			_, err := auth.Update(invalidEmail, updateAttrs)
+
+			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
+			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+		})
+
+		g.It("Should return an error in case the user does not exist", func() {
+			updateAttrs := structures.UserUpdate{}
+			_, err := auth.Update("nonexistingemail@example.com", updateAttrs)
+
+			Expect(err).NotTo(BeNil())
+			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
+		})
+
+		g.It("Should return an error in case the update email is invalid", func() {
+			updateAttrs := structures.UserUpdate{Email: invalidEmail, Password: validPassword}
+			_, err := auth.Update(validEmail, updateAttrs)
+
+			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
+			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+		})
+
+		g.It("Should return an error in case the update password does not have at least 8 characters", func() {
+			updateAttrs := structures.UserUpdate{Email: validEmail, Password: invalidPassword}
+			_, err := auth.Update(validEmail, updateAttrs)
+
+			Expect(err).NotTo(BeNil())
+
+			// TODO: rename this error property
+			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
+		})
+
+		g.It("Should Update a valid user", func() {
+			updateAttrs := structures.UserUpdate{
+				Email:            "newemail@example.com",
+				Password:         "newPassWord",
+				GivenName:        "newGivenName",
+				SecondName:       "newSecondName",
+				FamilyName:       "newFamilyName",
+				SecondFamilyName: "newSecondFamilyName",
+			}
+			updatedUser, err := auth.Update(validEmail, updateAttrs)
+
+			Expect(err).To(BeNil())
+
+			Expect(updatedUser.ID).NotTo(BeNil())
+			g.Assert(updatedUser.Email).Equal(updateAttrs.Email)
+			g.Assert(updatedUser.GivenName).Equal(updateAttrs.GivenName)
+			g.Assert(updatedUser.SecondName).Equal(updateAttrs.SecondName)
+			g.Assert(updatedUser.FamilyName).Equal(updateAttrs.FamilyName)
+			g.Assert(updatedUser.SecondFamilyName).Equal(updateAttrs.SecondFamilyName)
+
+			err = bcrypt.CompareHashAndPassword([]byte(updatedUser.Password), []byte(updateAttrs.Password))
+			g.Assert(err).Equal(nil)
+		})
+	})
 }

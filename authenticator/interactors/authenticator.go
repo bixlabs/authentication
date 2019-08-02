@@ -14,4 +14,5 @@ type Authenticator interface {
 	Create(user structures.User) (structures.User, error)
 	Delete(email string) error
 	Find(email string) (structures.User, error)
+	Update(email string, updateAttrs structures.UserUpdate) (structures.User, error)
 }
