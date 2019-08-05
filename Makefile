@@ -26,6 +26,9 @@ build-for-mac:
 build-for-windows:
 		GOOS=windows GOARCH=386 make api-docs && make format && go build -o ./tmp/auth-server.exe ./api/main.go
 
+build-admin-cli:
+		make format && go build -o ./tmp/admincli ./admincli/main.go
+
 clean:
 		rm -r -f ./tmp
 
