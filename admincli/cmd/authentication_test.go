@@ -110,6 +110,69 @@ func TestAdminCli(t *testing.T) {
 			Expect(output).To(Equal(fmt.Sprintf("user with email %s was deleted", validEmail)))
 		})
 	})
+
+	g.Describe("Create user command", func() {
+		const createUserCommandUse = "create-user"
+
+		g.BeforeEach(func() {
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
+			rootCmd.setAuth(auth)
+		})
+
+		g.It("Should return an error when email argument is not provided", func() {
+			_, err := executeCommand(&rootCmd.Command, createUserCommandUse)
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(Equal(oneArgumentErrorMessage))
+		})
+
+		g.It("Should return an error when the email is invalid", func() {
+			_, err := executeCommand(&rootCmd.Command, createUserCommandUse, invalidEmail)
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(Equal(invalidEmailErrorMessage))
+		})
+
+		g.It("Should create a user", func() {
+			output, err := executeCommand(&rootCmd.Command, createUserCommandUse, validEmail)
+			Expect(err).To(BeNil())
+			Expect(output).Should(ContainSubstring(fmt.Sprintf("Email:%s", validEmail)))
+			Expect(output).Should(ContainSubstring("Password"))
+		})
+
+		g.It("Should create a user with password", func() {
+			output, err := executeCommand(&rootCmd.Command, createUserCommandUse, validEmail, "--second-name", secondName)
+			Expect(err).To(BeNil())
+			Expect(output).Should(ContainSubstring("Password:"))
+		})
+
+		g.It("Should create a user with given name", func() {
+			givenName := "Isabella"
+			output, err := executeCommand(&rootCmd.Command, createUserCommandUse, validEmail, "--given-name", givenName)
+			Expect(err).To(BeNil())
+			Expect(output).Should(ContainSubstring(fmt.Sprintf("GivenName:%s", givenName)))
+		})
+
+		g.It("Should create a user with second name", func() {
+			secondName := "Rose"
+			output, err := executeCommand(&rootCmd.Command, createUserCommandUse, validEmail, "--second-name", secondName)
+			Expect(err).To(BeNil())
+			Expect(output).Should(ContainSubstring(fmt.Sprintf("SecondName:%s", secondName)))
+		})
+
+		g.It("Should create a user with family name", func() {
+			familyName := "Foreman"
+			output, err := executeCommand(&rootCmd.Command, createUserCommandUse, validEmail, "--family-name", familyName)
+			Expect(err).To(BeNil())
+			Expect(output).Should(ContainSubstring(fmt.Sprintf("FamilyName:%s", familyName)))
+		})
+
+		g.It("Should create a user with second family name", func() {
+			secondFamilyName := "Barclay"
+			output, err := executeCommand(&rootCmd.Command, createUserCommandUse, validEmail, "--second-family-name", secondFamilyName)
+			Expect(err).To(BeNil())
+			Expect(output).Should(ContainSubstring(fmt.Sprintf("SecondFamilyName:%s", secondFamilyName)))
+		})
+	})
 }
 
 func executeCommand(root *cobra.Command, args ...string) (output string, err error) {
