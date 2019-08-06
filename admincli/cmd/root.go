@@ -13,26 +13,33 @@ import (
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
+// TODO: use a constructor and rename
 var rootCmd = &AuthCommand{
 	Command: cobra.Command{
-		Use:   "admincli",
-		Short: "Command line utility to manage users.",
-		Long:  `Command line utility to create/update/delete/find users and reset their passwords.`,
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		Use:           "admincli",
+		Short:         "Command line utility to manage users.",
+		Long:          `Command line utility to create/update/delete/find users and reset their passwords.`,
 	},
 }
 
 type AuthCommand struct {
-	cobra.Command
-	authenticator interactors.Authenticator
+	Command       cobra.Command
+	Authenticator interactors.Authenticator
+}
+
+func (ac *AuthCommand) setAuth(auth interactors.Authenticator) {
+	ac.Authenticator = auth
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute(authenticator interactors.Authenticator) {
 	// TODO: use constructor
-	rootCmd.authenticator = authenticator
+	rootCmd.Authenticator = authenticator
 
-	if err := rootCmd.Execute(); err != nil {
+	if err := rootCmd.Command.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -42,7 +49,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.admincli.yaml)")
+	rootCmd.Command.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.admincli.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
