@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/spf13/cobra"
 	"os"
 
@@ -12,15 +13,25 @@ import (
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "admincli",
-	Short: "Command line utility to manage users.",
-	Long:  `Command line utility to create/update/delete/find users and reset their passwords.`,
+var rootCmd = &AuthCommand{
+	Command: cobra.Command{
+		Use:   "admincli",
+		Short: "Command line utility to manage users.",
+		Long:  `Command line utility to create/update/delete/find users and reset their passwords.`,
+	},
+}
+
+type AuthCommand struct {
+	cobra.Command
+	authenticator interactors.Authenticator
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(authenticator interactors.Authenticator) {
+	// TODO: use constructor
+	rootCmd.authenticator = authenticator
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
