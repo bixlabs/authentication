@@ -5,16 +5,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var password, givenName, secondName, familyName, secondFamilyName string
+var email, password, givenName, secondName, familyName, secondFamilyName string
 
 // createUserCmd represents the create-user command
 var createUserCmd = &cobra.Command{
-	Use:     "create-user",
+	Use:     "create-user <email>",
 	Aliases: []string{"create"},
 	Short:   "Create a user",
-	Args:    cobra.ExactArgs(1),
+	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		email := args[0]
+		// TODO: add a mapper
 		user, err := rootCmd.Authenticator.Create(structures.User{
 			Email:            email,
 			Password:         password,
@@ -35,9 +35,10 @@ var createUserCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Command.AddCommand(createUserCmd)
-	createUserCmd.Flags().StringVar(&password, "password", "", "Password")
-	createUserCmd.Flags().StringVar(&givenName, "given-name", "", "Given Name")
-	createUserCmd.Flags().StringVar(&secondName, "second-name", "", "Second Name")
-	createUserCmd.Flags().StringVar(&familyName, "family-name", "", "Family Name")
-	createUserCmd.Flags().StringVar(&secondFamilyName, "second-family-name", "", "Second Family Name")
+	createUserCmd.Flags().StringVar(&email, "email", "", "email")
+	createUserCmd.Flags().StringVar(&password, "password", "", "password")
+	createUserCmd.Flags().StringVar(&givenName, "given-name", "", "given name")
+	createUserCmd.Flags().StringVar(&secondName, "second-name", "", "second name")
+	createUserCmd.Flags().StringVar(&familyName, "family-name", "", "family name")
+	createUserCmd.Flags().StringVar(&secondFamilyName, "second-family-name", "", "second family name")
 }

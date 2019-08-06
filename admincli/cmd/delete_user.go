@@ -6,7 +6,7 @@ import (
 
 // deleteUserCmd represents the delete-user command
 var deleteUserCmd = &cobra.Command{
-	Use:     "delete-user",
+	Use:     "delete-user <email>",
 	Aliases: []string{"delete"},
 	Short:   "Delete a user",
 	Args:    cobra.ExactArgs(1),
