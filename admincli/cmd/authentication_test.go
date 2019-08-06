@@ -19,6 +19,10 @@ const emailWithoutUser = "nouser@email.com"
 const validEmail = "test@email.com"
 const invalidEmail = "invalid_email"
 
+const oneArgumentErrorMessage = "accepts 1 arg(s), received 0"
+const invalidEmailErrorMessage = "Email is not valid"
+const notFoundEmailErrorMessage = "User provided was not found"
+
 func TestAdminCli(t *testing.T) {
 	g := goblin.Goblin(t)
 	tools.InitializeLogger()
@@ -30,6 +34,8 @@ func TestAdminCli(t *testing.T) {
 	var auth interactors.Authenticator
 
 	g.Describe("Find user command", func() {
+		const findUserCommandUse = "find-user"
+
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
@@ -42,27 +48,66 @@ func TestAdminCli(t *testing.T) {
 		})
 
 		g.It("Should return an error when email argument is not provided", func() {
-			_, err := executeCommand(&rootCmd.Command, "find-user")
+			_, err := executeCommand(&rootCmd.Command, findUserCommandUse)
 			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(Equal("accepts 1 arg(s), received 0"))
+			Expect(err.Error()).To(Equal(oneArgumentErrorMessage))
 		})
 
 		g.It("Should return an error when the email is invalid", func() {
-			_, err := executeCommand(&rootCmd.Command, "find-user", invalidEmail)
+			_, err := executeCommand(&rootCmd.Command, findUserCommandUse, invalidEmail)
 			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(Equal("Email is not valid"))
+			Expect(err.Error()).To(Equal(invalidEmailErrorMessage))
 		})
 
 		g.It("Should return an error when the email does not exist", func() {
-			_, err := executeCommand(&rootCmd.Command, "find-user", emailWithoutUser)
+			_, err := executeCommand(&rootCmd.Command, findUserCommandUse, emailWithoutUser)
 			Expect(err).NotTo(BeNil())
-			Expect(err.Error()).To(Equal("User provided was not found"))
+			Expect(err.Error()).To(Equal(notFoundEmailErrorMessage))
 		})
 
 		g.It("Should return a valid user", func() {
-			output, err := executeCommand(&rootCmd.Command, "find-user", validEmail)
+			output, err := executeCommand(&rootCmd.Command, findUserCommandUse, validEmail)
 			Expect(err).To(BeNil())
 			Expect(output).Should(ContainSubstring(fmt.Sprintf("Email:%s", validEmail)))
+		})
+	})
+
+	g.Describe("Delete user command", func() {
+		const deleteUserCommandUse = "delete-user"
+
+		g.BeforeEach(func() {
+			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			auth = implementation.NewAuthenticator(userRepo, sender)
+			rootCmd.setAuth(auth)
+			_, err := auth.Create(structures.User{Email: validEmail})
+
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		g.It("Should return an error when email argument is not provided", func() {
+			_, err := executeCommand(&rootCmd.Command, deleteUserCommandUse)
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(Equal(oneArgumentErrorMessage))
+		})
+
+		g.It("Should return an error when the email is invalid", func() {
+			_, err := executeCommand(&rootCmd.Command, deleteUserCommandUse, invalidEmail)
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(Equal(invalidEmailErrorMessage))
+		})
+
+		g.It("Should return an error when the email does not exist", func() {
+			_, err := executeCommand(&rootCmd.Command, deleteUserCommandUse, emailWithoutUser)
+			Expect(err).NotTo(BeNil())
+			Expect(err.Error()).To(Equal(notFoundEmailErrorMessage))
+		})
+
+		g.It("Should delete an existing user", func() {
+			output, err := executeCommand(&rootCmd.Command, deleteUserCommandUse, validEmail)
+			Expect(err).To(BeNil())
+			Expect(output).To(Equal(fmt.Sprintf("user with email %s was deleted", validEmail)))
 		})
 	})
 }
