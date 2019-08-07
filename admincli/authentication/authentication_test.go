@@ -2,8 +2,10 @@ package authentication
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
+	"github.com/bixlabs/authentication/admincli/authentication/structures/finduser"
 	"github.com/bixlabs/authentication/admincli/authentication/structures/updateuser"
 	"github.com/bixlabs/authentication/admincli/cmd"
 	"github.com/bixlabs/authentication/authenticator/interactors"
@@ -73,7 +75,14 @@ func TestAdminCli(t *testing.T) {
 		g.It("Should return a valid user", func() {
 			output, err := executeCommand(findUserCommandUse, validEmail)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("Email:%s", validEmail)))
+
+			var user finduser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.Email).To(Equal(validEmail))
 		})
 	})
 
@@ -156,42 +165,85 @@ func TestAdminCli(t *testing.T) {
 		g.It("Should create a user", func() {
 			output, err := executeCommand(createUserCommandUse, "--email", validEmail)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("Email:%s", validEmail)))
-			Expect(output).Should(ContainSubstring("Password"))
+
+			var user createuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.Email).To(Equal(validEmail))
+			Expect(user.Password).NotTo(BeNil())
 		})
 
 		g.It("Should create a user with password", func() {
 			output, err := executeCommand(createUserCommandUse, "--email", validEmail, "--password", validPassword)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring("Password:"))
+
+			var user createuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.Email).To(Equal(validEmail))
+			Expect(user.Password).NotTo(BeNil())
 		})
 
 		g.It("Should create a user with given name", func() {
 			givenName := "Isabella"
 			output, err := executeCommand(createUserCommandUse, "--email", validEmail, "--given-name", givenName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("GivenName:%s", givenName)))
+
+			var user createuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.GivenName).To(Equal(givenName))
 		})
 
 		g.It("Should create a user with second name", func() {
 			secondName := "Rose"
 			output, err := executeCommand(createUserCommandUse, "--email", validEmail, "--second-name", secondName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("SecondName:%s", secondName)))
+
+			var user createuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.SecondName).To(Equal(secondName))
 		})
 
 		g.It("Should create a user with family name", func() {
 			familyName := "Foreman"
 			output, err := executeCommand(createUserCommandUse, "--email", validEmail, "--family-name", familyName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("FamilyName:%s", familyName)))
+
+			var user createuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.FamilyName).To(Equal(familyName))
 		})
 
 		g.It("Should create a user with second family name", func() {
 			secondFamilyName := "Barclay"
 			output, err := executeCommand(createUserCommandUse, "--email", validEmail, "--second-family-name", secondFamilyName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("SecondFamilyName:%s", secondFamilyName)))
+
+			var user createuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.SecondFamilyName).To(Equal(secondFamilyName))
 		})
 	})
 
@@ -246,49 +298,99 @@ func TestAdminCli(t *testing.T) {
 		g.It("Should update a user", func() {
 			output, err := executeCommand(updateUserCommandUse, validEmail)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("Email:%s", validEmail)))
+
+			var user updateuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.Email).To(Equal(validEmail))
 		})
 
 		g.It("Should update a user with email", func() {
 			newEmail := "update_email@gmail.com"
 			output, err := executeCommand(updateUserCommandUse, validEmail, "--new-email", newEmail)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("Email:%s", newEmail)))
+
+			var user updateuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.Email).To(Equal(newEmail))
 		})
 
 		g.It("Should update a user with password", func() {
-			password := "very_strong_and_secure_password"
-			output, err := executeCommand(updateUserCommandUse, validEmail, "--password", password)
+			newPassword := "very_strong_and_secure_password"
+			output, err := executeCommand(updateUserCommandUse, validEmail, "--password", newPassword)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring("Password:"))
+
+			var user updateuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.Password).NotTo(BeNil())
 		})
 
 		g.It("Should update a user with given name", func() {
 			givenName := "Isabella"
 			output, err := executeCommand(updateUserCommandUse, validEmail, "--given-name", givenName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("GivenName:%s", givenName)))
+
+			var user updateuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.GivenName).To(Equal(givenName))
 		})
 
 		g.It("Should update a user with second name", func() {
 			secondName := "Rose"
 			output, err := executeCommand(updateUserCommandUse, validEmail, "--second-name", secondName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("SecondName:%s", secondName)))
+
+			var user updateuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.SecondName).To(Equal(secondName))
 		})
 
 		g.It("Should update a user with family name", func() {
 			familyName := "Foreman"
 			output, err := executeCommand(updateUserCommandUse, validEmail, "--family-name", familyName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("FamilyName:%s", familyName)))
+
+			var user structures.User
+
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.FamilyName).To(Equal(familyName))
 		})
 
 		g.It("Should update a user with second family name", func() {
 			secondFamilyName := "Barclay"
 			output, err := executeCommand(updateUserCommandUse, validEmail, "--second-family-name", secondFamilyName)
 			Expect(err).To(BeNil())
-			Expect(output).Should(ContainSubstring(fmt.Sprintf("SecondFamilyName:%s", secondFamilyName)))
+
+			var user updateuser.Result
+			err = json.Unmarshal([]byte(output), &user)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(user.SecondFamilyName).To(Equal(secondFamilyName))
 		})
 	})
 

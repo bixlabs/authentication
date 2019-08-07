@@ -32,7 +32,7 @@ func SetAuthenticator(auth interactors.Authenticator) {
 }
 
 // Only use for testing purpose
-func GetRootCommand() *AdminCliCommand{
+func GetRootCommand() *AdminCliCommand {
 	return rootCmd
 }
 

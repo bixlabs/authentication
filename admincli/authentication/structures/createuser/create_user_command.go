@@ -1,5 +1,7 @@
 package createuser
 
+import "github.com/bixlabs/authentication/admincli/authentication/structures/finduser"
+
 type Command struct {
 	Email            string
 	Password         string
@@ -8,3 +10,5 @@ type Command struct {
 	FamilyName       string
 	SecondFamilyName string
 }
+
+type Result finduser.Result

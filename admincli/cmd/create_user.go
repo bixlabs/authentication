@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
 	"github.com/bixlabs/authentication/admincli/authentication/structures/mappers"
 	"github.com/spf13/cobra"
@@ -21,7 +22,12 @@ var createUserCmd = &cobra.Command{
 			return err
 		}
 
-		cmd.Printf("%+v\n", user)
+		jsonUser, err := json.Marshal(mappers.UserToCreateUserResult(user))
+		if err != nil {
+			return err
+		}
+
+		cmd.Print(string(jsonUser))
 		return nil
 	},
 }
