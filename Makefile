@@ -47,5 +47,7 @@ run-cli:
 api-docs:
 		$(GOPATH)/bin/swag init -g ./api/main.go -o ./api/docs
 
+cli-docs:
+		go run ./admincli/docs/main.go
 ci:
 		make all build
