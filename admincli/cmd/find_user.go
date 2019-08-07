@@ -23,5 +23,5 @@ var findUserCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Command.AddCommand(findUserCmd)
+	rootCmd.AddCommand(findUserCmd)
 }

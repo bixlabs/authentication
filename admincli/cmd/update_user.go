@@ -48,7 +48,7 @@ var updateUserCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Command.AddCommand(updateUserCmd)
+	rootCmd.AddCommand(updateUserCmd)
 
 	updateUserCmd.Flags().StringVar(&UpdateAttrs.email, "new-email", "", "new email")
 	updateUserCmd.Flags().StringVar(&UpdateAttrs.password, "password", "", "password")

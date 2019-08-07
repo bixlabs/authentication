@@ -43,7 +43,7 @@ var createUserCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Command.AddCommand(createUserCmd)
+	rootCmd.AddCommand(createUserCmd)
 	createUserCmd.Flags().StringVar(&CreateAttrs.email, "email", "", "email")
 	createUserCmd.Flags().StringVar(&CreateAttrs.password, "password", "", "password")
 	createUserCmd.Flags().StringVar(&CreateAttrs.givenName, "given-name", "", "given name")

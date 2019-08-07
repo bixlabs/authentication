@@ -28,7 +28,7 @@ var resetPasswordCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.Command.AddCommand(resetPasswordCmd)
+	rootCmd.AddCommand(resetPasswordCmd)
 	resetPasswordCmd.Flags().StringVar(&resetPassword, "new-password", "", "The new password that will be reset")
 
 	err := resetPasswordCmd.MarkFlagRequired("new-password")

@@ -338,7 +338,7 @@ func TestAdminCli(t *testing.T) {
 }
 
 func executeCommand(args ...string) (output string, err error) {
-	root := &rootCmd.Command
+	root := rootCmd
 
 	buf := new(bytes.Buffer)
 	root.SetOut(buf)
