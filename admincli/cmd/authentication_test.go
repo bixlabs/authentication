@@ -44,9 +44,8 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuth(auth)
+			rootCmd.setAuthenticator(auth)
 			_, err := auth.Create(structures.User{Email: validEmail})
-
 			if err != nil {
 				panic(err)
 			}
@@ -83,7 +82,7 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuth(auth)
+			rootCmd.setAuthenticator(auth)
 			_, err := auth.Create(structures.User{Email: validEmail})
 
 			if err != nil {
@@ -129,7 +128,7 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuth(auth)
+			rootCmd.setAuthenticator(auth)
 
 			// reset the create attributes, otherwise the flags are kept before each test
 			CreateAttrs = createuser.Command{}
@@ -201,7 +200,7 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuth(auth)
+			rootCmd.setAuthenticator(auth)
 
 			// reset the update attributes, otherwise the flags are kept before each test
 			UpdateAttrs = updateuser.Command{}
@@ -298,7 +297,7 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuth(auth)
+			rootCmd.setAuthenticator(auth)
 
 			_, err := auth.Create(structures.User{Email: validEmail})
 
@@ -346,7 +345,7 @@ func executeCommand(args ...string) (output string, err error) {
 	root.SetOut(buf)
 	root.SetArgs(args)
 
-	_, err = root.ExecuteC()
+	err = root.Execute()
 
 	return buf.String(), err
 }
