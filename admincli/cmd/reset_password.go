@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/admincli/authentication/structures/mappers"
+	"github.com/bixlabs/authentication/admincli/authentication/structures/resetpassword"
 
 	"github.com/spf13/cobra"
 )
 
-var resetPassword string
+var resetPassword resetpassword.Command
 
 // resetPasswordCmd represents the reset-password command
 var resetPasswordCmd = &cobra.Command{
@@ -17,7 +18,7 @@ var resetPasswordCmd = &cobra.Command{
 		email := args[0]
 
 		// TODO: we need a mapper here
-		user, err := rootCmd.Authenticator.Update(email, structures.UpdateUser{Password: resetPassword})
+		user, err := rootCmd.Authenticator.Update(email, mappers.ResetUserCommandToUpdateUser(resetPassword))
 		if err != nil {
 			return err
 		}
@@ -29,7 +30,7 @@ var resetPasswordCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(resetPasswordCmd)
-	resetPasswordCmd.Flags().StringVar(&resetPassword, "new-password", "", "The new password that will be reset")
+	resetPasswordCmd.Flags().StringVar(&resetPassword.Password, "new-password", "", "The new password that will be reset")
 
 	err := resetPasswordCmd.MarkFlagRequired("new-password")
 	if err != nil {
