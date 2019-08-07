@@ -13,7 +13,6 @@ import (
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
-// TODO: use a constructor
 var rootCmd = &AdminCliCommand{
 	Command: &cobra.Command{
 		Use:          "admincli",
@@ -28,15 +27,21 @@ type AdminCliCommand struct {
 	Authenticator interactors.Authenticator
 }
 
-func (ac *AdminCliCommand) setAuth(auth interactors.Authenticator) {
-	ac.Authenticator = auth
+func SetAuthenticator(auth interactors.Authenticator) {
+	rootCmd.Authenticator = auth
+}
+
+// Only use for testing purpose
+func GetRootCommand() *AdminCliCommand{
+	return rootCmd
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(authenticator interactors.Authenticator) {
-	// TODO: use constructor
-	rootCmd.Authenticator = authenticator
+func Execute() {
+	if rootCmd.Authenticator == nil {
+		panic("authenticator is required, try to set it before Execute")
+	}
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)

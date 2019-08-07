@@ -1,10 +1,11 @@
-package cmd
+package authentication
 
 import (
 	"bytes"
 	"fmt"
 	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
 	"github.com/bixlabs/authentication/admincli/authentication/structures/updateuser"
+	"github.com/bixlabs/authentication/admincli/cmd"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -44,7 +45,7 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuthenticator(auth)
+			cmd.SetAuthenticator(auth)
 			_, err := auth.Create(structures.User{Email: validEmail})
 			if err != nil {
 				panic(err)
@@ -82,7 +83,7 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuthenticator(auth)
+			cmd.SetAuthenticator(auth)
 			_, err := auth.Create(structures.User{Email: validEmail})
 
 			if err != nil {
@@ -128,10 +129,10 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuthenticator(auth)
+			cmd.SetAuthenticator(auth)
 
 			// reset the create attributes, otherwise the flags are kept before each test
-			CreateAttrs = createuser.Command{}
+			cmd.CreateAttrs = createuser.Command{}
 		})
 
 		g.It("Should return an error when email argument is not provided", func() {
@@ -200,10 +201,10 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuthenticator(auth)
+			cmd.SetAuthenticator(auth)
 
 			// reset the update attributes, otherwise the flags are kept before each test
-			UpdateAttrs = updateuser.Command{}
+			cmd.UpdateAttrs = updateuser.Command{}
 
 			_, err := auth.Create(structures.User{Email: validEmail})
 
@@ -297,7 +298,7 @@ func TestAdminCli(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			auth = implementation.NewAuthenticator(userRepo, sender)
-			rootCmd.setAuthenticator(auth)
+			cmd.SetAuthenticator(auth)
 
 			_, err := auth.Create(structures.User{Email: validEmail})
 
@@ -339,7 +340,7 @@ func TestAdminCli(t *testing.T) {
 }
 
 func executeCommand(args ...string) (output string, err error) {
-	root := rootCmd
+	root := cmd.GetRootCommand()
 
 	buf := new(bytes.Buffer)
 	root.SetOut(buf)

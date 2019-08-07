@@ -17,5 +17,6 @@ func main() {
 
 	authOperations := implementation.NewAuthenticator(userRepo, memory.DummySender{})
 
-	cmd.Execute(authOperations)
+	cmd.SetAuthenticator(authOperations)
+	cmd.Execute()
 }
