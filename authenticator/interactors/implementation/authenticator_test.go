@@ -328,7 +328,7 @@ func TestAuthenticator(t *testing.T) {
 		})
 
 		g.It("Should return an error in case the email is invalid", func() {
-			updateAttrs := structures.UserUpdate{GivenName: "GivenName"}
+			updateAttrs := structures.UpdateUser{GivenName: "GivenName"}
 			_, err := auth.Update(invalidEmail, updateAttrs)
 
 			Expect(err).NotTo(BeNil())
@@ -338,7 +338,7 @@ func TestAuthenticator(t *testing.T) {
 		})
 
 		g.It("Should return an error in case the user does not exist", func() {
-			updateAttrs := structures.UserUpdate{}
+			updateAttrs := structures.UpdateUser{}
 			_, err := auth.Update("nonexistingemail@example.com", updateAttrs)
 
 			Expect(err).NotTo(BeNil())
@@ -346,7 +346,7 @@ func TestAuthenticator(t *testing.T) {
 		})
 
 		g.It("Should return an error in case the update email is invalid", func() {
-			updateAttrs := structures.UserUpdate{Email: invalidEmail, Password: validPassword}
+			updateAttrs := structures.UpdateUser{Email: invalidEmail, Password: validPassword}
 			_, err := auth.Update(validEmail, updateAttrs)
 
 			Expect(err).NotTo(BeNil())
@@ -356,7 +356,7 @@ func TestAuthenticator(t *testing.T) {
 		})
 
 		g.It("Should return an error in case the update password does not have at least 8 characters", func() {
-			updateAttrs := structures.UserUpdate{Email: validEmail, Password: invalidPassword}
+			updateAttrs := structures.UpdateUser{Email: validEmail, Password: invalidPassword}
 			_, err := auth.Update(validEmail, updateAttrs)
 
 			Expect(err).NotTo(BeNil())
@@ -366,7 +366,7 @@ func TestAuthenticator(t *testing.T) {
 		})
 
 		g.It("Should Update a valid user", func() {
-			updateAttrs := structures.UserUpdate{
+			updateAttrs := structures.UpdateUser{
 				Email:            "newemail@example.com",
 				Password:         "newPassWord",
 				GivenName:        "newGivenName",
