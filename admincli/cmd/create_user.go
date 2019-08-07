@@ -5,7 +5,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var email, password, givenName, secondName, familyName, secondFamilyName string
+type CreateUser struct {
+	email            string
+	password         string
+	givenName        string
+	secondName       string
+	familyName       string
+	secondFamilyName string
+}
+
+var CreateAttrs CreateUser
 
 // createUserCmd represents the create-user command
 var createUserCmd = &cobra.Command{
@@ -16,12 +25,12 @@ var createUserCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// TODO: add a mapper
 		user, err := rootCmd.Authenticator.Create(structures.User{
-			Email:            email,
-			Password:         password,
-			GivenName:        givenName,
-			SecondName:       secondName,
-			FamilyName:       familyName,
-			SecondFamilyName: secondFamilyName,
+			Email:            CreateAttrs.email,
+			Password:         CreateAttrs.password,
+			GivenName:        CreateAttrs.givenName,
+			SecondName:       CreateAttrs.secondName,
+			FamilyName:       CreateAttrs.familyName,
+			SecondFamilyName: CreateAttrs.secondFamilyName,
 		})
 
 		if err != nil {
@@ -35,10 +44,15 @@ var createUserCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Command.AddCommand(createUserCmd)
-	createUserCmd.Flags().StringVar(&email, "email", "", "email")
-	createUserCmd.Flags().StringVar(&password, "password", "", "password")
-	createUserCmd.Flags().StringVar(&givenName, "given-name", "", "given name")
-	createUserCmd.Flags().StringVar(&secondName, "second-name", "", "second name")
-	createUserCmd.Flags().StringVar(&familyName, "family-name", "", "family name")
-	createUserCmd.Flags().StringVar(&secondFamilyName, "second-family-name", "", "second family name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.email, "email", "", "email")
+	createUserCmd.Flags().StringVar(&CreateAttrs.password, "password", "", "password")
+	createUserCmd.Flags().StringVar(&CreateAttrs.givenName, "given-name", "", "given name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.secondName, "second-name", "", "second name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.familyName, "family-name", "", "family name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.secondFamilyName, "second-family-name", "", "second family name")
+
+	err := createUserCmd.MarkFlagRequired("email")
+	if err != nil {
+		panic(err)
+	}
 }

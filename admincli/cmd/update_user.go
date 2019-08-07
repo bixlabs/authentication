@@ -6,6 +6,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type UpdateUser struct {
+	email            string
+	password         string
+	givenName        string
+	secondName       string
+	familyName       string
+	secondFamilyName string
+}
+
+var UpdateAttrs UpdateUser
+
 // updateUserCmd represents the update-user command
 var updateUserCmd = &cobra.Command{
 	Use:     "update-user <email>",
@@ -14,15 +25,19 @@ var updateUserCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		currentEmail := args[0]
+
 		// TODO: add a mapper
-		user, err := rootCmd.Authenticator.Update(currentEmail, structures.UserUpdate{
-			Email:            email,
-			Password:         password,
-			GivenName:        givenName,
-			SecondName:       secondName,
-			FamilyName:       familyName,
-			SecondFamilyName: secondFamilyName,
-		})
+		userUpdate := structures.UserUpdate{
+			Email:            UpdateAttrs.email,
+			Password:         UpdateAttrs.password,
+			GivenName:        UpdateAttrs.givenName,
+			SecondName:       UpdateAttrs.secondName,
+			FamilyName:       UpdateAttrs.familyName,
+			SecondFamilyName: UpdateAttrs.secondFamilyName,
+		}
+
+		user, err := rootCmd.Authenticator.Update(currentEmail, userUpdate)
+
 		if err != nil {
 			return err
 		}
@@ -34,10 +49,11 @@ var updateUserCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Command.AddCommand(updateUserCmd)
-	updateUserCmd.Flags().StringVar(&email, "new-email", "", "new email")
-	updateUserCmd.Flags().StringVar(&password, "password", "", "password")
-	updateUserCmd.Flags().StringVar(&givenName, "given-name", "", "given name")
-	updateUserCmd.Flags().StringVar(&secondName, "second-name", "", "second name")
-	updateUserCmd.Flags().StringVar(&familyName, "family-name", "", "family name")
-	updateUserCmd.Flags().StringVar(&secondFamilyName, "second-family-name", "", "second family name")
+
+	updateUserCmd.Flags().StringVar(&UpdateAttrs.email, "new-email", "", "new email")
+	updateUserCmd.Flags().StringVar(&UpdateAttrs.password, "password", "", "password")
+	updateUserCmd.Flags().StringVar(&UpdateAttrs.givenName, "given-name", "", "given name")
+	updateUserCmd.Flags().StringVar(&UpdateAttrs.secondName, "second-name", "", "second name")
+	updateUserCmd.Flags().StringVar(&UpdateAttrs.familyName, "family-name", "", "family name")
+	updateUserCmd.Flags().StringVar(&UpdateAttrs.secondFamilyName, "second-family-name", "", "second family name")
 }

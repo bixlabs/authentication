@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/tools"
 	"github.com/spf13/cobra"
 	"os"
 
@@ -16,11 +16,10 @@ var cfgFile string
 // TODO: use a constructor and rename
 var rootCmd = &AuthCommand{
 	Command: cobra.Command{
-		SilenceUsage:  true,
-		SilenceErrors: true,
-		Use:           "admincli",
-		Short:         "Command line utility to manage users.",
-		Long:          `Command line utility to create/update/delete/find users and reset their passwords.`,
+		Use:          "admincli",
+		Short:        "Command line utility to manage users.",
+		Long:         `Command line utility to create/update/delete/find users and reset their passwords.`,
+		SilenceUsage: true,
 	},
 }
 
@@ -40,7 +39,6 @@ func Execute(authenticator interactors.Authenticator) {
 	rootCmd.Authenticator = authenticator
 
 	if err := rootCmd.Command.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }
@@ -61,7 +59,7 @@ func initConfig() {
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Println(err)
+			tools.Log().Error(err)
 			os.Exit(1)
 		}
 
@@ -74,6 +72,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		tools.Log().Info("Using config file:", viper.ConfigFileUsed())
 	}
 }
