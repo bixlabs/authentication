@@ -7,7 +7,6 @@ import (
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/structures/login"
-	"github.com/bixlabs/authentication/authenticator/structures/mappers"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/dgrijalva/jwt-go"
@@ -17,12 +16,13 @@ import (
 type authenticator struct {
 	repository     user.Repository
 	sender         email.Sender
+	userManager    interactors.UserManager
 	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
-func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {
-	auth := &authenticator{repository: repository, sender: sender}
+func NewAuthenticator(repository user.Repository, sender email.Sender, um interactors.UserManager) interactors.Authenticator {
+	auth := &authenticator{repository: repository, sender: sender, userManager: um}
 	err := env.Parse(auth)
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the authenticator failed", err)
@@ -105,24 +105,7 @@ func (c *userClaims) Valid() error {
 }
 
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
-	return auth.createUser(user)
-}
-
-func (auth authenticator) hasValidationIssue(user structures.User) error {
-	if err := util.IsValidEmail(user.Email); err != nil {
-		return err
-	}
-
-	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
-		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
-		return util.DuplicatedEmailError{}
-	}
-
-	if err := util.CheckPasswordLength(user.Password); err != nil {
-		return err
-	}
-
-	return nil
+	return auth.userManager.Create(user)
 }
 
 func (auth authenticator) VerifyJWT(token string) (structures.User, error) {
@@ -157,113 +140,4 @@ func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.U
 		return structures.User{}, util.InvalidJWTToken{}
 	}
 	return claims.User, nil
-}
-
-func (auth authenticator) Create(user structures.User) (structures.User, error) {
-	if user, err := auth.generatePasswordIfEmpty(&user); err != nil {
-		return user, err
-	}
-
-	return auth.createUser(user)
-}
-
-func (auth authenticator) createUser(user structures.User) (structures.User, error) {
-	if err := auth.hasValidationIssue(user); err != nil {
-		return user, err
-	}
-
-	hashedPassword, err := util.HashPassword(user.Password)
-	if err != nil {
-		return user, err
-	}
-	user.Password = hashedPassword
-
-	user, err = auth.repository.Create(user)
-	if err != nil {
-		return user, err
-	}
-
-	return user, nil
-}
-
-func (auth authenticator) generatePasswordIfEmpty(user *structures.User) (structures.User, error) {
-	if user.Password != "" {
-		return *user, nil
-	}
-
-	var err error
-	user.GeneratedPassword, err = util.GenerateRandomPassword()
-	if err != nil {
-		return *user, err
-	}
-
-	user.Password = user.GeneratedPassword
-
-	return *user, nil
-}
-
-func (auth authenticator) Delete(email string) error {
-	if err := util.IsValidEmail(email); err != nil {
-		return err
-	}
-
-	userToRemove, err := auth.repository.Find(email)
-	if err != nil {
-		return util.UserNotFoundError{}
-	}
-
-	return auth.repository.Delete(userToRemove)
-}
-
-func (auth authenticator) Find(email string) (structures.User, error) {
-	if err := util.IsValidEmail(email); err != nil {
-		return structures.User{}, err
-	}
-
-	user, err := auth.repository.Find(email)
-	if err != nil {
-		return structures.User{}, util.UserNotFoundError{}
-	}
-
-	return user, nil
-}
-
-func (auth authenticator) Update(email string, updateAttrs structures.UpdateUser) (structures.User, error) {
-	if err := util.IsValidEmail(email); err != nil {
-		return structures.User{}, err
-	}
-
-	if updateAttrs.Email != "" {
-		if err := util.IsValidEmail(updateAttrs.Email); err != nil {
-			return structures.User{}, err
-		}
-	}
-
-	if updateAttrs.Password != "" {
-		if err := util.CheckPasswordLength(updateAttrs.Password); err != nil {
-			return structures.User{}, err
-		}
-	}
-
-	user, err := auth.repository.Find(email)
-	if err != nil {
-		return user, util.UserNotFoundError{}
-	}
-
-	if updateAttrs.Email != user.Email {
-		if isAvailable, err := auth.repository.IsEmailAvailable(updateAttrs.Email); err != nil || !isAvailable {
-			tools.Log().WithField("error", err).Debug("A duplicated email was provided")
-			return user, util.DuplicatedEmailError{}
-		}
-	}
-
-	if updateAttrs.Password != "" {
-		hashedPassword, err := util.HashPassword(updateAttrs.Password)
-		if err != nil {
-			return user, err
-		}
-		user.Password = hashedPassword
-	}
-
-	return auth.repository.Update(user.Email, mappers.AssignUserUpdateToUser(user, updateAttrs))
 }

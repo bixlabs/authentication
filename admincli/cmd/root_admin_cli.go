@@ -10,6 +10,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+type AdminCliCommand struct {
+	*cobra.Command
+	UserManager interactors.UserManager // TODO: think if it should be private
+}
+
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
@@ -22,13 +27,8 @@ var rootCmd = &AdminCliCommand{
 	},
 }
 
-type AdminCliCommand struct {
-	*cobra.Command
-	Authenticator interactors.Authenticator
-}
-
-func SetAuthenticator(auth interactors.Authenticator) {
-	rootCmd.Authenticator = auth
+func SetUserManager(um interactors.UserManager) {
+	rootCmd.UserManager = um
 }
 
 // Only use for testing purpose
@@ -39,8 +39,8 @@ func GetRootCommand() *AdminCliCommand {
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if rootCmd.Authenticator == nil {
-		panic("authenticator is required, try to set it before Execute")
+	if rootCmd.UserManager == nil {
+		panic("UserManager is required, try to set it before Execute")
 	}
 
 	if err := rootCmd.Execute(); err != nil {

@@ -1,10 +1,10 @@
 package mappers
 
 import (
-	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/finduser"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/resetpassword"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/updateuser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/createuser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/finduser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/resetpassword"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/updateuser"
 	"github.com/bixlabs/authentication/authenticator/structures"
 )
 

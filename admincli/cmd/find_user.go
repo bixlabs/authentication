@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/mappers"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/mappers"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var findUserCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email := args[0]
-		user, err := rootCmd.Authenticator.Find(email)
+		user, err := rootCmd.UserManager.Find(email)
 		if err != nil {
 			return err
 		}

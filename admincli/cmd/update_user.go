@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"encoding/json"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/mappers"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/updateuser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/mappers"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/updateuser"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ var updateUserCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		currentEmail := args[0]
-		user, err := rootCmd.Authenticator.Update(currentEmail, mappers.UpdateUserCommandToUpdateUser(UpdateAttrs))
+		user, err := rootCmd.UserManager.Update(currentEmail, mappers.UpdateUserCommandToUpdateUser(UpdateAttrs))
 
 		if err != nil {
 			return err

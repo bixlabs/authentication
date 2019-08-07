@@ -12,7 +12,7 @@ var deleteUserCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email := args[0]
-		err := rootCmd.Authenticator.Delete(email)
+		err := rootCmd.UserManager.Delete(email)
 
 		if err != nil {
 			return err

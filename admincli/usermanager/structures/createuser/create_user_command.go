@@ -1,6 +1,6 @@
-package updateuser
+package createuser
 
-import "github.com/bixlabs/authentication/admincli/authentication/structures/finduser"
+import "github.com/bixlabs/authentication/admincli/usermanager/structures/finduser"
 
 type Command struct {
 	Email            string

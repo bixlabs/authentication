@@ -17,7 +17,8 @@ func main() {
 	defer closeDB()
 	sender := memory.DummySender{}
 	passwordManager := implementation.NewPasswordManager(userRepo, sender)
-	auth := implementation.NewAuthenticator(userRepo, sender)
+	userManager := implementation.NewUserManager(userRepo)
+	auth := implementation.NewAuthenticator(userRepo, sender, userManager)
 
 	_, _ = auth.Signup(structures.User{Email: "email@bixlabs.com", Password: "secured_password"})
 	user, _ := auth.Login("email@bixlabs.com", "secured_password")

@@ -1,13 +1,13 @@
-package authentication
+package usermanager
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/finduser"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/updateuser"
 	"github.com/bixlabs/authentication/admincli/cmd"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/createuser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/finduser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/updateuser"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -39,16 +39,17 @@ func TestAdminCli(t *testing.T) {
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
-	var auth interactors.Authenticator
+	var um interactors.UserManager
 
 	g.Describe("Find user command", func() {
 		const findUserCommandUse = "find-user"
 
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender)
-			cmd.SetAuthenticator(auth)
-			_, err := auth.Create(structures.User{Email: validEmail})
+			userRepo := memory.NewUserRepo()
+			um = implementation.NewUserManager(userRepo)
+			cmd.SetUserManager(um)
+
+			_, err := um.Create(structures.User{Email: validEmail})
 			if err != nil {
 				panic(err)
 			}
@@ -90,10 +91,10 @@ func TestAdminCli(t *testing.T) {
 		const deleteUserCommandUse = "delete-user"
 
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender)
-			cmd.SetAuthenticator(auth)
-			_, err := auth.Create(structures.User{Email: validEmail})
+			userRepo := memory.NewUserRepo()
+			um = implementation.NewUserManager(userRepo)
+			cmd.SetUserManager(um)
+			_, err := um.Create(structures.User{Email: validEmail})
 
 			if err != nil {
 				panic(err)
@@ -136,9 +137,9 @@ func TestAdminCli(t *testing.T) {
 		const createUserCommandUse = "create-user"
 
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender)
-			cmd.SetAuthenticator(auth)
+			userRepo := memory.NewUserRepo()
+			um = implementation.NewUserManager(userRepo)
+			cmd.SetUserManager(um)
 
 			// reset the create attributes, otherwise the flags are kept before each test
 			cmd.CreateAttrs = createuser.Command{}
@@ -251,14 +252,14 @@ func TestAdminCli(t *testing.T) {
 		const updateUserCommandUse = "update-user"
 
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender)
-			cmd.SetAuthenticator(auth)
+			userRepo := memory.NewUserRepo()
+			um = implementation.NewUserManager(userRepo)
+			cmd.SetUserManager(um)
 
 			// reset the update attributes, otherwise the flags are kept before each test
 			cmd.UpdateAttrs = updateuser.Command{}
 
-			_, err := auth.Create(structures.User{Email: validEmail})
+			_, err := um.Create(structures.User{Email: validEmail})
 
 			if err != nil {
 				panic(err)
@@ -398,11 +399,11 @@ func TestAdminCli(t *testing.T) {
 		const resetPasswordCommandUse = "reset-password"
 
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender)
-			cmd.SetAuthenticator(auth)
+			userRepo := memory.NewUserRepo()
+			um = implementation.NewUserManager(userRepo)
+			cmd.SetUserManager(um)
 
-			_, err := auth.Create(structures.User{Email: validEmail})
+			_, err := um.Create(structures.User{Email: validEmail})
 
 			if err != nil {
 				panic(err)

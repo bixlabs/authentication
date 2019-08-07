@@ -39,7 +39,8 @@ func TestIntegration(t *testing.T) {
 	g.Describe("Integration tests", func() {
 		g.BeforeEach(func() {
 			userRepo, closeDB = sqlite.NewSqliteStorage()
-			auth = implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			userManager := implementation.NewUserManager(userRepo)
+			auth = implementation.NewAuthenticator(userRepo, memory.DummySender{}, userManager)
 			passwordManager = implementation.NewPasswordManager(userRepo, memory.DummySender{})
 		})
 

@@ -27,14 +27,15 @@ func TestAuthenticator(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	//tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
-	var memoryRepo databaseUserPackage.Repository
+	var repo databaseUserPackage.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+			repo = memory.NewUserRepo()
+			auth = NewAuthenticator(repo, memory.DummySender{}, NewUserManager(repo))
 		})
 
 		g.It("Should check for email duplication ", func() {
@@ -90,7 +91,8 @@ func TestAuthenticator(t *testing.T) {
 
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+			repo := memory.NewUserRepo()
+			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{}, NewUserManager(repo))
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {
@@ -138,7 +140,8 @@ func TestAuthenticator(t *testing.T) {
 			secret := "test"
 			err := os.Setenv("AUTH_SERVER_SECRET", secret)
 			Expect(err).To(BeNil())
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+			repo := memory.NewUserRepo()
+			auth = NewAuthenticator(repo, memory.DummySender{}, NewUserManager(repo))
 		})
 
 		g.It("Should return an error in case the JWT token is invalid", func() {
@@ -158,235 +161,6 @@ func TestAuthenticator(t *testing.T) {
 			result, err := auth.VerifyJWT(aToken)
 			Expect(err).To(BeNil())
 			Expect(result.Email).To(Equal(validEmail))
-		})
-	})
-
-	g.Describe("Create User process", func() {
-		g.BeforeEach(func() {
-			memoryRepo = memory.NewUserRepo()
-			auth = NewAuthenticator(memoryRepo, memory.DummySender{})
-		})
-
-		g.It("Should return an error in case the email is invalid", func() {
-			user := structures.User{Email: invalidEmail, Password: validPassword}
-			user, err := auth.Create(user)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
-		})
-
-		g.It("Should have a password of at least 8 characters", func() {
-			user := structures.User{Email: validEmail, Password: invalidPassword}
-			_, err := auth.Create(user)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
-		})
-
-		g.It("Should create a user with an ID", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			user, err := auth.Create(user)
-
-			Expect(err).To(BeNil())
-			g.Assert(user.ID).Equal("1")
-		})
-
-		g.It("Should create a random password if not provided", func() {
-			user := structures.User{Email: validEmail}
-			user, err := auth.Create(user)
-
-			Expect(err).To(BeNil())
-
-			savedUser, _ := memoryRepo.Find(user.Email)
-
-			err = bcrypt.CompareHashAndPassword([]byte(savedUser.Password), []byte(user.GeneratedPassword))
-			g.Assert(err).Equal(nil)
-		})
-
-		g.It("Should hash the password of the user", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			user, err := auth.Create(user)
-
-			Expect(err).To(BeNil())
-
-			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(validPassword))
-			g.Assert(err).Equal(nil)
-		})
-
-		g.It("Should hash the password and not be able to match when given a wrong one", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			user, err := auth.Create(user)
-
-			Expect(err).To(BeNil())
-
-			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(invalidPassword))
-			Expect(err).NotTo(BeNil())
-		})
-
-		g.It("Should check for email duplication", func() {
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, _ = auth.Create(user)
-			_, err := auth.Create(user)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupDuplicateEmailMessage)
-		})
-	})
-
-	g.Describe("Delete User process", func() {
-		g.BeforeEach(func() {
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
-
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, err := auth.Create(user)
-			if err != nil {
-				panic(err)
-			}
-		})
-
-		g.It("Should return an error in case the email is invalid", func() {
-			err := auth.Delete(invalidEmail)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
-		})
-
-		g.It("Should return an error in case the user does not exist", func() {
-			err := auth.Delete("nonexistingemail@example.com")
-
-			Expect(err).NotTo(BeNil())
-			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
-		})
-
-		g.It("Should delete a valid user", func() {
-			_ = auth.Delete(validEmail)
-			err := auth.Delete(validEmail)
-			Expect(err).NotTo(BeNil())
-		})
-
-		g.It("Should return an error in case the user was already deleted", func() {
-			_ = auth.Delete(validEmail)
-			err := auth.Delete(validEmail)
-
-			Expect(err).NotTo(BeNil())
-			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
-		})
-	})
-
-	g.Describe("Find User process", func() {
-		g.Before(func() {
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
-
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, err := auth.Create(user)
-			if err != nil {
-				panic(err)
-			}
-		})
-
-		g.It("Should return an error in case the email is invalid", func() {
-			_, err := auth.Find(invalidEmail)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
-		})
-
-		g.It("Should return an error in case the user does not exist", func() {
-			_, err := auth.Find("nonexistingemail@example.com")
-
-			Expect(err).NotTo(BeNil())
-			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
-		})
-
-		g.It("Should find a valid user", func() {
-			user, err := auth.Find(validEmail)
-
-			Expect(err).To(BeNil())
-			g.Assert(user.Email).Equal(validEmail)
-		})
-	})
-
-	g.Describe("Update User process", func() {
-		g.Before(func() {
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
-
-			user := structures.User{Email: validEmail, Password: validPassword}
-			_, err := auth.Create(user)
-			if err != nil {
-				panic(err)
-			}
-		})
-
-		g.It("Should return an error in case the email is invalid", func() {
-			updateAttrs := structures.UpdateUser{GivenName: "GivenName"}
-			_, err := auth.Update(invalidEmail, updateAttrs)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
-		})
-
-		g.It("Should return an error in case the user does not exist", func() {
-			updateAttrs := structures.UpdateUser{}
-			_, err := auth.Update("nonexistingemail@example.com", updateAttrs)
-
-			Expect(err).NotTo(BeNil())
-			g.Assert(err.Error()).Equal(util.UserNotFoundMessage)
-		})
-
-		g.It("Should return an error in case the update email is invalid", func() {
-			updateAttrs := structures.UpdateUser{Email: invalidEmail, Password: validPassword}
-			_, err := auth.Update(validEmail, updateAttrs)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
-		})
-
-		g.It("Should return an error in case the update password does not have at least 8 characters", func() {
-			updateAttrs := structures.UpdateUser{Email: validEmail, Password: invalidPassword}
-			_, err := auth.Update(validEmail, updateAttrs)
-
-			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
-		})
-
-		g.It("Should Update a valid user", func() {
-			updateAttrs := structures.UpdateUser{
-				Email:            "newemail@example.com",
-				Password:         "newPassWord",
-				GivenName:        "newGivenName",
-				SecondName:       "newSecondName",
-				FamilyName:       "newFamilyName",
-				SecondFamilyName: "newSecondFamilyName",
-			}
-			updatedUser, err := auth.Update(validEmail, updateAttrs)
-
-			Expect(err).To(BeNil())
-
-			Expect(updatedUser.ID).NotTo(BeNil())
-			g.Assert(updatedUser.Email).Equal(updateAttrs.Email)
-			g.Assert(updatedUser.GivenName).Equal(updateAttrs.GivenName)
-			g.Assert(updatedUser.SecondName).Equal(updateAttrs.SecondName)
-			g.Assert(updatedUser.FamilyName).Equal(updateAttrs.FamilyName)
-			g.Assert(updatedUser.SecondFamilyName).Equal(updateAttrs.SecondFamilyName)
-
-			err = bcrypt.CompareHashAndPassword([]byte(updatedUser.Password), []byte(updateAttrs.Password))
-			g.Assert(err).Equal(nil)
 		})
 	})
 }

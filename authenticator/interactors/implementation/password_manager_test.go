@@ -19,6 +19,7 @@ func TestPasswordManager(t *testing.T) {
 	tools.Log().Level = logrus.FatalLevel
 	var passwordManager interactors.PasswordManager
 	var auth interactors.Authenticator
+	var userManager interactors.UserManager
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
@@ -27,7 +28,8 @@ func TestPasswordManager(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			passwordManager = NewPasswordManager(userRepo, sender)
-			auth = NewAuthenticator(userRepo, sender)
+			userManager = NewUserManager(userRepo)
+			auth = NewAuthenticator(userRepo, sender, userManager)
 		})
 
 		g.It("Should return an error if invalid email", func() {
@@ -90,7 +92,8 @@ func TestPasswordManager(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			passwordManager = NewPasswordManager(userRepo, sender)
-			auth = NewAuthenticator(userRepo, sender)
+			userManager = NewUserManager(userRepo)
+			auth = NewAuthenticator(userRepo, sender, userManager)
 		})
 
 		g.It("Should return an error when an invalid email is provided", func() {
@@ -115,7 +118,8 @@ func TestPasswordManager(t *testing.T) {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
 			passwordManager = NewPasswordManager(userRepo, sender)
-			auth = NewAuthenticator(userRepo, sender)
+			userManager = NewUserManager(userRepo)
+			auth = NewAuthenticator(userRepo, sender, userManager)
 		})
 
 		g.It("Should return an error when an invalid email is provided", func() {

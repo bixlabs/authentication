@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"encoding/json"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/mappers"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/createuser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/mappers"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ var createUserCmd = &cobra.Command{
 	Short:   "Create a user",
 	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		user, err := rootCmd.Authenticator.Create(mappers.CreateUserCommandToUser(CreateAttrs))
+		user, err := rootCmd.UserManager.Create(mappers.CreateUserCommandToUser(CreateAttrs))
 
 		if err != nil {
 			return err

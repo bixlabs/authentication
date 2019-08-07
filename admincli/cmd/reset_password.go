@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/bixlabs/authentication/admincli/authentication/structures/mappers"
-	"github.com/bixlabs/authentication/admincli/authentication/structures/resetpassword"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/mappers"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/resetpassword"
 
 	"github.com/spf13/cobra"
 )
@@ -16,7 +16,7 @@ var resetPasswordCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email := args[0]
-		user, err := rootCmd.Authenticator.Update(email, mappers.ResetUserCommandToUpdateUser(resetPassword))
+		user, err := rootCmd.UserManager.Update(email, mappers.ResetUserCommandToUpdateUser(resetPassword))
 		if err != nil {
 			return err
 		}
