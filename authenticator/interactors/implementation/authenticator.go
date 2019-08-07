@@ -228,7 +228,7 @@ func (auth authenticator) Find(email string) (structures.User, error) {
 	return user, nil
 }
 
-func (auth authenticator) Update(email string, updateAttrs structures.UserUpdate) (structures.User, error) {
+func (auth authenticator) Update(email string, updateAttrs structures.UpdateUser) (structures.User, error) {
 	if err := util.IsValidEmail(email); err != nil {
 		return structures.User{}, err
 	}

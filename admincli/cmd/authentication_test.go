@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
+	"github.com/bixlabs/authentication/admincli/authentication/structures/updateuser"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -130,7 +131,7 @@ func TestAdminCli(t *testing.T) {
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			rootCmd.setAuth(auth)
 
-			// we reset the create attributes, otherwise the flags are kept before each test
+			// reset the create attributes, otherwise the flags are kept before each test
 			CreateAttrs = createuser.Command{}
 		})
 
@@ -202,8 +203,8 @@ func TestAdminCli(t *testing.T) {
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			rootCmd.setAuth(auth)
 
-			// we reset the update attributes, otherwise the flags are kept before each test
-			UpdateAttrs = UpdateUser{}
+			// reset the update attributes, otherwise the flags are kept before each test
+			UpdateAttrs = updateuser.Command{}
 
 			_, err := auth.Create(structures.User{Email: validEmail})
 

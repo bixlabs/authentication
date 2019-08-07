@@ -1,6 +1,6 @@
 package structures
 
-type UserUpdate struct {
+type UpdateUser struct {
 	Email            string `json:"email"`
 	Password         string `json:"-"`
 	GivenName        string `json:"givenName,omitempty"`

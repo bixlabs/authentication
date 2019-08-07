@@ -17,7 +17,7 @@ var resetPasswordCmd = &cobra.Command{
 		email := args[0]
 
 		// TODO: we need a mapper here
-		user, err := rootCmd.Authenticator.Update(email, structures.UserUpdate{Password: resetPassword})
+		user, err := rootCmd.Authenticator.Update(email, structures.UpdateUser{Password: resetPassword})
 		if err != nil {
 			return err
 		}

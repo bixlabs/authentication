@@ -4,7 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/structures"
 )
 
-func AssignUserUpdateToUser(user structures.User, updateAttrs structures.UserUpdate) structures.User {
+func AssignUserUpdateToUser(user structures.User, updateAttrs structures.UpdateUser) structures.User {
 	email := updateAttrs.Email
 	if updateAttrs.Email == "" {
 		email = user.Email
