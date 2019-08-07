@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -130,7 +131,7 @@ func TestAdminCli(t *testing.T) {
 			rootCmd.setAuth(auth)
 
 			// we reset the create attributes, otherwise the flags are kept before each test
-			CreateAttrs = CreateUser{}
+			CreateAttrs = createuser.Command{}
 		})
 
 		g.It("Should return an error when email argument is not provided", func() {

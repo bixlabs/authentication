@@ -1,20 +1,12 @@
 package cmd
 
 import (
-	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/admincli/authentication/structures/createuser"
+	"github.com/bixlabs/authentication/admincli/authentication/structures/mappers"
 	"github.com/spf13/cobra"
 )
 
-type CreateUser struct {
-	email            string
-	password         string
-	givenName        string
-	secondName       string
-	familyName       string
-	secondFamilyName string
-}
-
-var CreateAttrs CreateUser
+var CreateAttrs createuser.Command
 
 // createUserCmd represents the create-user command
 var createUserCmd = &cobra.Command{
@@ -23,15 +15,7 @@ var createUserCmd = &cobra.Command{
 	Short:   "Create a user",
 	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// TODO: add a mapper
-		user, err := rootCmd.Authenticator.Create(structures.User{
-			Email:            CreateAttrs.email,
-			Password:         CreateAttrs.password,
-			GivenName:        CreateAttrs.givenName,
-			SecondName:       CreateAttrs.secondName,
-			FamilyName:       CreateAttrs.familyName,
-			SecondFamilyName: CreateAttrs.secondFamilyName,
-		})
+		user, err := rootCmd.Authenticator.Create(mappers.CreateUserCommandToUser(CreateAttrs))
 
 		if err != nil {
 			return err
@@ -44,12 +28,12 @@ var createUserCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(createUserCmd)
-	createUserCmd.Flags().StringVar(&CreateAttrs.email, "email", "", "email")
-	createUserCmd.Flags().StringVar(&CreateAttrs.password, "password", "", "password")
-	createUserCmd.Flags().StringVar(&CreateAttrs.givenName, "given-name", "", "given name")
-	createUserCmd.Flags().StringVar(&CreateAttrs.secondName, "second-name", "", "second name")
-	createUserCmd.Flags().StringVar(&CreateAttrs.familyName, "family-name", "", "family name")
-	createUserCmd.Flags().StringVar(&CreateAttrs.secondFamilyName, "second-family-name", "", "second family name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.Email, "email", "", "email")
+	createUserCmd.Flags().StringVar(&CreateAttrs.Password, "password", "", "password")
+	createUserCmd.Flags().StringVar(&CreateAttrs.GivenName, "given-name", "", "given name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.SecondName, "second-name", "", "second name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.FamilyName, "family-name", "", "family name")
+	createUserCmd.Flags().StringVar(&CreateAttrs.SecondFamilyName, "second-family-name", "", "second family name")
 
 	err := createUserCmd.MarkFlagRequired("email")
 	if err != nil {
