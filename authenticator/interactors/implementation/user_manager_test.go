@@ -32,7 +32,7 @@ func TestUserManager(t *testing.T) {
 
 		g.It("Should return an error in case the email is invalid", func() {
 			user := structures.User{Email: invalidEmail, Password: validPassword}
-			user, err := um.Create(user)
+			_, err := um.Create(user)
 
 			Expect(err).NotTo(BeNil())
 

@@ -21,7 +21,11 @@ type authenticator struct {
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
-func NewAuthenticator(repository user.Repository, sender email.Sender, um interactors.UserManager) interactors.Authenticator {
+func NewAuthenticator(
+	repository user.Repository,
+	sender email.Sender,
+	um interactors.UserManager) interactors.Authenticator {
+
 	auth := &authenticator{repository: repository, sender: sender, userManager: um}
 	err := env.Parse(auth)
 	if err != nil {
