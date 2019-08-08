@@ -12,7 +12,7 @@ import (
 
 type AdminCliCommand struct {
 	*cobra.Command
-	UserManager interactors.UserManager // TODO: think if it should be private
+	userManager interactors.UserManager
 }
 
 var cfgFile string
@@ -28,7 +28,7 @@ var rootCmd = &AdminCliCommand{
 }
 
 func SetUserManager(um interactors.UserManager) {
-	rootCmd.UserManager = um
+	rootCmd.userManager = um
 }
 
 // Only use for testing purpose
@@ -39,7 +39,7 @@ func GetRootCommand() *AdminCliCommand {
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if rootCmd.UserManager == nil {
+	if rootCmd.userManager == nil {
 		panic("UserManager is required, try to set it before Execute")
 	}
 

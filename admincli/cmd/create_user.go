@@ -16,7 +16,7 @@ var createUserCmd = &cobra.Command{
 	Short:   "Create a user",
 	Args:    cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		user, err := rootCmd.UserManager.Create(mappers.CreateUserCommandToUser(CreateAttrs))
+		user, err := rootCmd.userManager.Create(mappers.CreateUserCommandToUser(CreateAttrs))
 
 		if err != nil {
 			return err

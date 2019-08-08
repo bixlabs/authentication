@@ -26,7 +26,7 @@ var updateUserCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		currentEmail := args[0]
-		user, err := rootCmd.UserManager.Update(currentEmail, mappers.UpdateUserCommandToUpdateUser(UpdateAttrs))
+		user, err := rootCmd.userManager.Update(currentEmail, mappers.UpdateUserCommandToUpdateUser(UpdateAttrs))
 
 		if err != nil {
 			return err

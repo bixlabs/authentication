@@ -14,7 +14,7 @@ var findUserCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email := args[0]
-		user, err := rootCmd.UserManager.Find(email)
+		user, err := rootCmd.userManager.Find(email)
 		if err != nil {
 			return err
 		}

@@ -92,7 +92,7 @@ func TestAuthenticator(t *testing.T) {
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
 			repo := memory.NewUserRepo()
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{}, NewUserManager(repo))
+			auth = NewAuthenticator(repo, memory.DummySender{}, NewUserManager(repo))
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {

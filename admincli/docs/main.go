@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/bixlabs/authentication/admincli/cmd"
 	"github.com/spf13/cobra/doc"
 	"os"
@@ -20,8 +19,6 @@ func main() {
 	} else {
 		workingDir = path.Join(workingDir, "admincli/docs")
 	}
-
-	fmt.Println(workingDir)
 
 	err = doc.GenManTree(cmd.GetRootCommand().Command, header, workingDir)
 

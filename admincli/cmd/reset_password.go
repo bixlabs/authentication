@@ -16,7 +16,7 @@ var resetPasswordCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email := args[0]
-		user, err := rootCmd.UserManager.Update(email, mappers.ResetUserCommandToUpdateUser(resetPassword))
+		user, err := rootCmd.userManager.Update(email, mappers.ResetUserCommandToUpdateUser(resetPassword))
 		if err != nil {
 			return err
 		}

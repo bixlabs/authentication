@@ -31,7 +31,7 @@ const invalidEmailErrorMessage = "Email is not valid"
 const notFoundEmailErrorMessage = "User provided was not found"
 const invalidPasswordErrorMessage = "Password should have at least 8 characters"
 
-func TestAdminCli(t *testing.T) {
+func TestUserManagerCli(t *testing.T) {
 	g := goblin.Goblin(t)
 	tools.InitializeLogger()
 	// This line prevents the logs to appear in the tests.
