@@ -57,6 +57,7 @@ func (u *UserRepo) UpdateResetToken(email, resetToken string) error {
 	return nil
 }
 
+// Find method finds the user with the given email
 func (u *UserRepo) Find(email string) (structures.User, error) {
 	user, exist := u.users[email]
 	if !exist || user.DeletedAt != nil {
@@ -65,6 +66,8 @@ func (u *UserRepo) Find(email string) (structures.User, error) {
 	return user, nil
 }
 
+// Delete method deletes the user
+// precondition: user should already exist
 func (u *UserRepo) Delete(user structures.User) error {
 	deletedAt := time.Now()
 	user.DeletedAt = &deletedAt
@@ -75,6 +78,8 @@ func (u *UserRepo) Delete(user structures.User) error {
 	return nil
 }
 
+// Update method updates a user with the given email
+// and it applies the changes existing in updateAttrs
 func (u *UserRepo) Update(email string, updateAttrs structures.User) (structures.User, error) {
 	_, err := u.Find(email)
 

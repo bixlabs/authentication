@@ -1,5 +1,6 @@
 package structures
 
+// UpdateUser represents the object to update a user
 type UpdateUser struct {
 	Email            string `json:"email"`
 	Password         string `json:"-"`

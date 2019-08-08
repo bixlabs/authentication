@@ -7,15 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type UpdateUser struct {
-	Email            string
-	Password         string
-	GivenName        string
-	SecondName       string
-	FamilyName       string
-	SecondFamilyName string
-}
-
+// UpdateAttrs represents the params values received by this command
 var UpdateAttrs updateuser.Command
 
 // updateUserCmd represents the update-user command

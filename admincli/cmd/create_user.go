@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// CreateAttrs represents the params values received by this command
 var CreateAttrs createuser.Command
 
 // createUserCmd represents the create-user command

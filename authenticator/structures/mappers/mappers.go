@@ -4,6 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/structures"
 )
 
+// AssignUserUpdateToUser takes the fields from updateAttrs and it assigns them to the current user
 func AssignUserUpdateToUser(user structures.User, updateAttrs structures.UpdateUser) structures.User {
 	email := updateAttrs.Email
 	if updateAttrs.Email == "" {

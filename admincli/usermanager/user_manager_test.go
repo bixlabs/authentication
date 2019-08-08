@@ -7,6 +7,7 @@ import (
 	"github.com/bixlabs/authentication/admincli/cmd"
 	"github.com/bixlabs/authentication/admincli/usermanager/structures/createuser"
 	"github.com/bixlabs/authentication/admincli/usermanager/structures/finduser"
+	"github.com/bixlabs/authentication/admincli/usermanager/structures/resetpassword"
 	"github.com/bixlabs/authentication/admincli/usermanager/structures/updateuser"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
@@ -402,6 +403,9 @@ func TestUserManagerCli(t *testing.T) {
 			userRepo := memory.NewUserRepo()
 			um = implementation.NewUserManager(userRepo)
 			cmd.SetUserManager(um)
+
+			// reset the reset password attributes, otherwise the flags are kept before each test
+			cmd.ResetPassword = resetpassword.Command{}
 
 			_, err := um.Create(structures.User{Email: validEmail})
 

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// AdminCliCommand is the main struct that contains all the cobra commands
 type AdminCliCommand struct {
 	*cobra.Command
 	userManager interactors.UserManager
@@ -27,10 +28,12 @@ var rootCmd = &AdminCliCommand{
 	},
 }
 
-func SetUserManager(um interactors.UserManager) {
-	rootCmd.userManager = um
+// SetUserManager assigns a user manager to the AdminCliCommand struct
+func SetUserManager(userManager interactors.UserManager) {
+	rootCmd.userManager = userManager
 }
 
+// GetRootCommand returns the instance of the current AdminCliCommand
 // Only use for testing purpose
 func GetRootCommand() *AdminCliCommand {
 	return rootCmd

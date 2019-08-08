@@ -7,7 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var resetPassword resetpassword.Command
+// ResetPassword represents the params values received by this command
+var ResetPassword resetpassword.Command
 
 // resetPasswordCmd represents the reset-password command
 var resetPasswordCmd = &cobra.Command{
@@ -16,7 +17,7 @@ var resetPasswordCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email := args[0]
-		user, err := rootCmd.userManager.Update(email, mappers.ResetUserCommandToUpdateUser(resetPassword))
+		user, err := rootCmd.userManager.Update(email, mappers.ResetUserCommandToUpdateUser(ResetPassword))
 		if err != nil {
 			return err
 		}
@@ -28,7 +29,7 @@ var resetPasswordCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(resetPasswordCmd)
-	resetPasswordCmd.Flags().StringVar(&resetPassword.Password, "new-password", "", "The new password that will be reset")
+	resetPasswordCmd.Flags().StringVar(&ResetPassword.Password, "new-password", "", "The new password that will be reset")
 
 	err := resetPasswordCmd.MarkFlagRequired("new-password")
 	if err != nil {

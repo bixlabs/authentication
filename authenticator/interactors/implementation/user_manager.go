@@ -13,6 +13,7 @@ type userManager struct {
 	repository user.Repository
 }
 
+// NewUserManager is a constructor for the userManager struct
 func NewUserManager(repository user.Repository) interactors.UserManager {
 	return &userManager{repository: repository}
 }

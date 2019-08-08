@@ -21,6 +21,7 @@ type authenticator struct {
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
+// NewAuthenticator is a constructor for the authenticator struct
 func NewAuthenticator(
 	repository user.Repository,
 	sender email.Sender,
