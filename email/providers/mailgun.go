@@ -44,9 +44,8 @@ func (ms MailgunSender) Send(emailMessage *message.Message) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	_, _, err := ms.mg.Send(ctx, ms.fromEmailMessageToMailgunMessage(emailMessage))
-
-	if err != nil {
+	mailgunMessage := ms.fromEmailMessageToMailgunMessage(emailMessage)
+	if _, _, err := ms.mg.Send(ctx, mailgunMessage); err != nil {
 		return err
 	}
 
@@ -54,12 +53,7 @@ func (ms MailgunSender) Send(emailMessage *message.Message) error {
 }
 
 func (ms MailgunSender) fromEmailMessageToMailgunMessage(message *message.Message) *mailgun.Message {
-	from := message.From
-	subject := message.Subject
-	body := message.Text
-	recipient := message.To
-
-	mgMessage := ms.mg.NewMessage(from, subject, body, recipient)
+	mgMessage := ms.mg.NewMessage(message.From, message.Subject, message.Text, message.To)
 	mgMessage.SetHtml(message.HTML)
 
 	return mgMessage

@@ -12,8 +12,8 @@ import (
 // AuthSender builds all the different kinds of email messages
 // and use the emailSender to send them.
 type AuthSender struct {
-	From     string `env:"EMAIL_FROM" envDefault:"test@example.com"`
-	FromName     string `env:"EMAIL_FROM_NAME"`
+	From        string `env:"EMAIL_FROM" envDefault:"test@example.com"`
+	FromName    string `env:"EMAIL_FROM_NAME"`
 	emailSender Sender
 }
 

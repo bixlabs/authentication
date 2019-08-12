@@ -35,9 +35,9 @@ func NewSengridSender() email.Sender {
 
 // Send is an implementation to send the emailMessage by email using Sendgrid
 func (ss SendgridSender) Send(emailMessage *message.Message) error {
-	_, err := ss.sg.Send(ss.fromEmailMessageToSendgridMessage(emailMessage))
+	sendgridMessage := ss.fromEmailMessageToSendgridMessage(emailMessage)
 
-	if err != nil {
+	if _, err := ss.sg.Send(sendgridMessage); err != nil {
 		return err
 	}
 

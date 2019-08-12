@@ -41,7 +41,8 @@ func NewSMTPSender() email.Sender {
 
 // Send is an implementation to send the emailMessage by email using SMTP
 func (ss SMTPSender) Send(emailMessage *message.Message) error {
-	if err := ss.dialer.DialAndSend(ss.fromEmailMessageToSMTPMessage(emailMessage)); err != nil {
+	SMTPMessage := ss.fromEmailMessageToSMTPMessage(emailMessage)
+	if err := ss.dialer.DialAndSend(SMTPMessage); err != nil {
 		return err
 	}
 
@@ -51,7 +52,9 @@ func (ss SMTPSender) Send(emailMessage *message.Message) error {
 func (ss SMTPSender) fromEmailMessageToSMTPMessage(message *message.Message) *gomail.Message {
 	m := gomail.NewMessage()
 	m.SetHeader("From", message.From)
+	m.SetHeader("FromName", message.FromName)
 	m.SetHeader("To", message.To)
+	m.SetHeader("ToName", message.ToName)
 	m.SetHeader("Subject", message.Subject)
 	m.SetBody("text/html", message.HTML)
 
