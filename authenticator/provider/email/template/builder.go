@@ -13,10 +13,12 @@ import (
 	textTemplate "text/template"
 )
 
+// Builder represents a template loader and builder for the emails
 type Builder struct {
 	TemplatePath string `env:"EMAIL_TEMPLATE_PATH" envDefault:"authenticator/provider/email/template/"`
 }
 
+// NewTemplateBuilder returns a new Builder instance
 func NewTemplateBuilder() *Builder {
 	const templateRelativePath = "authenticator/provider/email/template/"
 
@@ -39,20 +41,21 @@ func NewTemplateBuilder() *Builder {
 	return loader
 }
 
-func (tb Builder) Build(templateName string, templateParams interface{}) (htmlTemplate, textTemplate string, error error) {
+// Build generates html and text templates using the templateName with the params
+func (tb *Builder) Build(templateName string, params interface{}) (htmlTemplate, textTemplate string, error error) {
 	currentTemplateDirName := strings.Replace(templateName, "_", "", 1)
 	currentTemplateDirPath := path.Join(tb.TemplatePath, currentTemplateDirName)
 
 	htmlTemplateName := templateName + ".html"
 	htmlTemplatePath := path.Join(currentTemplateDirPath, htmlTemplateName)
-	htmlMessage, err := tb.buildHTMLTemplate(htmlTemplateName, htmlTemplatePath, templateParams)
+	htmlMessage, err := tb.buildHTMLTemplate(htmlTemplateName, htmlTemplatePath, params)
 	if err != nil {
 		return "", "", err
 	}
 
 	textTemplateName := templateName + ".txt"
 	textTemplatePath := path.Join(currentTemplateDirPath, textTemplateName)
-	textMessage, err := tb.buildTextTemplate(textTemplateName, textTemplatePath, templateParams)
+	textMessage, err := tb.buildTextTemplate(textTemplateName, textTemplatePath, params)
 	if err != nil {
 		return "", "", err
 	}
@@ -60,7 +63,7 @@ func (tb Builder) Build(templateName string, templateParams interface{}) (htmlTe
 	return htmlMessage, textMessage, nil
 }
 
-func (tb Builder) buildHTMLTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
+func (tb *Builder) buildHTMLTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
 	t := htmlTemplate.New(templateName)
 
 	var err error
@@ -77,7 +80,7 @@ func (tb Builder) buildHTMLTemplate(templateName, templatePath string, templateV
 	return tpl.String(), nil
 }
 
-func (tb Builder) buildTextTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
+func (tb *Builder) buildTextTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
 	t := textTemplate.New(templateName)
 
 	var err error
