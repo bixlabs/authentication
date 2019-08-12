@@ -16,7 +16,7 @@ import (
 
 // Builder represents a template loader and builder for the emails
 type Builder struct {
-	TemplatePath string `env:"EMAIL_TEMPLATE_PATH"`
+	TemplatePath string `env:"AUTH_SERVER_EMAIL_TEMPLATE_PATH"`
 }
 
 // NewTemplateBuilder returns a new Builder instance

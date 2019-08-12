@@ -12,7 +12,7 @@ import (
 // SendgridSender is the Sendgrid provider to send emails
 type SendgridSender struct {
 	sg     *sendgrid.Client
-	APIKey string `env:"SENDGRID_API_KEY"`
+	APIKey string `env:"AUTH_SERVER_SENDGRID_API_KEY"`
 }
 
 // NewSengridSender returns an instance of the SendgridSender

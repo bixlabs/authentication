@@ -13,8 +13,8 @@ import (
 // MailgunSender is a Mailgun provider to send emails
 type MailgunSender struct {
 	mg     *mailgun.MailgunImpl
-	Domain string `env:"MAILGUN_DOMAIN"`
-	APIKey string `env:"MAILGUN_API_KEY"`
+	Domain string `env:"AUTH_SERVER_MAILGUN_DOMAIN"`
+	APIKey string `env:"AUTH_SERVER_MAILGUN_API_KEY"`
 }
 
 // NewMailgunSender returns an instance of the MailgunSender

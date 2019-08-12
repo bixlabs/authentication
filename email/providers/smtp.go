@@ -11,10 +11,10 @@ import (
 // SMTPSender is a SMTP provider to send emails
 type SMTPSender struct {
 	dialer   *gomail.Dialer
-	Host     string `env:"SMTP_HOST" envDefault:"smtp.gmail.com"`
-	Port     int    `env:"SMTP_PORT" envDefault:"587"`
-	Username string `env:"SMTP_USERNAME"`
-	Password string `env:"SMTP_PASSWORD"`
+	Host     string `env:"AUTH_SERVER_SMTP_HOST" envDefault:"smtp.gmail.com"`
+	Port     int    `env:"AUTH_SERVER_SMTP_PORT" envDefault:"587"`
+	Username string `env:"AUTH_SERVER_SMTP_USERNAME"`
+	Password string `env:"AUTH_SERVER_SMTP_PASSWORD"`
 }
 
 // NewSMTPSender returns an instance of the SMTPSender
