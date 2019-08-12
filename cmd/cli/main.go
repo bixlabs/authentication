@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/sqlite"
@@ -31,8 +30,7 @@ func main() {
 	user, _ = auth.Login("acabrera@bixlabs.com", "secured_password2")
 	jsonUser, _ = json.Marshal(user)
 	tools.Log().Info(string(jsonUser))
-	code, err := passwordManager.ForgotPassword("acabrera@bixlabs.com")
-	fmt.Println(err)
+	code, _ := passwordManager.ForgotPassword("acabrera@bixlabs.com")
 	_ = passwordManager.ResetPassword("acabrera@bixlabs.com", code, "secured_password3")
 	user, _ = auth.Login("acabrera@bixlabs.com", "secured_password3")
 	jsonUser, _ = json.Marshal(user)

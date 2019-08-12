@@ -2,12 +2,14 @@ package template
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
+	"runtime"
+
 	// autoload is not working in main
 	_ "github.com/joho/godotenv/autoload"
 	htmlTemplate "html/template"
-	"os"
 	"path"
 	"strings"
 	textTemplate "text/template"
@@ -15,13 +17,11 @@ import (
 
 // Builder represents a template loader and builder for the emails
 type Builder struct {
-	TemplatePath string `env:"EMAIL_TEMPLATE_PATH" envDefault:"authenticator/provider/email/template/"`
+	TemplatePath string `env:"EMAIL_TEMPLATE_PATH"`
 }
 
 // NewTemplateBuilder returns a new Builder instance
 func NewTemplateBuilder() *Builder {
-	const templateRelativePath = "authenticator/provider/email/template/"
-
 	loader := &Builder{}
 	err := env.Parse(loader)
 
@@ -29,13 +29,15 @@ func NewTemplateBuilder() *Builder {
 		tools.Log().Panic("Parsing the env variables for the template build failed", err)
 	}
 
-	rootDir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-
 	if loader.TemplatePath == "" {
-		loader.TemplatePath = path.Join(rootDir, templateRelativePath)
+		_, filename, _, ok := runtime.Caller(1)
+
+		if !ok {
+			tools.Log().Panic("Getting the current directory of email templates", err)
+		}
+
+		const templateRelativePath = "template"
+		loader.TemplatePath = path.Join(path.Dir(filename), templateRelativePath)
 	}
 
 	return loader
