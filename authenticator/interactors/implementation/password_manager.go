@@ -4,7 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
-	"github.com/bixlabs/authentication/authenticator/provider/email"
+	emailProvider "github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
@@ -15,13 +15,16 @@ import (
 
 type passwordManager struct {
 	repository           user.Repository
-	sender               email.Sender
+	authSender           *emailProvider.AuthSender
 	ResetPasswordCodeMax int `env:"AUTH_SERVER_RESET_PASSWORD_MAX" envDefault:"99999"`
 	ResetPasswordCodeMin int `env:"AUTH_SERVER_RESET_PASSWORD_MIN" envDefault:"10000"`
 }
 
-func NewPasswordManager(repository user.Repository, sender email.Sender) interactors.PasswordManager {
-	pm := passwordManager{repository: repository, sender: sender}
+// NewPasswordManager returns a new instance of the passwordManager
+func NewPasswordManager(repository user.Repository, sender emailProvider.Sender) interactors.PasswordManager {
+	authSender := emailProvider.NewAuthSender(sender)
+
+	pm := passwordManager{repository: repository, authSender: authSender}
 	err := env.Parse(&pm)
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the password manager failed", err)
@@ -90,7 +93,7 @@ func (pm passwordManager) ForgotPassword(email string) (string, error) {
 		return "", err
 	}
 
-	return code, pm.sender.SendEmailPasswordRequest(userAccount, code)
+	return code, pm.authSender.SendEmailForgotPassword(userAccount, code)
 }
 
 func (pm passwordManager) generateCode(user structures.User) (string, error) {
