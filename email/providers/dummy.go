@@ -15,6 +15,7 @@ func NewDummySender() email.Sender {
 	return &DummySender{}
 }
 
+// GetEmailMessage returns the EmailMessage for testing purpose
 func (sender *DummySender) GetEmailMessage() *message.Message {
 	return sender.EmailMessage
 }

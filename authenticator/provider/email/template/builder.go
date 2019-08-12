@@ -2,7 +2,6 @@ package template
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"runtime"
