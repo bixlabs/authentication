@@ -1,4 +1,4 @@
 version: '3'
 services:
   api:
-    command: make run-dev
+    command: [bash, "-c", "make build-for-docker && make run-dev"]
