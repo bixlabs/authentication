@@ -54,10 +54,7 @@ docker-build:
 		docker-compose build
 
 docker-run:
-		docker-compose up
+		docker-compose up -d
 
 docker-run-dev:
-		docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-
-docker-build-run:
-		docker-compose up --build
+		docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d

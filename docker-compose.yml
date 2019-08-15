@@ -2,11 +2,11 @@ version: '3'
 services:
   api:
     build: .
-    container_name: "auth-ms"
+    container_name: "authentication_api"
     env_file:
       - ".env"
     volumes:
       - .:/app
     ports:
       - "9000:9000"
-    command: ./tmp/auth-server
+    command: [bash, "-c", "make build-for-docker && ./tmp/auth-server"]
