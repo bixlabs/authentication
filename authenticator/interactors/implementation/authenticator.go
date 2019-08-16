@@ -116,18 +116,25 @@ func (c *userClaims) Valid() error {
 }
 
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
+	contextLogger := tools.Log().WithFields(logrus.Fields{"email": user.Email, "meth": "authenticator:Signup"})
+
 	if err := auth.hasValidationIssue(user); err != nil {
+		contextLogger.WithField("err", err).Debug("invalid user provided")
 		return user, err
 	}
 
 	hashedPassword, err := util.HashPassword(user.Password)
 	if err != nil {
+		contextLogger.WithField("error", err).Error("failed password hash")
+
 		return user, err
 	}
 	user.Password = hashedPassword
 
 	user, err = auth.repository.Create(user)
 	if err != nil {
+		contextLogger.WithField("error", err).Error("failed user creation")
+
 		return user, err
 	}
 
@@ -159,11 +166,14 @@ func (auth authenticator) VerifyJWT(token string) (structures.User, error) {
 }
 
 func (auth authenticator) parseJWTToken(token string) (*jwt.Token, error) {
+	loggerFields := logrus.Fields{"token": token[len(token)-3:], "meth": "authenticator:parseJWTToken"}
+	contextLogger := tools.Log().WithFields(loggerFields)
+
 	jwtToken, err := jwt.ParseWithClaims(token, &userClaims{}, func(t *jwt.Token) (interface{}, error) {
 		return []byte(auth.Secret), nil
 	})
 	if err != nil {
-		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		contextLogger.WithField("error", err).Debug("an error happened while parsing the JWT token")
 		return jwtToken, util.InvalidJWTToken{}
 	}
 
@@ -178,7 +188,7 @@ func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.U
 	}
 
 	if err := claims.Valid(); err != nil {
-		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		tools.Log().WithField("error", err).Debug("an error happened while validating the JWT token")
 		return structures.User{}, util.InvalidJWTToken{}
 	}
 	return claims.User, nil
