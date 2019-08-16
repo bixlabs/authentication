@@ -10,6 +10,7 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -30,21 +31,27 @@ func NewAuthenticator(repository user.Repository, sender email.Sender) interacto
 }
 
 func (auth authenticator) Login(email, password string) (*login.Response, error) {
+	contextLogger := tools.Log().WithFields(logrus.Fields{"email": email, "meth": "authenticator:Login"})
+
 	if err := util.IsValidEmail(email); err != nil {
+		contextLogger.Debug("invalid email was provided")
 		return nil, err
 	}
 
 	if err := util.CheckPasswordLength(password); err != nil {
+		contextLogger.Debug("password with incorrect length was provided")
 		return nil, err
 	}
 
 	hashedPassword, err := auth.repository.GetHashedPassword(email)
 
 	if err != nil {
+		contextLogger.WithField("err", err).Debug("wrong email was provided")
 		return nil, util.WrongCredentialsError{}
 	}
 
 	if err := util.VerifyPassword(hashedPassword, password); err != nil {
+		contextLogger.Debug("password did not match")
 		return nil, err
 	}
 
@@ -52,8 +59,11 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 }
 
 func generateJWT(email string, auth authenticator) (*login.Response, error) {
+	contextLogger := tools.Log().WithFields(logrus.Fields{"email": email, "func": "generateJWT"})
+
 	currentUser, err := auth.repository.Find(email)
 	if err != nil {
+		contextLogger.Debug("wrong email was provided")
 		return nil, util.WrongCredentialsError{}
 	}
 
@@ -68,9 +78,11 @@ func generateJWT(email string, auth authenticator) (*login.Response, error) {
 }
 
 func setToken(response *login.Response, secret string) error {
+	contextLogger := tools.Log().WithFields(logrus.Fields{"email": response.User.Email, "func": "setToken"})
+
 	tokenString, err := generateClaims(*response).SignedString([]byte(secret))
 	if err != nil {
-		tools.Log().Error("Generating jwt signed token failed", err)
+		contextLogger.WithField("err", err).Error("generating jwt signed token failed")
 		return err
 	}
 
@@ -128,7 +140,6 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	}
 
 	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
-		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
 		return util.DuplicatedEmailError{}
 	}
 

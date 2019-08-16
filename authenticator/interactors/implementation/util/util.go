@@ -14,7 +14,6 @@ const resetPasswordWrongCodeError = "Wrong reset password code"
 
 func IsValidEmail(email string) error {
 	if isValidEmail, _ := regexp.MatchString(EmailValidationRegex, email); !isValidEmail {
-		tools.Log().Debug("An invalid email was provided: " + email)
 		return InvalidEmailError{}
 	}
 	return nil
@@ -28,7 +27,6 @@ func (e InvalidEmailError) Error() string {
 
 func CheckPasswordLength(password string) error {
 	if len(password) < PasswordManager {
-		tools.Log().Debug("A password with incorrect length was provided")
 		return PasswordLengthError{}
 	}
 	return nil
@@ -53,7 +51,6 @@ func HashPassword(password string) (string, error) {
 
 func VerifyPassword(hashedPassword, plainPassword string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword)); err != nil {
-		tools.Log().Debug("A wrong password was provided")
 		return WrongCredentialsError{}
 	}
 	return nil
