@@ -51,10 +51,10 @@ ci:
 		make all build
 
 docker-build:
-		docker-compose build
+		docker-compose -f deployments/docker-compose.yml build
 
 docker-run:
-		docker-compose up -d
+		docker-compose -f deployments/docker-compose.yml up -d
 
 docker-run-dev:
-		docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+		docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.dev.yml up

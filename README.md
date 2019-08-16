@@ -202,19 +202,19 @@ You will also need to configure the `.env` in the root of the project, please re
 
 #### Usage
 
-First you must build the image:
-
-```bash
-$ make docker-build
-```
-
-After that you need to run the container:
+To run the container you should run:
 
 ```bash
 $ make docker-run
 ```
 
-If you want to run the project with hot reload you could run :
+If you need to build the image:
+
+```bash
+$ make docker-build
+```
+
+For development you must run the project with hot reload:
 
 ```bash
 $ make docker-run-dev
@@ -224,11 +224,17 @@ Behind the scenes we are using docker-compose,
 but you could build and run the same configuration using docker:
 
 ```bash
-$ docker build -f Dockerfile -t authentication_api .
+$ docker build -f build/package/Dockerfile -t authentication_api .
 ```
 
 ```bash
-$ docker run -d --env-file=.env -p 9000:9000 -v "$PWD":/app --name authentication_api authentication_api
+$ docker run -d --env-file=.env -p 9000:9000 --name authentication_api authentication_api
+```
+
+Also with hot reload:
+
+```bash
+$ docker run -d --env-file=.env -p 9000:9000 --name authentication_api authentication_api make run-dev
 ```
 
 ## Notes
