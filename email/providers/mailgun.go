@@ -11,8 +11,7 @@ import (
 	"time"
 )
 
-// MailgunSender is a Mailgun provider to send emails
-type MailgunSender struct {
+type mailgunSender struct {
 	mg     *mailgun.MailgunImpl
 	Domain string `env:"AUTH_SERVER_MAILGUN_DOMAIN"`
 	APIKey string `env:"AUTH_SERVER_MAILGUN_API_KEY"`
@@ -20,7 +19,7 @@ type MailgunSender struct {
 
 // NewMailgunSender returns an instance of the MailgunSender
 func NewMailgunSender() email.Sender {
-	sender := &MailgunSender{}
+	sender := &mailgunSender{}
 
 	contextLogger := sender.getLogger()
 	contextLogger.Info("email provider is initializing")
@@ -47,7 +46,7 @@ func NewMailgunSender() email.Sender {
 }
 
 // Send is an implementation to send the emailMessage by email using Mailgun
-func (ms MailgunSender) Send(emailMessage *message.Message) error {
+func (ms mailgunSender) Send(emailMessage *message.Message) error {
 	contextLogger := ms.getLogger()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -64,13 +63,13 @@ func (ms MailgunSender) Send(emailMessage *message.Message) error {
 	return nil
 }
 
-func (ms MailgunSender) fromEmailMessageToMailgunMessage(message *message.Message) *mailgun.Message {
+func (ms mailgunSender) fromEmailMessageToMailgunMessage(message *message.Message) *mailgun.Message {
 	mgMessage := ms.mg.NewMessage(message.From, message.Subject, message.Text, message.To)
 	mgMessage.SetHtml(message.HTML)
 
 	return mgMessage
 }
 
-func (ms MailgunSender) getLogger() *logrus.Entry {
+func (ms mailgunSender) getLogger() *logrus.Entry {
 	return tools.Log().WithField("email_provider", "mailgun")
 }
