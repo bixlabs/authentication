@@ -9,4 +9,5 @@ type Message struct {
 	Subject  string
 	Text     string
 	HTML     string
+	Type     string
 }

@@ -46,6 +46,7 @@ func (as AuthSender) SendEmailForgotPassword(user structures.User, code string) 
 		Subject:  "Reset your Password",
 		HTML:     htmlMessage,
 		Text:     textMessage,
+		Type:     "Forgot Password",
 	}
 
 	return as.emailSender.Send(emailMessage)

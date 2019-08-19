@@ -7,6 +7,7 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/mailgun/mailgun-go/v3"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -20,32 +21,43 @@ type MailgunSender struct {
 // NewMailgunSender returns an instance of the MailgunSender
 func NewMailgunSender() email.Sender {
 	sender := &MailgunSender{}
+
+	contextLogger := sender.getLogger()
+	contextLogger.Info("email provider is initializing")
+
 	err := env.Parse(sender)
 
 	if err != nil {
-		tools.Log().Panic("Parsing the env variables for the mailgun sender failed", err)
+		contextLogger.Panic("parsing the env variables for the email provider failed", err)
 	}
 
 	if sender.Domain == "" {
-		tools.Log().Panic("A mailgun domain is required", err)
+		contextLogger.Panic("a domain is required", err)
 	}
 
 	if sender.APIKey == "" {
-		tools.Log().Panic("A mailgun api key is required", err)
+		contextLogger.Panic("an api key is required", err)
 	}
 
 	sender.mg = mailgun.NewMailgun(sender.Domain, sender.APIKey)
+
+	contextLogger.Info("email provider was initialized")
 
 	return sender
 }
 
 // Send is an implementation to send the emailMessage by email using Mailgun
 func (ms MailgunSender) Send(emailMessage *message.Message) error {
+	contextLogger := ms.getLogger()
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	mailgunMessage := ms.fromEmailMessageToMailgunMessage(emailMessage)
 	if _, _, err := ms.mg.Send(ctx, mailgunMessage); err != nil {
+		logFields := logrus.Fields{"err": err, "message_type": emailMessage.Type}
+		contextLogger.WithFields(logFields).Error("there was an error sending the email")
+
 		return err
 	}
 
@@ -57,4 +69,8 @@ func (ms MailgunSender) fromEmailMessageToMailgunMessage(message *message.Messag
 	mgMessage.SetHtml(message.HTML)
 
 	return mgMessage
+}
+
+func (ms MailgunSender) getLogger() *logrus.Entry {
+	return tools.Log().WithField("email_provider", "mailgun")
 }
