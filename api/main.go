@@ -47,7 +47,7 @@ func main() {
 func NewGinRouter() *gin.Engine {
 	result := gin.New()
 
-	result.Use(addRequestId())
+	result.Use(addRequestID())
 	result.Use(logger())
 	result.Use(gin.Recovery())
 
@@ -78,11 +78,11 @@ func getRestConfiguration() RestConfiguration {
 	return result
 }
 
-func addRequestId() gin.HandlerFunc {
+func addRequestID() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		requestId := util.GenerateUniqueId()
-		c.Set("rid", requestId)
-		c.Header("X-Request-Id", requestId)
+		requestID := util.GenerateUniqueID()
+		c.Set("rid", requestID)
+		c.Header("X-Request-Id", requestID)
 		c.Next()
 	}
 }

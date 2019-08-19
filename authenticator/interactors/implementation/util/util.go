@@ -87,6 +87,7 @@ func (InvalidJWTToken) Error() string {
 	return "invalid token"
 }
 
-func GenerateUniqueId() string {
+// GenerateUniqueID generates a unique id
+func GenerateUniqueID() string {
 	return uuid.Must(uuid.NewUUID()).String()
 }
