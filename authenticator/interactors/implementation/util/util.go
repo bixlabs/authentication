@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
 )
@@ -84,4 +85,8 @@ type InvalidJWTToken struct{}
 
 func (InvalidJWTToken) Error() string {
 	return "invalid token"
+}
+
+func GenerateUniqueId() string {
+	return uuid.Must(uuid.NewUUID()).String()
 }

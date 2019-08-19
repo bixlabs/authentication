@@ -11,6 +11,7 @@ require (
 	github.com/go-openapi/spec v0.19.2 // indirect
 	github.com/go-openapi/swag v0.19.4 // indirect
 	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/jinzhu/gorm v1.9.8
 	github.com/jinzhu/inflection v0.0.0-20190603042836-f5c5f50e6090 // indirect
 	github.com/joho/godotenv v1.3.0
