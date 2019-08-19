@@ -23,3 +23,5 @@ coverage.out
 #api/docs
 sqlite.s3db
 test.s3db
+
+*.log

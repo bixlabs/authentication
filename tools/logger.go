@@ -13,7 +13,7 @@ func InitializeLogger() {
 	log = logrus.New()
 	log.SetLevel(logrus.TraceLevel)
 
-	if os.Getenv("APP_ENV") == "production" {
+	if os.Getenv("AUTH_SERVER_APP_ENV") == "production" {
 		log.SetLevel(logrus.InfoLevel)
 	}
 

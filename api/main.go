@@ -15,6 +15,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"io"
+	"os"
+	"time"
 )
 
 // @title Go-Authenticator
@@ -42,11 +45,14 @@ func main() {
 }
 
 func NewGinRouter() *gin.Engine {
-	result := gin.Default()
-	result.Use(gin.Logger())
-	result.Use(gin.Recovery())
+	result := gin.New()
+
 	result.Use(addRequestId())
+	result.Use(logger())
+	result.Use(gin.Recovery())
+
 	configureSwagger(result)
+
 	return result
 }
 
@@ -79,6 +85,31 @@ func addRequestId() gin.HandlerFunc {
 		c.Header("X-Request-Id", requestId)
 		c.Next()
 	}
+}
+
+func logger() gin.HandlerFunc {
+	if os.Getenv("AUTH_SERVER_APP_ENV") == "dev" {
+		return gin.Logger()
+	}
+
+	logFile, _ := os.Create("gin.log")
+	gin.DefaultWriter = io.MultiWriter(logFile)
+	return gin.LoggerWithFormatter(customFormatter)
+}
+
+func customFormatter(param gin.LogFormatterParams) string {
+	return fmt.Sprintf("%s - %s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
+		param.Keys["rid"],
+		param.ClientIP,
+		param.TimeStamp.Format(time.RFC1123),
+		param.Method,
+		param.Path,
+		param.Request.Proto,
+		param.StatusCode,
+		param.Latency,
+		param.Request.UserAgent(),
+		param.ErrorMessage,
+	)
 }
 
 type RestConfiguration struct {
