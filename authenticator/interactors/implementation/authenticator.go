@@ -130,7 +130,7 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	}
 
 	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
-		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
+		tools.Log().WithError(err).Debug("A duplicated email was provided")
 		return util.DuplicatedEmailError{}
 	}
 
@@ -154,7 +154,7 @@ func (auth authenticator) parseJWTToken(token string) (*jwt.Token, error) {
 		return []byte(auth.Secret), nil
 	})
 	if err != nil {
-		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		tools.Log().WithError(err).Info("An error happened while validating the JWT token")
 		return jwtToken, util.InvalidJWTToken{}
 	}
 
@@ -169,7 +169,7 @@ func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.U
 	}
 
 	if err := claims.Valid(); err != nil {
-		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		tools.Log().WithError(err).Info("An error happened while validating the JWT token")
 		return structures.User{}, util.InvalidJWTToken{}
 	}
 	return claims.User, nil
