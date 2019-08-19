@@ -35,7 +35,7 @@ func (pm passwordManager) ChangePassword(user structures.User, newPassword strin
 	contextLogger := tools.Log().WithFields(loggerFields)
 
 	if err := util.IsValidEmail(user.Email); err != nil {
-		contextLogger.WithField("err", err).Debug("invalid email provided")
+		contextLogger.WithError(err).Debug("invalid email provided")
 
 		return err
 	}
@@ -97,21 +97,21 @@ func (pm passwordManager) ForgotPassword(email string) (string, error) {
 	contextLogger := tools.Log().WithFields(loggerFields)
 
 	if err := util.IsValidEmail(email); err != nil {
-		contextLogger.WithField("err", err).Debug("invalid email provided")
+		contextLogger.WithError(err).Debug("invalid email provided")
 
 		return "", err
 	}
 
 	userAccount, err := pm.repository.Find(email)
 	if err != nil {
-		contextLogger.WithField("err", err).Debug("wrong email provided")
+		contextLogger.WithError(err).Debug("wrong email provided")
 
 		return "", err
 	}
 
 	code, err := pm.generateCode(userAccount)
 	if err != nil {
-		contextLogger.WithField("err", err).Debug("an error happened generating the forgot code")
+		contextLogger.WithError(err).Debug("an error happened generating the forgot code")
 
 		return "", err
 	}
@@ -143,7 +143,7 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 	contextLogger := tools.Log().WithFields(loggerFields)
 
 	if err := util.IsValidEmail(email); err != nil {
-		contextLogger.WithField("err", err).Debug("invalid email provided")
+		contextLogger.WithError(err).Debug("invalid email provided")
 
 		return err
 	}
@@ -155,7 +155,7 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 	}
 
 	if err := pm.isValidCode(email, code); err != nil {
-		contextLogger.WithField("err", err).Debug("invalid code provided")
+		contextLogger.WithError(err).Debug("invalid code provided")
 
 		return err
 	}
@@ -167,7 +167,7 @@ func (pm passwordManager) ResetPassword(email string, code string, newPassword s
 	}
 
 	if err := pm.hashAndSavePassword(email, newPassword); err != nil {
-		contextLogger.WithField("err", err).Debug("an error happened hashing and saving the password")
+		contextLogger.WithError(err).Debug("an error happened hashing and saving the password")
 
 		return err
 	}

@@ -46,7 +46,7 @@ func (auth authenticator) Login(email, password string) (*login.Response, error)
 	hashedPassword, err := auth.repository.GetHashedPassword(email)
 
 	if err != nil {
-		contextLogger.WithField("err", err).Debug("wrong email was provided")
+		contextLogger.WithError(err).Debug("wrong email was provided")
 		return nil, util.WrongCredentialsError{}
 	}
 
@@ -82,7 +82,7 @@ func setToken(response *login.Response, secret string) error {
 
 	tokenString, err := generateClaims(*response).SignedString([]byte(secret))
 	if err != nil {
-		contextLogger.WithField("err", err).Error("generating jwt signed token failed")
+		contextLogger.WithError(err).Error("generating jwt signed token failed")
 		return err
 	}
 
@@ -119,13 +119,13 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 	contextLogger := tools.Log().WithFields(logrus.Fields{"email": user.Email, "meth": "authenticator:Signup"})
 
 	if err := auth.hasValidationIssue(user); err != nil {
-		contextLogger.WithField("err", err).Debug("invalid user provided")
+		contextLogger.WithError(err).Debug("invalid user provided")
 		return user, err
 	}
 
 	hashedPassword, err := util.HashPassword(user.Password)
 	if err != nil {
-		contextLogger.WithField("error", err).Error("failed password hash")
+		contextLogger.WithError(err).Error("failed password hash")
 
 		return user, err
 	}
@@ -133,7 +133,7 @@ func (auth authenticator) Signup(user structures.User) (structures.User, error) 
 
 	user, err = auth.repository.Create(user)
 	if err != nil {
-		contextLogger.WithField("error", err).Error("failed user creation")
+		contextLogger.WithError(err).Error("failed user creation")
 
 		return user, err
 	}
@@ -173,7 +173,7 @@ func (auth authenticator) parseJWTToken(token string) (*jwt.Token, error) {
 		return []byte(auth.Secret), nil
 	})
 	if err != nil {
-		contextLogger.WithField("error", err).Debug("an error happened while parsing the JWT token")
+		contextLogger.WithError(err).Debug("an error happened while parsing the JWT token")
 		return jwtToken, util.InvalidJWTToken{}
 	}
 
@@ -188,7 +188,7 @@ func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.U
 	}
 
 	if err := claims.Valid(); err != nil {
-		tools.Log().WithField("error", err).Debug("an error happened while validating the JWT token")
+		tools.Log().WithError(err).Debug("an error happened while validating the JWT token")
 		return structures.User{}, util.InvalidJWTToken{}
 	}
 	return claims.User, nil

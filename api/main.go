@@ -55,6 +55,8 @@ func configureSwagger(result *gin.Engine) gin.IRoutes {
 func runGinRouter(router *gin.Engine, port string) {
 	err := router.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
+		tools.Log().WithError(err).Panic("running the router for the rest configuration")
+
 		panic(err)
 	}
 }

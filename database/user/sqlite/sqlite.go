@@ -27,7 +27,7 @@ func NewSqliteStorage() (user.Repository, func()) {
 	contextLogger := db.getLogger()
 
 	if err != nil {
-		contextLogger.WithField("err", err).Panic("parsing the env variables for the db failed")
+		contextLogger.WithError(err).Panic("parsing the env variables for the db failed")
 	}
 
 	contextLogger.Info("env variables for db were parsed")
@@ -58,7 +58,7 @@ func openDatabase(storage *sqliteStorage) *gorm.DB {
 
 	db, err := gorm.Open("sqlite3", storage.getConnectionString())
 	if err != nil {
-		contextLogger.WithField("err", err).Panic("there was an error initializing the db connection")
+		contextLogger.WithError(err).Panic("there was an error initializing the db connection")
 	}
 
 	contextLogger.Info("db connection was initialized")
