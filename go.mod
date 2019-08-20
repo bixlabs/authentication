@@ -18,7 +18,7 @@ require (
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
 	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/onsi/gomega v1.4.3
+	github.com/onsi/gomega v1.6.0
 	github.com/sirupsen/logrus v1.3.0
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.2
