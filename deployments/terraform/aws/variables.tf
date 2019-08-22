@@ -1,3 +1,19 @@
+variable "aws_ecs_cluster_name" {
+  description = "The AWS ECS cluster name"
+  default     = "ga-cluster"
+}
+
+variable "aws_autoscaling_min" {
+  description = "Minimun number of containers"
+  default     = 2
+}
+
+variable "aws_autoscaling_max" {
+  description = "Maximun number of containers"
+  default     = 3
+}
+
+
 variable "aws_region" {
   description = "The AWS region things are created in"
   default     = "us-west-2"
@@ -5,12 +21,12 @@ variable "aws_region" {
 
 variable "ecs_task_execution_role_name" {
   description = "ECS task execution role name"
-  default = "myEcsTaskExecutionRole"
+  default = "gaEcsTaskExecutionRole"
 }
 
 variable "ecs_auto_scale_role_name" {
   description = "ECS auto scale role Name"
-  default = "myEcsAutoScaleRole"
+  default = "gaEcsAutoScaleRole"
 }
 
 variable "az_count" {
@@ -23,7 +39,7 @@ variable "app_image" {
   default     = "bixlabs/go-authenticator:0.1"
 }
 
-variable "auth_server_port" { // Can be override by TF_VAR_auth_server_port ENV var
+variable "auth_server_port" {
   description = "Port exposed by the docker image to redirect traffic to"
   default     = 9000
 }
@@ -73,8 +89,8 @@ variable "auth_server_database_salt" {
 }
 
 variable "app_count" {
-  description = "Number of docker containers to run"
-  default     = 1
+  description = "Desired number of docker containers to run"
+  default     = 2
 }
 
 // TODO: Create a healtcheck endpoint and update health_check_path variable

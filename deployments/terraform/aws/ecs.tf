@@ -1,16 +1,24 @@
 resource "aws_ecs_cluster" "main" {
-  name = "ga-cluster"
+  name = "${var.aws_ecs_cluster_name}"
 }
 
 data "template_file" "go_authenticator_api" {
   template = file("${path.module}/templates/ecs/go_authenticator_api.json.tpl")
 
   vars = {
-    app_image      = "${var.app_image}"
-    app_port       = "${var.auth_server_port}"
-    fargate_cpu    = "${var.fargate_cpu}"
-    fargate_memory = "${var.fargate_memory}"
-    aws_region     = "${var.aws_region}"
+    app_image                    = "${var.app_image}"
+    app_port                     = "${var.auth_server_port}"
+    app_server_token_expiration  = "${var.auth_server_token_expiration}"
+    app_server_secret            = "${var.auth_server_secret}"
+    app_reset_password_max       = "${var.auth_server_reset_password_max}"
+    app_reset_password_min       = "${var.auth_server_reset_password_min}"
+    app_server_database_name     = "${var.auth_server_database_name}"
+    app_server_database_user     = "${var.auth_server_database_user}"
+    app_server_database_password = "${var.auth_server_database_password}"
+    app_server_database_salt     = "${var.auth_server_database_salt}"
+    fargate_cpu                  = "${var.fargate_cpu}"
+    fargate_memory               = "${var.fargate_memory}"
+    aws_region                   = "${var.aws_region}"
   }
 }
 
@@ -39,7 +47,7 @@ resource "aws_ecs_service" "main" {
 
   load_balancer {
     target_group_arn = "${aws_alb_target_group.app.id}"
-    container_name   = "ga"
+    container_name   = "go-authenticator"
     container_port   = "${var.auth_server_port}"
   }
 

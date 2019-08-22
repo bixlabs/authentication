@@ -3,13 +3,13 @@ resource "aws_appautoscaling_target" "target" {
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   role_arn           = "${aws_iam_role.ecs_auto_scale_role.arn}"
-  min_capacity       = 2
-  max_capacity       = 3
+  min_capacity       = "${var.aws_autoscaling_min}"
+  max_capacity       = "${var.aws_autoscaling_max}"
 }
 
 # Automatically scale capacity up by one
 resource "aws_appautoscaling_policy" "up" {
-  name               = "cb_scale_up"
+  name               = "ga_scale_up"
   service_namespace  = "ecs"
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main.name}"
   scalable_dimension = "ecs:service:DesiredCount"
