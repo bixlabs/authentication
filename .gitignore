@@ -23,3 +23,10 @@ coverage.out
 #api/docs
 sqlite.s3db
 test.s3db
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
