@@ -1,0 +1,11 @@
+version: '3'
+services:
+  api:
+    build:
+      context: '../'
+      dockerfile: 'build/package/Dockerfile'
+    container_name: "authentication_api"
+    env_file:
+      - "../.env"
+    ports:
+      - "9000:9000"
