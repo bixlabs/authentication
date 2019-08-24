@@ -56,7 +56,7 @@ func HashPassword(password string) (string, error) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword(pass, bcrypt.DefaultCost)
 	if err != nil {
-		tools.Log().WithField("error", err).Error("Password hash failed")
+		tools.Log().WithError(err).Error("Password hash failed")
 		return "", err
 	}
 	return string(hashedPassword), nil

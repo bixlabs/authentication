@@ -13,6 +13,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/memory"
+	"github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -47,7 +48,7 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			auth := implementation.NewAuthenticator(userRepo, email.NewDummySender())
 			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 
@@ -94,7 +95,7 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			auth := implementation.NewAuthenticator(userRepo, email.NewDummySender())
 			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 			_, err := um.Create(structures.User{Email: validEmail})
@@ -141,7 +142,7 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			auth := implementation.NewAuthenticator(userRepo, email.NewDummySender())
 			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 
@@ -257,7 +258,7 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			auth := implementation.NewAuthenticator(userRepo, email.NewDummySender())
 			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 
@@ -405,7 +406,7 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			auth := implementation.NewAuthenticator(userRepo, email.NewDummySender())
 			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 

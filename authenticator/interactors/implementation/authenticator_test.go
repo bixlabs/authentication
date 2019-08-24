@@ -1,12 +1,12 @@
 package implementation
 
 import (
-	databaseUserPackage "github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/structures/login"
 	"github.com/bixlabs/authentication/database/user/memory"
+	"github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -27,15 +27,13 @@ func TestAuthenticator(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	//tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
-	var repo databaseUserPackage.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
-			repo = memory.NewUserRepo()
-			auth = NewAuthenticator(repo, memory.DummySender{})
+			auth = NewAuthenticator(memory.NewUserRepo(), email.NewDummySender())
 		})
 
 		g.It("Should check for email duplication ", func() {
@@ -91,8 +89,7 @@ func TestAuthenticator(t *testing.T) {
 
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
-			repo := memory.NewUserRepo()
-			auth = NewAuthenticator(repo, memory.DummySender{})
+			auth = NewAuthenticator(memory.NewUserRepo(), email.NewDummySender())
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {
@@ -140,8 +137,7 @@ func TestAuthenticator(t *testing.T) {
 			secret := "test"
 			err := os.Setenv("AUTH_SERVER_SECRET", secret)
 			Expect(err).To(BeNil())
-			repo := memory.NewUserRepo()
-			auth = NewAuthenticator(repo, memory.DummySender{})
+			auth = NewAuthenticator(memory.NewUserRepo(), email.NewDummySender())
 		})
 
 		g.It("Should return an error in case the JWT token is invalid", func() {

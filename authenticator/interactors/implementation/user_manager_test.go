@@ -6,6 +6,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/memory"
+	"github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -28,7 +29,7 @@ func TestUserManager(t *testing.T) {
 	g.Describe("Create User process", func() {
 		g.BeforeEach(func() {
 			userRepo = memory.NewUserRepo()
-			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			auth = NewAuthenticator(userRepo, email.NewDummySender())
 			um = NewUserManager(auth, userRepo)
 		})
 
@@ -107,7 +108,7 @@ func TestUserManager(t *testing.T) {
 	g.Describe("Delete User process", func() {
 		g.BeforeEach(func() {
 			userRepo = memory.NewUserRepo()
-			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			auth = NewAuthenticator(userRepo, email.NewDummySender())
 			um = NewUserManager(auth, userRepo)
 
 			user := structures.User{Email: validEmail, Password: validPassword}
@@ -151,7 +152,7 @@ func TestUserManager(t *testing.T) {
 	g.Describe("Find User process", func() {
 		g.Before(func() {
 			userRepo = memory.NewUserRepo()
-			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			auth = NewAuthenticator(userRepo, email.NewDummySender())
 			um = NewUserManager(auth, userRepo)
 
 			user := structures.User{Email: validEmail, Password: validPassword}
@@ -188,7 +189,7 @@ func TestUserManager(t *testing.T) {
 	g.Describe("Update User process", func() {
 		g.Before(func() {
 			userRepo = memory.NewUserRepo()
-			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			auth = NewAuthenticator(userRepo, email.NewDummySender())
 			um = NewUserManager(auth, userRepo)
 
 			user := structures.User{Email: validEmail, Password: validPassword}
