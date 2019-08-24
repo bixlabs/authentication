@@ -18,7 +18,7 @@ type sender struct {
 	provider email.Provider
 }
 
-// NewAuthSender returns an instance of the AuthSender
+// NewSender return an instance of Sender
 func NewSender(provider email.Provider) email.Sender {
 	s := &sender{provider: provider}
 	err := env.Parse(s)
