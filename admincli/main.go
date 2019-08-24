@@ -15,7 +15,7 @@ func main() {
 	userRepo, closeDB := sqlite.NewSqliteStorage()
 	defer closeDB()
 	auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
-	userManager := implementation.NewUserManager(auth,userRepo)
+	userManager := implementation.NewUserManager(auth, userRepo)
 	cmd.SetUserManager(userManager)
 	cmd.Execute()
 }
