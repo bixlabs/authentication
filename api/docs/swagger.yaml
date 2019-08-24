@@ -11,9 +11,17 @@ definitions:
     type: object
   changepass.Response:
     properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
       result:
         $ref: '#/definitions/changepass.Result'
         type: object
+      status:
+        type: string
     type: object
   changepass.Result:
     properties:
@@ -141,9 +149,17 @@ definitions:
     type: object
   signup.Response:
     properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
       result:
         $ref: '#/definitions/signup.Result'
         type: object
+      status:
+        type: string
     type: object
   signup.Result:
     properties:
@@ -179,7 +195,40 @@ definitions:
       secondName:
         type: string
     type: object
-host: '{{.Host}}'
+  token.Response:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/token.Result'
+        type: object
+      status:
+        type: string
+    type: object
+  token.Result:
+    properties:
+      user:
+        $ref: '#/definitions/structures.User'
+        type: object
+    type: object
+  token.SwaggerResponse:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/token.Response'
+        type: object
+      status:
+        type: string
+    type: object
 info:
   contact:
     email: jarrieta@bixlabs.com
@@ -212,22 +261,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/changepass.SwaggerResponse'
-            type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
       summary: Change password functionality
   /user/login:
     post:
@@ -249,22 +294,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/login.SwaggerResponse'
-            type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
       summary: Login functionality
   /user/reset-password:
     put:
@@ -286,32 +327,26 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/resetpass.Response'
-            type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "408":
           description: Request Timeout
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "504":
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
       summary: Reset password functionality
   /user/reset-password-request:
     put:
@@ -334,17 +369,14 @@ paths:
           description: Accepted
           schema:
             $ref: '#/definitions/forgotpass.SwaggerResponse'
-            type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
       summary: Forgot password request functionality
   /user/signup:
     post:
@@ -366,16 +398,45 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/signup.SwaggerResponse'
-            type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/rest.ResponseWrapper'
-            type: object
       summary: Signup functionality
+  /user/token/validate:
+    get:
+      consumes:
+      - application/json
+      description: If the JWT is valid this endpoint returns the user inside of the
+        token.
+      parameters:
+      - description: 'Authorization: Bearer <jwtToken>'
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/token.SwaggerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ResponseWrapper'
+      summary: Validates a JWT and returns the claims for it.
 swagger: "2.0"
