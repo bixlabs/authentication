@@ -116,3 +116,36 @@ func (storage sqliteStorage) UpdateResetToken(email, resetToken string) error {
 
 	return transaction.Commit().Error
 }
+
+func (storage sqliteStorage) Delete(user structures.User) error {
+	transaction := storage.db.Begin()
+	if err := transaction.Delete(&user).Error; err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	return transaction.Commit().Error
+}
+
+func (storage sqliteStorage) Update(email string, updateAttrs structures.User) (structures.User, error) {
+	user, err := storage.Find(email)
+
+	if err != nil {
+		return structures.User{}, err
+	}
+
+	transaction := storage.db.Begin()
+	modelForUpdate := mappers.UserToDatabaseModel(user)
+	modelUpdateAttrs := mappers.UserToDatabaseModel(updateAttrs)
+
+	if err := transaction.Model(&modelForUpdate).Update(modelUpdateAttrs).Error; err != nil {
+		transaction.Rollback()
+		return structures.User{}, err
+	}
+
+	if err := transaction.Commit().Error; err != nil {
+		return structures.User{}, err
+	}
+
+	return mappers.DatabaseModelToUser(modelForUpdate), nil
+}

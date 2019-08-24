@@ -1,6 +1,7 @@
 package implementation
 
 import (
+	databaseUserPackage "github.com/bixlabs/authentication/authenticator/database/user"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/bixlabs/authentication/authenticator/structures"
@@ -26,13 +27,15 @@ func TestAuthenticator(t *testing.T) {
 	// This line prevents the logs to appear in the tests.
 	//tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
+	var repo databaseUserPackage.Repository
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+			repo = memory.NewUserRepo()
+			auth = NewAuthenticator(repo, memory.DummySender{})
 		})
 
 		g.It("Should check for email duplication ", func() {
@@ -69,6 +72,8 @@ func TestAuthenticator(t *testing.T) {
 			if err != nil {
 				panic(err)
 			}
+
+			// TODO: we should use an utility for this in the overall file
 			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(validPassword))
 			g.Assert(err).Equal(nil)
 		})
@@ -86,7 +91,8 @@ func TestAuthenticator(t *testing.T) {
 
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+			repo := memory.NewUserRepo()
+			auth = NewAuthenticator(repo, memory.DummySender{})
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {
@@ -134,7 +140,8 @@ func TestAuthenticator(t *testing.T) {
 			secret := "test"
 			err := os.Setenv("AUTH_SERVER_SECRET", secret)
 			Expect(err).To(BeNil())
-			auth = NewAuthenticator(memory.NewUserRepo(), memory.DummySender{})
+			repo := memory.NewUserRepo()
+			auth = NewAuthenticator(repo, memory.DummySender{})
 		})
 
 		g.It("Should return an error in case the JWT token is invalid", func() {
