@@ -15,15 +15,13 @@ import (
 
 type authenticator struct {
 	repository     user.Repository
-	authSender     *email.AuthSender
+	emailSender    email.Sender
 	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
 func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {
-	authSender := email.NewAuthSender(sender)
-
-	auth := &authenticator{repository: repository, authSender: authSender}
+	auth := &authenticator{repository: repository, emailSender: sender}
 	err := env.Parse(auth)
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the authenticator failed", err)

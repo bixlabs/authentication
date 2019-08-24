@@ -19,7 +19,7 @@ type SMTPSender struct {
 }
 
 // NewSMTPSender returns an instance of the SMTPSender
-func NewSMTPSender() email.Sender {
+func NewSMTPSender() email.Provider {
 	sender := &SMTPSender{}
 
 	contextLogger := sender.getLogger()

@@ -15,7 +15,6 @@ require (
 	github.com/jinzhu/gorm v1.9.8
 	github.com/jinzhu/inflection v0.0.0-20190603042836-f5c5f50e6090 // indirect
 	github.com/joho/godotenv v1.3.0
-	github.com/kr/pty v1.1.8 // indirect
 	github.com/lib/pq v1.1.1 // indirect
 	github.com/mailgun/mailgun-go/v3 v3.6.0
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
@@ -26,7 +25,6 @@ require (
 	github.com/sirupsen/logrus v1.3.0
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.2
-	github.com/urfave/cli v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	golang.org/x/sys v0.0.0-20190812172437-4e8604ab3aff // indirect

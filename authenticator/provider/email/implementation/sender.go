@@ -1,6 +1,7 @@
-package email
+package implementation
 
 import (
+	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/provider/email/message"
 	"github.com/bixlabs/authentication/authenticator/provider/email/template"
 	"github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
@@ -11,27 +12,27 @@ import (
 
 // AuthSender builds all the different kinds of email messages
 // and use the emailSender to send them.
-type AuthSender struct {
-	From        string `env:"AUTH_SERVER_EMAIL_FROM" envDefault:"test@example.com"`
-	FromName    string `env:"AUTH_SERVER_EMAIL_FROM_NAME"`
-	emailSender Sender
+type sender struct {
+	From     string `env:"AUTH_SERVER_EMAIL_FROM" envDefault:"test@example.com"`
+	FromName string `env:"AUTH_SERVER_EMAIL_FROM_NAME"`
+	provider email.Provider
 }
 
 // NewAuthSender returns an instance of the AuthSender
-func NewAuthSender(emailSender Sender) *AuthSender {
-	authSender := &AuthSender{emailSender: emailSender}
-	err := env.Parse(authSender)
+func NewSender(provider email.Provider) email.Sender {
+	s := &sender{provider: provider}
+	err := env.Parse(s)
 
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the auth sender failed", err)
 	}
 
-	return authSender
+	return s
 }
 
-// SendEmailForgotPassword builds a forgot email message and send it using the emailSender,
+// ForgotPasswordRequest builds a forgot email message and send it using the emailSender,
 // this forgot email message contains the code to reset the password.
-func (as AuthSender) SendEmailForgotPassword(user structures.User, code string) error {
+func (s sender) ForgotPasswordRequest(user structures.User, code string) error {
 	templateBuilder := template.NewTemplateBuilder()
 	htmlMessage, textMessage, err := templateBuilder.Build("forgot_password", &forgotpassword.TemplateParam{Code: code})
 	if err != nil {
@@ -39,8 +40,8 @@ func (as AuthSender) SendEmailForgotPassword(user structures.User, code string) 
 	}
 
 	emailMessage := &message.Message{
-		From:     as.From,
-		FromName: as.FromName,
+		From:     s.From,
+		FromName: s.FromName,
 		To:       user.Email,
 		ToName:   "",
 		Subject:  "Reset your Password",
@@ -49,5 +50,5 @@ func (as AuthSender) SendEmailForgotPassword(user structures.User, code string) 
 		Type:     "Forgot Password",
 	}
 
-	return as.emailSender.Send(emailMessage)
+	return s.provider.Send(emailMessage)
 }

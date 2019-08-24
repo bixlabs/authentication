@@ -7,7 +7,7 @@ import (
 )
 
 // NewEmailProvider returns a concrete email provider depending on the selected configuration
-func NewEmailProvider() email.Sender {
+func NewEmailProvider() email.Provider {
 	emailProvider := strings.ToLower(os.Getenv("AUTH_SERVER_EMAIL_PROVIDER"))
 
 	switch emailProvider {

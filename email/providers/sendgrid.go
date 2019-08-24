@@ -17,7 +17,7 @@ type SendgridSender struct {
 }
 
 // NewSengridSender returns an instance of the SendgridSender
-func NewSengridSender() email.Sender {
+func NewSengridSender() email.Provider {
 	sender := &SendgridSender{}
 
 	contextLogger := sender.getLogger()

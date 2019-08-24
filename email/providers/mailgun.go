@@ -18,7 +18,7 @@ type mailgunSender struct {
 }
 
 // NewMailgunSender returns an instance of the MailgunSender
-func NewMailgunSender() email.Sender {
+func NewMailgunSender() email.Provider {
 	sender := &mailgunSender{}
 
 	contextLogger := sender.getLogger()

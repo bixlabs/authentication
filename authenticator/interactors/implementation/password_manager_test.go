@@ -6,7 +6,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/memory"
-	emailProviders "github.com/bixlabs/authentication/email/providers"
+	email2 "github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -28,7 +28,7 @@ func TestPasswordManager(t *testing.T) {
 
 	g.Describe("Change password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), emailProviders.NewDummySender()
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})
@@ -92,7 +92,7 @@ func TestPasswordManager(t *testing.T) {
 	g.Describe("Send Reset Password Request process", func() {
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			sender = emailProviders.NewDummySender()
+			sender = email2.NewDummySender()
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})
@@ -113,18 +113,12 @@ func TestPasswordManager(t *testing.T) {
 			_, err := passwordManager.ForgotPassword(validEmail)
 
 			Expect(err).To(BeNil())
-
-			dummySender := sender.(*emailProviders.DummySender)
-
-			Expect(dummySender.EmailMessage.To).To(Equal(validEmail))
-			Expect(dummySender.EmailMessage.Subject).To(Equal("Reset your Password"))
-			Expect(dummySender.EmailMessage.Text).Should(MatchRegexp("The code to reset your password is: [0-9]+"))
 		})
 	})
 
 	g.Describe("Reset Password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), emailProviders.NewDummySender()
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})

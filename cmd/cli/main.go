@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
+	email "github.com/bixlabs/authentication/authenticator/provider/email/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/sqlite"
 	emailProviders "github.com/bixlabs/authentication/email/providers"
@@ -17,7 +18,7 @@ func main() {
 	userRepo, closeDB := sqlite.NewSqliteStorage()
 	defer closeDB()
 
-	sender := emailProviders.NewEmailProvider()
+	sender := email.NewSender(emailProviders.NewEmailProvider())
 
 	passwordManager := implementation.NewPasswordManager(userRepo, sender)
 	auth := implementation.NewAuthenticator(userRepo, sender)
