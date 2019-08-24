@@ -35,7 +35,7 @@ func TestRest(t *testing.T) {
 	g.Describe("Login rest handler", func() {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender, implementation.NewUserManager(userRepo))
+			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
 		g.It("should return 400 if email is invalid", func() {
@@ -65,7 +65,7 @@ func TestRest(t *testing.T) {
 	g.Describe("Reset password request rest handler", func() {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender, implementation.NewUserManager(userRepo))
+			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
 
@@ -90,7 +90,7 @@ func TestRest(t *testing.T) {
 	g.Describe("Change Password process", func() {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender, implementation.NewUserManager(userRepo))
+			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
 
@@ -140,7 +140,7 @@ func TestRest(t *testing.T) {
 	g.Describe("Sign up rest handler", func() {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender, implementation.NewUserManager(userRepo))
+			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
 		g.It("should return 400 if email is invalid", func() {
@@ -172,7 +172,7 @@ func TestRest(t *testing.T) {
 	g.Describe("Reset password rest handler", func() {
 		g.BeforeEach(func() {
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			auth = implementation.NewAuthenticator(userRepo, sender, implementation.NewUserManager(userRepo))
+			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
 
@@ -218,8 +218,7 @@ func TestRest(t *testing.T) {
 			err := os.Setenv("AUTH_SERVER_SECRET", secret)
 			Expect(err).To(BeNil())
 			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
-			userManager := implementation.NewUserManager(userRepo)
-			auth = implementation.NewAuthenticator(userRepo, sender, userManager)
+			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
 		g.It("should return 401 if the token is invalid", func() {

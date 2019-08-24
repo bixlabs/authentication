@@ -47,7 +47,8 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			um = implementation.NewUserManager(userRepo)
+			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 
 			_, err := um.Create(structures.User{Email: validEmail})
@@ -93,7 +94,8 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			um = implementation.NewUserManager(userRepo)
+			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 			_, err := um.Create(structures.User{Email: validEmail})
 
@@ -139,7 +141,8 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			um = implementation.NewUserManager(userRepo)
+			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 
 			// reset the create attributes, otherwise the flags are kept before each test
@@ -254,7 +257,8 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			um = implementation.NewUserManager(userRepo)
+			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 
 			// reset the update attributes, otherwise the flags are kept before each test
@@ -401,7 +405,8 @@ func TestUserManagerCli(t *testing.T) {
 
 		g.BeforeEach(func() {
 			userRepo := memory.NewUserRepo()
-			um = implementation.NewUserManager(userRepo)
+			auth := implementation.NewAuthenticator(userRepo, memory.DummySender{})
+			um = implementation.NewUserManager(auth, userRepo)
 			cmd.SetUserManager(um)
 
 			// reset the reset password attributes, otherwise the flags are kept before each test

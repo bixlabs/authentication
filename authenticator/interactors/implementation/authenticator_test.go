@@ -35,7 +35,7 @@ func TestAuthenticator(t *testing.T) {
 	g.Describe("Signup process", func() {
 		g.BeforeEach(func() {
 			repo = memory.NewUserRepo()
-			auth = NewAuthenticator(repo, memory.DummySender{}, NewUserManager(repo))
+			auth = NewAuthenticator(repo, memory.DummySender{})
 		})
 
 		g.It("Should check for email duplication ", func() {
@@ -92,7 +92,7 @@ func TestAuthenticator(t *testing.T) {
 	g.Describe("Login process", func() {
 		g.BeforeEach(func() {
 			repo := memory.NewUserRepo()
-			auth = NewAuthenticator(repo, memory.DummySender{}, NewUserManager(repo))
+			auth = NewAuthenticator(repo, memory.DummySender{})
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(user)
 			if err != nil {
@@ -141,7 +141,7 @@ func TestAuthenticator(t *testing.T) {
 			err := os.Setenv("AUTH_SERVER_SECRET", secret)
 			Expect(err).To(BeNil())
 			repo := memory.NewUserRepo()
-			auth = NewAuthenticator(repo, memory.DummySender{}, NewUserManager(repo))
+			auth = NewAuthenticator(repo, memory.DummySender{})
 		})
 
 		g.It("Should return an error in case the JWT token is invalid", func() {

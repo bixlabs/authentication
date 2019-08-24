@@ -1,5 +1,7 @@
 module github.com/bixlabs/authentication
 
+go 1.12
+
 require (
 	cloud.google.com/go v0.43.0 // indirect
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc

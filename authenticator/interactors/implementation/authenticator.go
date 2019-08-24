@@ -16,18 +16,13 @@ import (
 type authenticator struct {
 	repository     user.Repository
 	sender         email.Sender
-	userManager    interactors.UserManager
 	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
 // NewAuthenticator is a constructor for the authenticator struct
-func NewAuthenticator(
-	repository user.Repository,
-	sender email.Sender,
-	um interactors.UserManager) interactors.Authenticator {
-
-	auth := &authenticator{repository: repository, sender: sender, userManager: um}
+func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {
+	auth := &authenticator{repository: repository, sender: sender}
 	err := env.Parse(auth)
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the authenticator failed", err)
@@ -110,7 +105,39 @@ func (c *userClaims) Valid() error {
 }
 
 func (auth authenticator) Signup(user structures.User) (structures.User, error) {
-	return auth.userManager.Create(user)
+	if err := auth.hasValidationIssue(user); err != nil {
+		return user, err
+	}
+
+	hashedPassword, err := util.HashPassword(user.Password)
+	if err != nil {
+		return user, err
+	}
+	user.Password = hashedPassword
+
+	user, err = auth.repository.Create(user)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (auth authenticator) hasValidationIssue(user structures.User) error {
+	if err := util.IsValidEmail(user.Email); err != nil {
+		return err
+	}
+
+	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
+		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
+		return util.DuplicatedEmailError{}
+	}
+
+	if err := util.CheckPasswordLength(user.Password); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (auth authenticator) VerifyJWT(token string) (structures.User, error) {

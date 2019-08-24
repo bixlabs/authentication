@@ -20,6 +20,7 @@ func TestUserManager(t *testing.T) {
 	//tools.Log().Level = logrus.FatalLevel
 	var um interactors.UserManager
 	var userRepo databaseUserPackage.Repository
+	var auth interactors.Authenticator
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
@@ -27,7 +28,8 @@ func TestUserManager(t *testing.T) {
 	g.Describe("Create User process", func() {
 		g.BeforeEach(func() {
 			userRepo = memory.NewUserRepo()
-			um = NewUserManager(userRepo)
+			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			um = NewUserManager(auth, userRepo)
 		})
 
 		g.It("Should return an error in case the email is invalid", func() {
@@ -104,7 +106,9 @@ func TestUserManager(t *testing.T) {
 
 	g.Describe("Delete User process", func() {
 		g.BeforeEach(func() {
-			um = NewUserManager(memory.NewUserRepo())
+			userRepo = memory.NewUserRepo()
+			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			um = NewUserManager(auth, userRepo)
 
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := um.Create(user)
@@ -146,7 +150,9 @@ func TestUserManager(t *testing.T) {
 
 	g.Describe("Find User process", func() {
 		g.Before(func() {
-			um = NewUserManager(memory.NewUserRepo())
+			userRepo = memory.NewUserRepo()
+			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			um = NewUserManager(auth, userRepo)
 
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := um.Create(user)
@@ -181,7 +187,9 @@ func TestUserManager(t *testing.T) {
 
 	g.Describe("Update User process", func() {
 		g.Before(func() {
-			um = NewUserManager(memory.NewUserRepo())
+			userRepo = memory.NewUserRepo()
+			auth = NewAuthenticator(userRepo, memory.DummySender{})
+			um = NewUserManager(auth, userRepo)
 
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, err := um.Create(user)

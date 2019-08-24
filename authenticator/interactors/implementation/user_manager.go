@@ -10,12 +10,13 @@ import (
 )
 
 type userManager struct {
-	repository user.Repository
+	authenticator interactors.Authenticator
+	repository    user.Repository
 }
 
 // NewUserManager is a constructor for the userManager struct
-func NewUserManager(repository user.Repository) interactors.UserManager {
-	return &userManager{repository: repository}
+func NewUserManager(auth interactors.Authenticator, repo user.Repository) interactors.UserManager {
+	return &userManager{authenticator: auth, repository: repo}
 }
 
 func (um userManager) Create(user structures.User) (structures.User, error) {
@@ -23,7 +24,7 @@ func (um userManager) Create(user structures.User) (structures.User, error) {
 		return user, err
 	}
 
-	return um.createUser(user)
+	return um.authenticator.Signup(user)
 }
 
 func (um userManager) generatePasswordIfEmpty(user *structures.User) (structures.User, error) {
@@ -40,42 +41,6 @@ func (um userManager) generatePasswordIfEmpty(user *structures.User) (structures
 	user.Password = user.GeneratedPassword
 
 	return *user, nil
-}
-
-func (um userManager) createUser(user structures.User) (structures.User, error) {
-	if err := um.hasValidationIssue(user); err != nil {
-		return user, err
-	}
-
-	hashedPassword, err := util.HashPassword(user.Password)
-	if err != nil {
-		return user, err
-	}
-	user.Password = hashedPassword
-
-	user, err = um.repository.Create(user)
-	if err != nil {
-		return user, err
-	}
-
-	return user, nil
-}
-
-func (um userManager) hasValidationIssue(user structures.User) error {
-	if err := util.IsValidEmail(user.Email); err != nil {
-		return err
-	}
-
-	if isAvailable, err := um.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
-		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
-		return util.DuplicatedEmailError{}
-	}
-
-	if err := util.CheckPasswordLength(user.Password); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (um userManager) Delete(email string) error {
