@@ -1,0 +1,3 @@
+run:
+  skip-dirs:
+    - admincli/cmd # the architecture of Cobra does not follow the linter guidelines

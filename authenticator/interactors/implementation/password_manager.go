@@ -15,13 +15,14 @@ import (
 
 type passwordManager struct {
 	repository           user.Repository
-	sender               email.Sender
+	emailSender          email.Sender
 	ResetPasswordCodeMax int `env:"AUTH_SERVER_RESET_PASSWORD_MAX" envDefault:"99999"`
 	ResetPasswordCodeMin int `env:"AUTH_SERVER_RESET_PASSWORD_MIN" envDefault:"10000"`
 }
 
+// NewPasswordManager returns a new instance of the passwordManager
 func NewPasswordManager(repository user.Repository, sender email.Sender) interactors.PasswordManager {
-	pm := passwordManager{repository: repository, sender: sender}
+	pm := passwordManager{repository: repository, emailSender: sender}
 	err := env.Parse(&pm)
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the password manager failed", err)
@@ -90,7 +91,7 @@ func (pm passwordManager) ForgotPassword(email string) (string, error) {
 		return "", err
 	}
 
-	return code, pm.sender.SendEmailPasswordRequest(userAccount, code)
+	return code, pm.emailSender.ForgotPasswordRequest(userAccount, code)
 }
 
 func (pm passwordManager) generateCode(user structures.User) (string, error) {

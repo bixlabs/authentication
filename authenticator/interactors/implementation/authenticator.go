@@ -15,13 +15,14 @@ import (
 
 type authenticator struct {
 	repository     user.Repository
-	sender         email.Sender
+	emailSender    email.Sender
 	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
 	Secret         string `env:"AUTH_SERVER_SECRET"`
 }
 
+// NewAuthenticator is a constructor for the authenticator struct
 func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {
-	auth := &authenticator{repository: repository, sender: sender}
+	auth := &authenticator{repository: repository, emailSender: sender}
 	err := env.Parse(auth)
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the authenticator failed", err)
@@ -128,7 +129,7 @@ func (auth authenticator) hasValidationIssue(user structures.User) error {
 	}
 
 	if isAvailable, err := auth.repository.IsEmailAvailable(user.Email); err != nil || !isAvailable {
-		tools.Log().WithField("error", err).Debug("A duplicated email was provided")
+		tools.Log().WithError(err).Debug("A duplicated email was provided")
 		return util.DuplicatedEmailError{}
 	}
 
@@ -152,7 +153,7 @@ func (auth authenticator) parseJWTToken(token string) (*jwt.Token, error) {
 		return []byte(auth.Secret), nil
 	})
 	if err != nil {
-		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		tools.Log().WithError(err).Info("An error happened while validating the JWT token")
 		return jwtToken, util.InvalidJWTToken{}
 	}
 
@@ -167,7 +168,7 @@ func (auth authenticator) validateAndObtainClaims(token jwt.Token) (structures.U
 	}
 
 	if err := claims.Valid(); err != nil {
-		tools.Log().WithField("error", err).Info("An error happened while validating the JWT token")
+		tools.Log().WithError(err).Info("An error happened while validating the JWT token")
 		return structures.User{}, util.InvalidJWTToken{}
 	}
 	return claims.User, nil

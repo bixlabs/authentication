@@ -3,8 +3,10 @@ package implementation
 import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
+	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/memory"
+	email2 "github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -19,13 +21,14 @@ func TestPasswordManager(t *testing.T) {
 	tools.Log().Level = logrus.FatalLevel
 	var passwordManager interactors.PasswordManager
 	var auth interactors.Authenticator
+	var sender email.Sender
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Change password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})
@@ -88,7 +91,8 @@ func TestPasswordManager(t *testing.T) {
 
 	g.Describe("Send Reset Password Request process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo := memory.NewUserRepo()
+			sender = email2.NewDummySender()
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})
@@ -107,13 +111,14 @@ func TestPasswordManager(t *testing.T) {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
 			_, err := passwordManager.ForgotPassword(validEmail)
+
 			Expect(err).To(BeNil())
 		})
 	})
 
 	g.Describe("Reset Password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			passwordManager = NewPasswordManager(userRepo, sender)
 			auth = NewAuthenticator(userRepo, sender)
 		})

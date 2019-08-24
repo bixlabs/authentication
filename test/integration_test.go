@@ -5,8 +5,8 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
-	"github.com/bixlabs/authentication/database/user/memory"
 	"github.com/bixlabs/authentication/database/user/sqlite"
+	"github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	_ "github.com/mattn/go-sqlite3"
@@ -39,8 +39,8 @@ func TestIntegration(t *testing.T) {
 	g.Describe("Integration tests", func() {
 		g.BeforeEach(func() {
 			userRepo, closeDB = sqlite.NewSqliteStorage()
-			auth = implementation.NewAuthenticator(userRepo, memory.DummySender{})
-			passwordManager = implementation.NewPasswordManager(userRepo, memory.DummySender{})
+			auth = implementation.NewAuthenticator(userRepo, email.NewDummySender())
+			passwordManager = implementation.NewPasswordManager(userRepo, email.NewDummySender())
 		})
 
 		g.AfterEach(func() {
