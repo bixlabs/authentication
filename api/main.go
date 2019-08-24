@@ -9,12 +9,16 @@ import (
 	"github.com/bixlabs/authentication/database/user/sqlite"
 	emailProviders "github.com/bixlabs/authentication/email/providers"
 	"github.com/bixlabs/authentication/tools"
+	"github.com/bixlabs/authentication/tools/util"
 	"github.com/caarlos0/env"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/mattn/go-sqlite3"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"io"
+	"os"
+	"time"
 )
 
 // @title Go-Authenticator
@@ -43,8 +47,9 @@ func main() {
 }
 
 func NewGinRouter() *gin.Engine {
-	result := gin.Default()
-	result.Use(gin.Logger())
+	result := gin.New()
+	result.Use(addRequestID())
+	result.Use(logger())
 	result.Use(gin.Recovery())
 	configureSwagger(result)
 	return result
@@ -57,7 +62,7 @@ func configureSwagger(result *gin.Engine) gin.IRoutes {
 func runGinRouter(router *gin.Engine, port string) {
 	err := router.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
-		panic(err)
+		tools.Log().WithError(err).Panic("running the router for the rest configuration")
 	}
 }
 
@@ -65,9 +70,43 @@ func getRestConfiguration() RestConfiguration {
 	result := RestConfiguration{}
 	err := env.Parse(&result)
 	if err != nil {
-		tools.Log().Panic("parsing the env variables for the rest configuration failed", err)
+		tools.Log().WithError(err).Panic("parsing the env variables for the rest configuration failed")
 	}
 	return result
+}
+
+func addRequestID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requestID := util.GenerateUniqueID()
+		c.Set("rid", requestID)
+		c.Header("X-Request-Id", requestID)
+		c.Next()
+	}
+}
+
+func logger() gin.HandlerFunc {
+	if os.Getenv("AUTH_SERVER_APP_ENV") == "dev" {
+		return gin.Logger()
+	}
+
+	logFile, _ := os.Create("gin.log")
+	gin.DefaultWriter = io.MultiWriter(logFile)
+	return gin.LoggerWithFormatter(customFormatter)
+}
+
+func customFormatter(param gin.LogFormatterParams) string {
+	return fmt.Sprintf("%s - %s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
+		param.Keys["rid"],
+		param.ClientIP,
+		param.TimeStamp.Format(time.RFC1123),
+		param.Method,
+		param.Path,
+		param.Request.Proto,
+		param.StatusCode,
+		param.Latency,
+		param.Request.UserAgent(),
+		param.ErrorMessage,
+	)
 }
 
 type RestConfiguration struct {

@@ -8,6 +8,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
+	"github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
 	"time"
@@ -31,19 +32,30 @@ func NewPasswordManager(repository user.Repository, sender email.Sender) interac
 }
 
 func (pm passwordManager) ChangePassword(user structures.User, newPassword string) error {
+	loggerFields := logrus.Fields{"email": user.Email, "meth": "passwordManager:ChangePassword"}
+	contextLogger := tools.Log().WithFields(loggerFields)
+
 	if err := util.IsValidEmail(user.Email); err != nil {
+		contextLogger.WithError(err).Debug("invalid email provided")
+
 		return err
 	}
 
 	if user.Password == newPassword {
+		contextLogger.Debug("same password provided")
+
 		return util.SamePasswordChangeError{}
 	}
 
 	if err := util.CheckPasswordLength(newPassword); err != nil {
+		contextLogger.Debug("invalid password length")
+
 		return err
 	}
 
 	if err := pm.isPasswordMatch(user); err != nil {
+		contextLogger.Debug("password did not match")
+
 		return err
 	}
 
@@ -64,9 +76,14 @@ func (pm passwordManager) isPasswordMatch(user structures.User) error {
 }
 
 func (pm passwordManager) hashAndSavePassword(email, newPassword string) error {
+	loggerFields := logrus.Fields{"email": email, "meth": "passwordManager:hashAndSavePassword"}
+	contextLogger := tools.Log().WithFields(loggerFields)
+
 	hashedPassword, err := util.HashPassword(newPassword)
 
 	if err != nil {
+		contextLogger.Debug("an error happened when hashing the new password")
+
 		return err
 	}
 
@@ -77,17 +94,26 @@ func (pm passwordManager) hashAndSavePassword(email, newPassword string) error {
 }
 
 func (pm passwordManager) ForgotPassword(email string) (string, error) {
+	loggerFields := logrus.Fields{"email": email, "meth": "passwordManager:ForgotPassword"}
+	contextLogger := tools.Log().WithFields(loggerFields)
+
 	if err := util.IsValidEmail(email); err != nil {
+		contextLogger.WithError(err).Debug("invalid email provided")
+
 		return "", err
 	}
 
 	userAccount, err := pm.repository.Find(email)
 	if err != nil {
+		contextLogger.WithError(err).Debug("wrong email provided")
+
 		return "", err
 	}
 
 	code, err := pm.generateCode(userAccount)
 	if err != nil {
+		contextLogger.WithError(err).Debug("an error happened generating the forgot code")
+
 		return "", err
 	}
 
@@ -114,23 +140,36 @@ func (pm passwordManager) generateRandomNumber() string {
 }
 
 func (pm passwordManager) ResetPassword(email string, code string, newPassword string) error {
+	loggerFields := logrus.Fields{"email": email, "meth": "passwordManager:ResetPassword"}
+	contextLogger := tools.Log().WithFields(loggerFields)
+
 	if err := util.IsValidEmail(email); err != nil {
+		contextLogger.WithError(err).Debug("invalid email provided")
+
 		return err
 	}
 
 	if err := util.CheckPasswordLength(newPassword); err != nil {
+		contextLogger.Debug("invalid password length")
+
 		return err
 	}
 
 	if err := pm.isValidCode(email, code); err != nil {
+		contextLogger.WithError(err).Debug("invalid code provided")
+
 		return err
 	}
 
 	if err := pm.isNewPasswordSameAsOld(email, newPassword); err != nil {
+		contextLogger.Debug("same password provided")
+
 		return err
 	}
 
 	if err := pm.hashAndSavePassword(email, newPassword); err != nil {
+		contextLogger.WithError(err).Debug("an error happened hashing and saving the password")
+
 		return err
 	}
 
