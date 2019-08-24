@@ -1,7 +1,6 @@
 package util
 
 import (
-	"github.com/google/uuid"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/sethvargo/go-password/password"
 	"golang.org/x/crypto/bcrypt"
@@ -108,9 +107,4 @@ type UserNotFoundError struct{}
 
 func (UserNotFoundError) Error() string {
 	return UserNotFoundMessage
-}
-
-// GenerateUniqueID generates a unique id
-func GenerateUniqueID() string {
-	return uuid.Must(uuid.NewUUID()).String()
 }
