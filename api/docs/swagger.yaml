@@ -67,15 +67,31 @@ definitions:
     type: object
   login.Response:
     properties:
-      exp:
+      code:
         type: integer
-      iat:
-        type: integer
-      jwt:
-        type: string
-      user:
-        $ref: '#/definitions/structures.User'
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/login.Result'
         type: object
+      status:
+        type: string
+    type: object
+  login.Result:
+    properties:
+      code:
+        type: integer
+      messages:
+        items:
+          type: string
+        type: array
+      result:
+        $ref: '#/definitions/login.Result'
+        type: object
+      status:
+        type: string
     type: object
   login.SwaggerResponse:
     properties:
