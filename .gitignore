@@ -25,3 +25,10 @@ sqlite.s3db
 test.s3db
 
 *.log
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*

@@ -430,18 +430,42 @@
         "login.Response": {
             "type": "object",
             "properties": {
-                "exp": {
+                "code": {
                     "type": "integer"
                 },
-                "iat": {
-                    "type": "integer"
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
-                "jwt": {
-                    "type": "string"
-                },
-                "user": {
+                "result": {
                     "type": "object",
-                    "$ref": "#/definitions/structures.User"
+                    "$ref": "#/definitions/login.Result"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "login.Result": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/login.Result"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
