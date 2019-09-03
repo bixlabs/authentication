@@ -7,7 +7,6 @@ import (
 
 type sender struct{}
 
-// NewDummySender returns an instance of the DummySender
 func NewDummySender() email.Sender {
 	return &sender{}
 }

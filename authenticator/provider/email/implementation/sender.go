@@ -18,7 +18,6 @@ type sender struct {
 	provider email.Provider
 }
 
-// NewSender return an instance of Sender
 func NewSender(provider email.Provider) email.Sender {
 	s := &sender{provider: provider}
 	err := env.Parse(s)
@@ -30,8 +29,8 @@ func NewSender(provider email.Provider) email.Sender {
 	return s
 }
 
-// ForgotPasswordRequest builds a forgot email message and send it using the emailSender,
-// this forgot email message contains the code to reset the password.
+// builds a forgot email message and send it using the emailSender
+// this message contains the code to reset the password.
 func (s sender) ForgotPasswordRequest(user structures.User, code string) error {
 	templateBuilder := template.NewTemplateBuilder()
 	htmlMessage, textMessage, err := templateBuilder.Build("forgot_password", &forgotpassword.TemplateParam{Code: code})

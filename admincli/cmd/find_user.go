@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// findUserCmd represents the find-user command
 var findUserCmd = &cobra.Command{
 	Use:     "find-user <email>",
 	Aliases: []string{"find"},

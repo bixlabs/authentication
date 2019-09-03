@@ -7,10 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ResetPassword represents the params values received by this command
 var ResetPassword resetpassword.Command
 
-// resetPasswordCmd represents the reset-password command
 var resetPasswordCmd = &cobra.Command{
 	Use:   "reset-password <email>",
 	Short: "Reset a user password",

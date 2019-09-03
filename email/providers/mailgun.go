@@ -17,7 +17,6 @@ type mailgunSender struct {
 	APIKey string `env:"AUTH_SERVER_MAILGUN_API_KEY"`
 }
 
-// NewMailgunSender returns an instance of the MailgunSender
 func NewMailgunSender() email.Provider {
 	sender := &mailgunSender{}
 
@@ -45,7 +44,6 @@ func NewMailgunSender() email.Provider {
 	return sender
 }
 
-// Send is an implementation to send the emailMessage by email using Mailgun
 func (ms mailgunSender) Send(emailMessage *message.Message) error {
 	contextLogger := ms.getLogger()
 

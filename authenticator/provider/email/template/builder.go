@@ -19,7 +19,6 @@ type Builder struct {
 	TemplatePath string `env:"AUTH_SERVER_EMAIL_TEMPLATE_PATH"`
 }
 
-// NewTemplateBuilder returns a new Builder instance
 func NewTemplateBuilder() *Builder {
 	loader := &Builder{}
 	err := env.Parse(loader)
