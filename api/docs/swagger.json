@@ -443,44 +443,14 @@
         "login.Response": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "messages": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "result": {
                     "type": "object",
                     "$ref": "#/definitions/login.Result"
-                },
-                "status": {
-                    "type": "string"
                 }
             }
         },
         "login.Result": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "messages": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "result": {
-                    "type": "object",
-                    "$ref": "#/definitions/login.Result"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "login.SwaggerResponse": {
             "type": "object",

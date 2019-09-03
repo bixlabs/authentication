@@ -60,3 +60,21 @@ docker-run:
 
 docker-run-dev:
 		docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.dev.yml up
+
+		
+#####################################################
+## Deployments
+#####################################################
+terraform-aws-root = deployments/terraform/aws
+
+# .tfvars file path for terraform deployment
+terraform-aws-tfvars = $(terraform-aws-root)/$(ENV).aws.tfvars
+
+define terraform_aws_apply
+	terraform init $(terraform-aws-root) && terraform apply -var-file="$(terraform-aws-tfvars)" $(terraform-aws-root)
+endef
+
+deploy-aws:
+		[ -f $(terraform-aws-tfvars) ] && $(call terraform_aws_apply) || echo "Error: $(ENV).awqs.tfvars does not exists"
+		
+
