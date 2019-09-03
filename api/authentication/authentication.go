@@ -100,7 +100,6 @@ func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
 	} else {
 		c.JSON(signupHandler(request, config.authenticator))
 	}
-	c.JSON(http.StatusCreated, signup.Response{})
 }
 
 func isInvalidSignupRequest(c *gin.Context, request *signup.Request) bool {
@@ -279,7 +278,7 @@ func handleForgotPasswordError(err error) (int, forgotpass.Response) {
 // @Description If the JWT is valid this endpoint returns the user inside of the token.
 // @Accept  json
 // @Produce  json
-// @Param token header string true "Authorization: Bearer <jwtToken>"
+// @Param Authorization header string true "Authorization: Bearer <jwtToken>"
 // @Success 200 {object} token.SwaggerResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
@@ -297,7 +296,8 @@ func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
 func getTokenFromHeader(c *gin.Context) (string, error) {
 	// TODO: Use ShouldBindHeader when gin framework releases the feature, it's in master but not release.
 	t := c.Request.Header.Get("Authorization")
-	if t == "" || strings.Contains(t, "Bearer") {
+
+	if t == "" || !strings.Contains(t, "Bearer") {
 		return "", errors.New("token missing or malformed")
 	}
 	headerSeparated := strings.Split(t, " ")

@@ -14,7 +14,6 @@
         },
         "version": "1.0"
     },
-    "host": "{{.Host}}",
     "basePath": "/",
     "paths": {
         "/user/change-password": {
@@ -43,28 +42,24 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/changepass.SwaggerResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     }
@@ -97,28 +92,24 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/login.SwaggerResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     }
@@ -151,42 +142,36 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resetpass.Response"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "408": {
                         "description": "Request Timeout",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "504": {
                         "description": "Gateway Timeout",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     }
@@ -219,21 +204,18 @@
                     "202": {
                         "description": "Accepted",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/forgotpass.SwaggerResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     }
@@ -266,21 +248,65 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/signup.SwaggerResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
+                            "$ref": "#/definitions/rest.ResponseWrapper"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/token/validate": {
+            "get": {
+                "description": "If the JWT is valid this endpoint returns the user inside of the token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Validates a JWT and returns the claims for it.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization: Bearer \u003cjwtToken\u003e",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token.SwaggerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rest.ResponseWrapper"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/rest.ResponseWrapper"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
                             "$ref": "#/definitions/rest.ResponseWrapper"
                         }
                     }
@@ -306,9 +332,21 @@
         "changepass.Response": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "result": {
                     "type": "object",
                     "$ref": "#/definitions/changepass.Result"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -529,9 +567,21 @@
         "signup.Response": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "result": {
                     "type": "object",
                     "$ref": "#/definitions/signup.Result"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -583,6 +633,57 @@
                     "type": "string"
                 },
                 "secondName": {
+                    "type": "string"
+                }
+            }
+        },
+        "token.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/token.Result"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "token.Result": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "type": "object",
+                    "$ref": "#/definitions/structures.User"
+                }
+            }
+        },
+        "token.SwaggerResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/token.Response"
+                },
+                "status": {
                     "type": "string"
                 }
             }

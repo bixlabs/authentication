@@ -18,7 +18,9 @@ func UserToDatabaseModel(user structures.User) model.User {
 		SecondName:       user.SecondName,
 		FamilyName:       user.FamilyName,
 		SecondFamilyName: user.SecondFamilyName,
-		ResetToken:       user.ResetToken}
+		ResetToken:       user.ResetToken,
+		DeletedAt:        user.DeletedAt,
+	}
 }
 
 func DatabaseModelToUser(user model.User) structures.User {
@@ -30,5 +32,7 @@ func DatabaseModelToUser(user model.User) structures.User {
 		SecondName:       user.SecondName,
 		FamilyName:       user.FamilyName,
 		SecondFamilyName: user.SecondFamilyName,
-		ResetToken:       user.ResetToken}
+		ResetToken:       user.ResetToken,
+		DeletedAt:        user.DeletedAt,
+	}
 }
