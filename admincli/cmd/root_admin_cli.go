@@ -18,7 +18,6 @@ type AdminCliCommand struct {
 
 var cfgFile string
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &AdminCliCommand{
 	Command: &cobra.Command{
 		Use:          "admincli",
@@ -28,7 +27,6 @@ var rootCmd = &AdminCliCommand{
 	},
 }
 
-// SetUserManager assigns a user manager to the AdminCliCommand struct
 func SetUserManager(userManager interactors.UserManager) {
 	rootCmd.userManager = userManager
 }
@@ -58,7 +56,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.admincli.yaml)")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag.

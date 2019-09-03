@@ -10,13 +10,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// SendgridSender is the Sendgrid provider to send emails
 type SendgridSender struct {
 	sg     *sendgrid.Client
 	APIKey string `env:"AUTH_SERVER_SENDGRID_API_KEY"`
 }
 
-// NewSengridSender returns an instance of the SendgridSender
 func NewSengridSender() email.Provider {
 	sender := &SendgridSender{}
 
@@ -40,7 +38,6 @@ func NewSengridSender() email.Provider {
 	return sender
 }
 
-// Send is an implementation to send the emailMessage by email using Sendgrid
 func (ss SendgridSender) Send(emailMessage *message.Message) error {
 	contextLogger := ss.getLogger()
 	sendgridMessage := ss.fromEmailMessageToSendgridMessage(emailMessage)

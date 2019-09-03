@@ -21,7 +21,6 @@ type passwordManager struct {
 	ResetPasswordCodeMin int `env:"AUTH_SERVER_RESET_PASSWORD_MIN" envDefault:"10000"`
 }
 
-// NewPasswordManager returns a new instance of the passwordManager
 func NewPasswordManager(repository user.Repository, sender email.Sender) interactors.PasswordManager {
 	pm := passwordManager{repository: repository, emailSender: sender}
 	err := env.Parse(&pm)

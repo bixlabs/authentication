@@ -7,10 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// UpdateAttrs represents the params values received by this command
 var UpdateAttrs updateuser.Command
 
-// updateUserCmd represents the update-user command
 var updateUserCmd = &cobra.Command{
 	Use:     "update-user <email>",
 	Aliases: []string{"update"},

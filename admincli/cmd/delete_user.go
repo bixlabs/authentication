@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// deleteUserCmd represents the delete-user command
 var deleteUserCmd = &cobra.Command{
 	Use:     "delete-user <email>",
 	Aliases: []string{"delete"},

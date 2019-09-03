@@ -18,7 +18,6 @@ type SMTPSender struct {
 	Password string `env:"AUTH_SERVER_SMTP_PASSWORD"`
 }
 
-// NewSMTPSender returns an instance of the SMTPSender
 func NewSMTPSender() email.Provider {
 	sender := &SMTPSender{}
 
@@ -45,7 +44,6 @@ func NewSMTPSender() email.Provider {
 	return sender
 }
 
-// Send is an implementation to send the emailMessage by email using SMTP
 func (ss SMTPSender) Send(emailMessage *message.Message) error {
 	contextLogger := ss.getLogger()
 

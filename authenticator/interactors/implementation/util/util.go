@@ -14,8 +14,6 @@ const EmailValidationRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'
 const SignupInvalidEmailMessage = "Email is not valid"
 const SignupPasswordLengthMessage = "Password should have at least 8 characters"
 const resetPasswordWrongCodeError = "Wrong reset password code"
-
-// UserNotFoundMessage is the text of the error message when a user is not found
 const UserNotFoundMessage = "User provided was not found"
 
 func IsValidEmail(email string) error {
@@ -102,7 +100,6 @@ func (InvalidJWTToken) Error() string {
 	return "invalid token"
 }
 
-// UserNotFoundError is the result error when a user is not found
 type UserNotFoundError struct{}
 
 func (UserNotFoundError) Error() string {
