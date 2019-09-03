@@ -38,9 +38,6 @@ clean:
 lint:
 		$(GOPATH)/bin/golangci-lint run --enable-all --disable goimports
 
-run-dev:
-		make format && $(GOPATH)/air -c .air.config
-
 run:
 		make api-docs && make format && go run api/main.go
 
