@@ -5,8 +5,10 @@ import (
 	"github.com/bixlabs/authentication/api/authentication/structures/signup"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
+	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/database/user/memory"
+	email2 "github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -28,13 +30,14 @@ func TestRest(t *testing.T) {
 	tools.Log().Level = logrus.FatalLevel
 	var auth interactors.Authenticator
 	var passwordManager interactors.PasswordManager
+	var sender email.Sender
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
 	g.Describe("Login rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
@@ -64,7 +67,7 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Reset password request rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
@@ -89,7 +92,7 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Change Password process", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
@@ -139,7 +142,7 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Sign up rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 
@@ -171,7 +174,8 @@ func TestRest(t *testing.T) {
 
 	g.Describe("Reset password rest handler", func() {
 		g.BeforeEach(func() {
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo := memory.NewUserRepo()
+			sender = email2.NewDummySender()
 			auth = implementation.NewAuthenticator(userRepo, sender)
 			passwordManager = implementation.NewPasswordManager(userRepo, sender)
 		})
@@ -217,7 +221,7 @@ func TestRest(t *testing.T) {
 			secret := "test"
 			err := os.Setenv("AUTH_SERVER_SECRET", secret)
 			Expect(err).To(BeNil())
-			userRepo, sender := memory.NewUserRepo(), memory.DummySender{}
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
 			auth = implementation.NewAuthenticator(userRepo, sender)
 		})
 

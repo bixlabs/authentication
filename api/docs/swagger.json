@@ -286,6 +286,57 @@
                     }
                 }
             }
+        },
+        "/user/token/validate": {
+            "get": {
+                "description": "If the JWT is valid this endpoint returns the user inside of the token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Validates a JWT and returns the claims for it.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization: Bearer \u003cjwtToken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/token.SwaggerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/rest.ResponseWrapper"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/rest.ResponseWrapper"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/rest.ResponseWrapper"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -415,6 +466,7 @@
             "properties": {
                 "code": {
                     "type": "integer"
+<<<<<<< HEAD
                 },
                 "messages": {
                     "type": "array",
@@ -422,6 +474,15 @@
                         "type": "string"
                     }
                 },
+=======
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+>>>>>>> master
                 "result": {
                     "type": "object",
                     "$ref": "#/definitions/login.Result"
@@ -573,6 +634,9 @@
                 "familyName": {
                     "type": "string"
                 },
+                "generatedPassword": {
+                    "type": "string"
+                },
                 "givenName": {
                     "type": "string"
                 },
@@ -583,6 +647,45 @@
                     "type": "string"
                 },
                 "secondName": {
+                    "type": "string"
+                }
+            }
+        },
+        "token.Response": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/token.Result"
+                }
+            }
+        },
+        "token.Result": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "type": "object",
+                    "$ref": "#/definitions/structures.User"
+                }
+            }
+        },
+        "token.SwaggerResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/token.Response"
+                },
+                "status": {
                     "type": "string"
                 }
             }

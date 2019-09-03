@@ -9,6 +9,7 @@ import (
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/jinzhu/gorm"
+	"github.com/sirupsen/logrus"
 )
 
 type sqliteStorage struct {
@@ -22,28 +23,46 @@ type sqliteStorage struct {
 func NewSqliteStorage() (user.Repository, func()) {
 	db := sqliteStorage{}
 	err := env.Parse(&db)
+
+	contextLogger := db.getLogger()
+
 	if err != nil {
-		tools.Log().Panic("Parsing the env variables for the database failed", err)
+		contextLogger.WithError(err).Panic("parsing the env variables for the db failed")
 	}
+
+	contextLogger.Info("env variables for db were parsed")
+
 	closeDB := db.initialize()
 	return db, closeDB
 }
 
 func (storage *sqliteStorage) initialize() func() {
+	contextLogger := storage.getLogger()
+	contextLogger.Info("db is initializing")
+
 	db := openDatabase(storage)
 	db.AutoMigrate(&model.User{})
+	contextLogger.Info("db was automigrated")
+
 	storage.db = db
 
 	return func() {
-		_ = storage.db.Close()
+		if err := storage.db.Close(); err != nil {
+			contextLogger.Error("there was an error closing the connection with the db")
+		}
 	}
 }
 
 func openDatabase(storage *sqliteStorage) *gorm.DB {
+	contextLogger := storage.getLogger()
+
 	db, err := gorm.Open("sqlite3", storage.getConnectionString())
 	if err != nil {
-		panic(err)
+		contextLogger.WithError(err).Panic("there was an error initializing the db connection")
 	}
+
+	contextLogger.Info("db connection was initialized")
+
 	storage.db = db
 	return db
 }
@@ -115,4 +134,41 @@ func (storage sqliteStorage) UpdateResetToken(email, resetToken string) error {
 	}
 
 	return transaction.Commit().Error
+}
+
+func (storage sqliteStorage) Delete(user structures.User) error {
+	transaction := storage.db.Begin()
+	if err := transaction.Delete(&user).Error; err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	return transaction.Commit().Error
+}
+
+func (storage sqliteStorage) Update(email string, updateAttrs structures.User) (structures.User, error) {
+	user, err := storage.Find(email)
+
+	if err != nil {
+		return structures.User{}, err
+	}
+
+	transaction := storage.db.Begin()
+	modelForUpdate := mappers.UserToDatabaseModel(user)
+	modelUpdateAttrs := mappers.UserToDatabaseModel(updateAttrs)
+
+	if err := transaction.Model(&modelForUpdate).Update(modelUpdateAttrs).Error; err != nil {
+		transaction.Rollback()
+		return structures.User{}, err
+	}
+
+	if err := transaction.Commit().Error; err != nil {
+		return structures.User{}, err
+	}
+
+	return mappers.DatabaseModelToUser(modelForUpdate), nil
+}
+
+func (storage sqliteStorage) getLogger() *logrus.Entry {
+	return tools.Log().WithField("storage", "sqlite")
 }

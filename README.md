@@ -189,6 +189,54 @@ Possibly in the future we will have different ways of providing external storage
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/golang-standards/project-layout)
 [![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/golang-standards/project-layout/releases/latest)
 
+## Docker
+
+### Getting Started
+
+At the time of configuration we used Docker version 19.03.1 and Docker Compose version 1.24.1
+
+#### Prerequisites
+
+In order to run this container you'll need [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/install/) installed.
+You will also need to configure the `.env` in the root of the project, please read [the environment section](#how-to-handle-environment-variables).
+
+#### Usage
+
+To run the container you should run:
+
+```bash
+$ make docker-run
+```
+
+If you need to build the image:
+
+```bash
+$ make docker-build
+```
+
+For development you must run the project with hot reload:
+
+```bash
+$ make docker-run-dev
+```
+
+Behind the scenes we are using docker-compose, 
+but you could build and run the same configuration using docker:
+
+```bash
+$ docker build -f build/package/Dockerfile -t authentication_api .
+```
+
+```bash
+$ docker run -d --env-file=.env -p 9000:9000 --name authentication_api authentication_api
+```
+
+Also with hot reload:
+
+```bash
+$ docker run -d --env-file=.env -p 9000:9000 --name authentication_api authentication_api make run-dev
+```
+
 ## Notes
 
 If you want more information about all the folders being used in this project please refer to the [original template](https://github.com/golang-standards/project-layout). Thanks for the authors of this one!
