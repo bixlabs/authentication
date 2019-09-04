@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"time"
@@ -80,22 +79,6 @@ func createHttpServer(router *gin.Engine, port string) *http.Server {
 		ReadTimeout:       1 * time.Minute,
 		WriteTimeout:      2 * time.Minute,
 		MaxHeaderBytes:    1 << 20,
-	}
-}
-
-func getHttpClient() *http.Client {
-	return &http.Client{
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout:   10 * time.Second,
-				KeepAlive: 10 * time.Second,
-			}).DialContext,
-			TLSHandshakeTimeout:    5 * time.Second,
-			ExpectContinueTimeout:  5 * time.Second,
-			ResponseHeaderTimeout:  10 * time.Second,
-			MaxResponseHeaderBytes: 1 << 20,
-		},
-		Timeout: 20 * time.Second,
 	}
 }
 
