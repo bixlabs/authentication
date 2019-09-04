@@ -62,16 +62,18 @@ func configureSwagger(result *gin.Engine) gin.IRoutes {
 }
 
 func runGinRouter(router *gin.Engine, port string) {
-	server := createHttpServer(router, port)
+	server := createHTTPServer(router, port)
 	err := server.ListenAndServe()
 	fmt.Printf(":%s", port)
 
 	if err != nil {
 		tools.Log().WithError(err).Panic("running the router for the rest configuration")
 	}
+
+	tools.Log().Info(fmt.Sprintf(":%s", port))
 }
 
-func createHttpServer(router *gin.Engine, port string) *http.Server {
+func createHTTPServer(router http.Handler, port string) *http.Server {
 	return &http.Server{
 		Addr:              ":" + port,
 		Handler:           router,
