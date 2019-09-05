@@ -75,6 +75,6 @@ define terraform_aws_apply
 endef
 
 deploy-aws:
-		[ -f $(terraform-aws-tfvars) ] && $(call terraform_aws_apply) || echo "Error: $(ENV).awqs.tfvars does not exists"
+		[ -f $(terraform-aws-tfvars) ] && $(call terraform_aws_apply) || echo "Error: $(ENV).aws.tfvars does not exists"
 		
 
