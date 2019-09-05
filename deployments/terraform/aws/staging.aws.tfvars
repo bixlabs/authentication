@@ -1,6 +1,6 @@
 aws_ecs_cluster_name = "ga-staging-cluster"
 aws_autoscaling_min = 2
-aws_autoscaling_ma = 3
+aws_autoscaling_max = 3
 aws_region = "us-west-2"
 ecs_task_execution_role_name = "gaEcsTaskExecutionRole"
 ecs_auto_scale_role_name = "gaEcsAutoScaleRole"
