@@ -39,7 +39,7 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/swaggo/gin-swagger v1.2.0
-	github.com/swaggo/swag v1.6.2
+	github.com/swaggo/swag v1.6.3
 	github.com/ugorji/go v1.1.7 // indirect
 	github.com/urfave/cli v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
