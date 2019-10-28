@@ -181,6 +181,8 @@ github.com/magiconair/properties v1.8.1 h1:ZC2Vc7/ZFkGmsVC9KvOjumD+G5lXy2RtTKyzR
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/mailgun/mailgun-go/v3 v3.6.0 h1:oQWhyDTFjSiuO6vx1PRlfLZ7Fu+oK0Axn0UTREh3k/g=
 github.com/mailgun/mailgun-go/v3 v3.6.0/go.mod h1:E81I5Agcfi/u1szdehi6p6ttdRX/UD3Rq2SrUzwyFIU=
+github.com/mailgun/mailgun-go/v3 v3.6.1 h1:iq7WXvUTp+VmckGIOvA0049mocwxNR1Ga3efK0yEU7U=
+github.com/mailgun/mailgun-go/v3 v3.6.1/go.mod h1:E81I5Agcfi/u1szdehi6p6ttdRX/UD3Rq2SrUzwyFIU=
 github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/mailru/easyjson v0.0.0-20190614124828-94de47d64c63/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e h1:hB2xlXdHp/pmPZq0y3QnmWAArdw9PqbmotexnWx/FU8=
