@@ -22,7 +22,7 @@ require (
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/lib/pq v1.1.1 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
-	github.com/mailgun/mailgun-go/v3 v3.6.1
+	github.com/mailgun/mailgun-go/v3 v3.6.2
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
 	github.com/mattn/go-sqlite3 v1.13.0
 	github.com/mitchellh/go-homedir v1.1.0
