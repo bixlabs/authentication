@@ -9,7 +9,7 @@ require (
 	github.com/denisenkom/go-mssqldb v0.0.0-20190515213511-eb9f6a1743f3 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/franela/goblin v0.0.0-20180407132755-cd5d08fb4ede
-	github.com/gin-gonic/gin v1.5.0
+	github.com/gin-gonic/gin v1.6.1
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/go-openapi/spec v0.19.2 // indirect
 	github.com/go-openapi/swag v0.19.5 // indirect
