@@ -26,7 +26,7 @@ require (
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/mapstructure v1.2.2
 	github.com/onsi/gomega v1.9.0
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
