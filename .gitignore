@@ -32,3 +32,4 @@ test.s3db
 # .tfstate files
 *.tfstate
 *.tfstate.*
+api/docs/*
