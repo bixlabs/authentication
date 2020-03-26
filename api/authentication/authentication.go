@@ -143,7 +143,7 @@ func isDuplicatedEmail(err error) bool {
 // @Accept  json
 // @Produce  json
 // @Param changePassword body changepass.Request true "Change password Request"
-// @Success 200 {object} changepass.SwaggerResponse
+// @Success 200 {object} changepass.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper

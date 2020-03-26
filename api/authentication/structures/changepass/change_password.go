@@ -4,10 +4,10 @@ import "github.com/bixlabs/authentication/tools/rest"
 
 type Response struct {
 	rest.ResponseWrapper
-	Result *Result `json:"result"`
+	Result Result `json:"result,omitempty"`
 }
 
-func newResponse(code int, result *Result, err error) Response {
+func newResponse(code int, result Result, err error) Response {
 	r := Response{}
 	r.ResponseWrapper = rest.NewResponseWrapper(code, err)
 	r.Result = result
@@ -15,11 +15,11 @@ func newResponse(code int, result *Result, err error) Response {
 }
 
 func NewErrorResponse(code int, err error) Response {
-	return newResponse(code, nil, err)
+	return newResponse(code, Result{}, err)
 }
 
 func NewResponse(code int, success bool) Response {
-	return newResponse(code, &Result{Success: success}, nil)
+	return newResponse(code, Result{Success: success}, nil)
 }
 
 type Result struct {
