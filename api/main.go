@@ -23,6 +23,10 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
+const readHeaderTimeoutSeconds = 20
+const writeHeaderTimeoutMinutes = 2
+const powerForHeaderBytes = 20
+
 // @title Go-Authenticator
 // @version 1.0
 // @description Leverage of authentication functionality
@@ -75,10 +79,10 @@ func createHTTPServer(router http.Handler, port string) *http.Server {
 	return &http.Server{
 		Addr:              ":" + port,
 		Handler:           router,
-		ReadHeaderTimeout: 20 * time.Second,
+		ReadHeaderTimeout: readHeaderTimeoutSeconds * time.Second,
 		ReadTimeout:       1 * time.Minute,
-		WriteTimeout:      2 * time.Minute,
-		MaxHeaderBytes:    1 << 20,
+		WriteTimeout:      writeHeaderTimeoutMinutes * time.Minute,
+		MaxHeaderBytes:    1 << powerForHeaderBytes,
 	}
 }
 

@@ -16,6 +16,8 @@ import (
 	"strings"
 )
 
+const tokenHeaderLength = 2
+
 type authenticatorRESTConfigurator struct {
 	authenticator   interactors.Authenticator
 	passwordManager interactors.PasswordManager
@@ -301,7 +303,7 @@ func getTokenFromHeader(c *gin.Context) (string, error) {
 		return "", errors.New("token missing or malformed")
 	}
 	headerSeparated := strings.Split(t, " ")
-	if len(headerSeparated) != 2 {
+	if len(headerSeparated) != tokenHeaderLength {
 		return "", errors.New("token missing or malformed")
 	}
 	return headerSeparated[1], nil

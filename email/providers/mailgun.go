@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const sendEmailContextTimeoutSeconds = 10
+
 type mailgunSender struct {
 	mg     *mailgun.MailgunImpl
 	Domain string `env:"AUTH_SERVER_MAILGUN_DOMAIN"`
@@ -47,7 +49,7 @@ func NewMailgunSender() email.Provider {
 func (ms mailgunSender) Send(emailMessage *message.Message) error {
 	contextLogger := ms.getLogger()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*sendEmailContextTimeoutSeconds)
 	defer cancel()
 
 	mailgunMessage := ms.fromEmailMessageToMailgunMessage(emailMessage)

@@ -87,7 +87,6 @@ func (storage sqliteStorage) Create(user structures.User) (structures.User, erro
 	}
 
 	return storage.Find(user.Email)
-
 }
 
 func (storage sqliteStorage) Find(email string) (structures.User, error) {
@@ -113,7 +112,6 @@ func (storage sqliteStorage) GetHashedPassword(email string) (string, error) {
 	}
 
 	return account.Password, nil
-
 }
 
 func (storage sqliteStorage) ChangePassword(email, newPassword string) error {

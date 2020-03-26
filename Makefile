@@ -36,7 +36,7 @@ clean:
 		rm -r -f ./tmp
 
 lint:
-		$(GOPATH)/bin/golangci-lint run --enable-all --disable goimports
+		./bin/golangci-lint run --enable-all -D goimports -D godox -D wsl
 
 run:
 		make api-docs && make format && go run api/main.go

@@ -15,6 +15,9 @@ const SignupInvalidEmailMessage = "Email is not valid"
 const SignupPasswordLengthMessage = "Password should have at least 8 characters"
 const resetPasswordWrongCodeError = "Wrong reset password code"
 const UserNotFoundMessage = "User provided was not found"
+const randomPasswordLength = 10
+const randomPasswordMinDigits = 2
+const randomPasswordMinSymbols = 2
 
 func IsValidEmail(email string) error {
 	if isValidEmail, _ := regexp.MatchString(EmailValidationRegex, email); !isValidEmail {
@@ -46,7 +49,7 @@ func (e PasswordLengthError) Error() string {
 
 // GenerateRandomPassword generates a secure random password
 func GenerateRandomPassword() (string, error) {
-	return password.Generate(10, 2, 2, false, false)
+	return password.Generate(randomPasswordLength, randomPasswordMinDigits, randomPasswordMinSymbols, false, false)
 }
 
 func HashPassword(password string) (string, error) {
