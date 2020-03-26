@@ -2,9 +2,8 @@ package resetpass
 
 import "github.com/bixlabs/authentication/tools/rest"
 
-type Response struct {
-	rest.ResponseWrapper
-	Result Result `json:"result,omitempty"`
+func NewResponse(code int) Response {
+	return newResponse(code, Result{Success: true}, nil)
 }
 
 func newResponse(code int, result Result, err error) Response {
@@ -14,12 +13,13 @@ func newResponse(code int, result Result, err error) Response {
 	return r
 }
 
-func NewResponse(code int) Response {
-	return newResponse(code, Result{Success:true}, nil)
+func NewErrorResponse(code int, err error) Response {
+	return newResponse(code, Result{Success: false}, err)
 }
 
-func NewErrorResponse(code int, err error) Response {
-	return newResponse(code, Result{Success:false}, err)
+type Response struct {
+	rest.ResponseWrapper
+	Result Result `json:"result,omitempty"`
 }
 
 type Result struct {

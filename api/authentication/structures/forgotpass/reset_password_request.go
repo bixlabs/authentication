@@ -4,9 +4,8 @@ import (
 	"github.com/bixlabs/authentication/tools/rest"
 )
 
-type Response struct {
-	rest.ResponseWrapper
-	Result Result `json:"result,omitempty"`
+func NewResponse(code int) Response {
+	return newResponse(code, Result{Success: true}, nil)
 }
 
 func newResponse(code int, result Result, err error) Response {
@@ -20,8 +19,9 @@ func NewErrorResponse(code int, err error) Response {
 	return newResponse(code, Result{}, err)
 }
 
-func NewResponse(code int) Response {
-	return newResponse(code, Result{Success: true}, nil)
+type Response struct {
+	rest.ResponseWrapper
+	Result Result `json:"result,omitempty"`
 }
 
 type Result struct {
