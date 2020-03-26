@@ -7,12 +7,19 @@ type Response struct {
 	Result Result `json:"result,omitempty"`
 }
 
-func NewResponse() Response {
-	return Response{Result: Result{Success: true}}
+func newResponse(code int, result Result, err error) Response {
+	r := Response{}
+	r.ResponseWrapper = rest.NewResponseWrapper(code, err)
+	r.Result = result
+	return r
 }
 
-func NewUnsuccessfulResponse() Response {
-	return Response{Result: Result{Success: false}}
+func NewResponse(code int) Response {
+	return newResponse(code, Result{Success:true}, nil)
+}
+
+func NewErrorResponse(code int, err error) Response {
+	return newResponse(code, Result{Success:false}, err)
 }
 
 type Result struct {

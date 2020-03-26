@@ -223,14 +223,14 @@ func resetPasswordHandler(email string, code string, newPassword string, handler
 	if err := handler.ResetPassword(email, code, newPassword); err != nil {
 		return handleResetPasswordError(err)
 	}
-	return http.StatusNoContent, resetpass.NewResponse()
+	return http.StatusNoContent, resetpass.NewResponse(http.StatusNoContent)
 }
 
 func handleResetPasswordError(err error) (int, resetpass.Response) {
 	if isInvalidEmail(err) || isPasswordLength(err) || isInvalidCode(err) || isSamePasswordChange(err) {
-		return http.StatusBadRequest, resetpass.NewUnsuccessfulResponse()
+		return http.StatusBadRequest, resetpass.NewErrorResponse(http.StatusBadRequest, err)
 	}
-	return http.StatusInternalServerError, resetpass.NewUnsuccessfulResponse()
+	return http.StatusInternalServerError, resetpass.NewErrorResponse(http.StatusInternalServerError, err)
 }
 
 func isInvalidCode(err error) bool {
