@@ -43,7 +43,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Accept  json
 // @Produce  json
 // @Param login body login.Request true "Login Request"
-// @Success 200 {object} login.SwaggerResponse
+// @Success 200 {object} login.RestResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
@@ -62,7 +62,7 @@ func isInvalidLoginRequest(c *gin.Context, request *login.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Password == ""
 }
 
-func loginHandler(email, password string, handler interactors.Authenticator) (int, login.Response) {
+func loginHandler(email, password string, handler interactors.Authenticator) (int, login.RestResponse) {
 	response, err := handler.Login(email, password)
 	if err != nil {
 		return handleLoginError(err)
@@ -70,7 +70,7 @@ func loginHandler(email, password string, handler interactors.Authenticator) (in
 	return http.StatusOK, login.NewResponse(http.StatusOK, mappers.LoginResponseToResult(*response))
 }
 
-func handleLoginError(err error) (int, login.Response) {
+func handleLoginError(err error) (int, login.RestResponse) {
 	var code int
 	switch err.(type) {
 	case util.InvalidEmailError:

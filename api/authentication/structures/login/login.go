@@ -5,23 +5,23 @@ import (
 	"github.com/bixlabs/authentication/tools/rest"
 )
 
-type Response struct {
+type RestResponse struct {
 	rest.ResponseWrapper
-	Result *Result `json:"result,omitempty"`
+	Result Result `json:"result,omitempty"`
 }
 
-func newResponse(code int, result *Result, err error) Response {
-	r := Response{}
+func newResponse(code int, result Result, err error) RestResponse {
+	r := RestResponse{}
 	r.ResponseWrapper = rest.NewResponseWrapper(code, err)
 	r.Result = result
 	return r
 }
 
-func NewErrorResponse(code int, err error) Response {
-	return newResponse(code, nil, err)
+func NewErrorResponse(code int, err error) RestResponse {
+	return newResponse(code, Result{}, err)
 }
 
-func NewResponse(code int, result *Result) Response {
+func NewResponse(code int, result Result) RestResponse {
 	return newResponse(code, result, nil)
 }
 
