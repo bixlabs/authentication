@@ -243,7 +243,7 @@ func isInvalidCode(err error) bool {
 // @Accept  json
 // @Produce  json
 // @Param resetPassword body forgotpass.Request true "Forgot password request"
-// @Success 202 {object} forgotpass.SwaggerResponse
+// @Success 202 {object} forgotpass.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/reset-password-request [put]
@@ -266,7 +266,7 @@ func forgotPasswordHandler(email string, handler interactors.PasswordManager) (i
 	if err != nil {
 		return handleForgotPasswordError(err)
 	}
-	return http.StatusAccepted, forgotpass.NewResponse(http.StatusAccepted, &forgotpass.Result{Success: true})
+	return http.StatusAccepted, forgotpass.NewResponse(http.StatusAccepted)
 }
 
 func handleForgotPasswordError(err error) (int, forgotpass.Response) {
