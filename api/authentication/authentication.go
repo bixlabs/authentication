@@ -90,7 +90,7 @@ func handleLoginError(err error) (int, login.RestResponse) {
 // @Accept  json
 // @Produce  json
 // @Param signup body signup.Request true "Signup Request"
-// @Success 201 {object} signup.SwaggerResponse
+// @Success 201 {object} signup.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/signup [post]
@@ -113,7 +113,7 @@ func signupHandler(request signup.Request, handler interactors.Authenticator) (i
 	if err != nil {
 		return handleSignUpError(err)
 	}
-	return http.StatusCreated, signup.NewResponse(http.StatusCreated, &signup.Result{Success: true})
+	return http.StatusCreated, signup.NewResponse(http.StatusCreated)
 }
 
 func handleSignUpError(err error) (int, signup.Response) {
