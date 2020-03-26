@@ -198,7 +198,7 @@ func isSamePasswordChange(err error) bool {
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
-	var request passreset.Request
+	var request resetpass.Request
 	if isInvalidResetPassword(c, &request) {
 		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email or code missing")))
@@ -207,11 +207,11 @@ func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 	}
 }
 
-func isInvalidResetPassword(c *gin.Context, request *passreset.Request) bool {
+func isInvalidResetPassword(c *gin.Context, request *resetpass.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
 }
 
-func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request passreset.Request, c *gin.Context) {
+func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request resetpass.Request, c *gin.Context) {
 	if code, response := resetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent { //nolint
 		c.Status(http.StatusNoContent)
 	} else {
@@ -219,18 +219,18 @@ func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(reque
 	}
 }
 
-func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, passreset.Response) { //nolint
+func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, resetpass.Response) { //nolint
 	if err := handler.ResetPassword(email, code, newPassword); err != nil {
 		return handleResetPasswordError(err)
 	}
-	return http.StatusNoContent, passreset.Response{}
+	return http.StatusNoContent, resetpass.NewResponse()
 }
 
-func handleResetPasswordError(err error) (int, passreset.Response) {
+func handleResetPasswordError(err error) (int, resetpass.Response) {
 	if isInvalidEmail(err) || isPasswordLength(err) || isInvalidCode(err) || isSamePasswordChange(err) {
-		return http.StatusBadRequest, passreset.Response{}
+		return http.StatusBadRequest, resetpass.NewUnsuccessfulResponse()
 	}
-	return http.StatusInternalServerError, passreset.Response{}
+	return http.StatusInternalServerError, resetpass.NewUnsuccessfulResponse()
 }
 
 func isInvalidCode(err error) bool {
