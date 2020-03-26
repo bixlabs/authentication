@@ -281,7 +281,7 @@ func handleForgotPasswordError(err error) (int, forgotpass.Response) {
 // @Accept  json
 // @Produce  json
 // @Param Authorization header string true "Authorization: Bearer <jwtToken>"
-// @Success 200 {object} token.SwaggerResponse
+// @Success 200 {object} token.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
@@ -317,7 +317,7 @@ func verifyJWTHandler(t string, handler interactors.Authenticator) (int, token.R
 		}
 		return http.StatusInternalServerError, token.NewErrorResponse(http.StatusInternalServerError, err)
 	}
-	return http.StatusOK, token.NewResponse(http.StatusOK, &token.Result{User: user})
+	return http.StatusOK, token.NewResponse(http.StatusOK, user)
 }
 
 func isInvalidToken(err error) bool {
