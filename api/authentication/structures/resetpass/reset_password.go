@@ -1,12 +1,25 @@
-package passreset
+package resetpass
 
-//TODO: We could use nested struct promoted fields here but the swaggo
-// library is not generating correct documentation using that.
+import "github.com/bixlabs/authentication/tools/rest"
+
+func NewResponse(code int) Response {
+	return newResponse(code, Result{Success: true}, nil)
+}
+
+func newResponse(code int, result Result, err error) Response {
+	r := Response{}
+	r.ResponseWrapper = rest.NewResponseWrapper(code, err)
+	r.Result = result
+	return r
+}
+
+func NewErrorResponse(code int, err error) Response {
+	return newResponse(code, Result{Success: false}, err)
+}
+
 type Response struct {
-	Status   string   `json:"status"`
-	Code     int      `json:"code"`
-	Messages []string `json:"messages"`
-	Result   Result   `json:"result"`
+	rest.ResponseWrapper
+	Result Result `json:"result,omitempty"`
 }
 
 type Result struct {
