@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/bixlabs/go-layout?style=flat-square)](https://goreportcard.com/report/github.com/bixlabs/authentication)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bixlabs/authentication?style=flat-square)](https://goreportcard.com/report/github.com/bixlabs/authentication)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/bixlabs/authentication)
 [![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/bixlabs/authentication/releases/latest)
 
