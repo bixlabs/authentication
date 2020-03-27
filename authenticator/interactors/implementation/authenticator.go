@@ -108,6 +108,7 @@ type userClaims struct {
 
 // TODO: This is a workaround because jwt-go is validating iat when it shouldn't (jwt specification doesn't say so)
 // let's remove this later when jwt-go removes the iat validation in v4.
+// https://github.com/dgrijalva/jwt-go/issues/314#issuecomment-481789374
 func (c *userClaims) Valid() error {
 	c.StandardClaims.IssuedAt /= 10
 	valid := c.StandardClaims.Valid()

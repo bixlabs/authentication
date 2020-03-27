@@ -296,7 +296,6 @@ func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
 }
 
 func getTokenFromHeader(c *gin.Context) (string, error) {
-	// TODO: Use ShouldBindHeader when gin framework releases the feature, it's in master but not release.
 	t := c.Request.Header.Get("Authorization")
 
 	if t == "" || !strings.Contains(t, "Bearer") {

@@ -71,7 +71,6 @@ func TestAuthenticator(t *testing.T) {
 				panic(err)
 			}
 
-			// TODO: we should use an utility for this in the overall file
 			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(validPassword))
 			g.Assert(err).Equal(nil)
 		})
