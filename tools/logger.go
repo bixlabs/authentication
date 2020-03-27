@@ -6,20 +6,37 @@ import (
 )
 
 // For more information: https://github.com/sirupsen/logrus/blob/master/example_basic_test.go
+// If we want to use a specific logging service there are multiple formatters implementations here: https://github.com/sirupsen/logrus#formatters
 
-var log *logrus.Logger //nolint
+var logger *logrus.Logger
 
 func InitializeLogger() {
-	log = logrus.New()
-	log.SetLevel(logrus.TraceLevel)
-
-	if os.Getenv("AUTH_SERVER_APP_ENV") == "production" {
-		log.SetLevel(logrus.InfoLevel)
+	if isProduction() {
+		initializeLoggerForProduction()
+	} else {
+		initializeLogger()
 	}
+}
 
-	log.SetOutput(os.Stdout)
+func isProduction() bool {
+	return os.Getenv("AUTH_SERVER_APP_ENV") == "production"
+}
+
+func initializeLoggerForProduction() {
+	initializeLogger()
+	logger.Level = logrus.InfoLevel
+	logger.SetReportCaller(false)
+
+}
+
+func initializeLogger() {
+	logger = logrus.New()
+	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
+	logger.SetReportCaller(true)
+	logger.Level = logrus.TraceLevel
+	logger.Out = os.Stdout
 }
 
 func Log() *logrus.Logger {
-	return log
+	return logger
 }
