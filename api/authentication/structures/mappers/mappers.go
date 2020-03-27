@@ -12,8 +12,8 @@ func ChangePasswordRequestToUser(request changepass.Request) structures.User {
 	return structures.User{Email: request.Email, Password: request.OldPassword}
 }
 
-func LoginResponseToResult(r login.Response) *api.Result {
-	return &api.Result{Response: r}
+func LoginResponseToResult(r login.Response) api.Result {
+	return api.Result{Response: r}
 }
 
 func SignupRequestToUser(request signup.Request) structures.User {

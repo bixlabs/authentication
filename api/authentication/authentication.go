@@ -43,7 +43,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Accept  json
 // @Produce  json
 // @Param login body login.Request true "Login Request"
-// @Success 200 {object} login.SwaggerResponse
+// @Success 200 {object} login.RestResponse
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
@@ -62,7 +62,7 @@ func isInvalidLoginRequest(c *gin.Context, request *login.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Password == ""
 }
 
-func loginHandler(email, password string, handler interactors.Authenticator) (int, login.Response) {
+func loginHandler(email, password string, handler interactors.Authenticator) (int, login.RestResponse) {
 	response, err := handler.Login(email, password)
 	if err != nil {
 		return handleLoginError(err)
@@ -70,7 +70,7 @@ func loginHandler(email, password string, handler interactors.Authenticator) (in
 	return http.StatusOK, login.NewResponse(http.StatusOK, mappers.LoginResponseToResult(*response))
 }
 
-func handleLoginError(err error) (int, login.Response) {
+func handleLoginError(err error) (int, login.RestResponse) {
 	var code int
 	switch err.(type) {
 	case util.InvalidEmailError:
@@ -90,7 +90,7 @@ func handleLoginError(err error) (int, login.Response) {
 // @Accept  json
 // @Produce  json
 // @Param signup body signup.Request true "Signup Request"
-// @Success 201 {object} signup.SwaggerResponse
+// @Success 201 {object} signup.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/signup [post]
@@ -113,7 +113,7 @@ func signupHandler(request signup.Request, handler interactors.Authenticator) (i
 	if err != nil {
 		return handleSignUpError(err)
 	}
-	return http.StatusCreated, signup.NewResponse(http.StatusCreated, &signup.Result{Success: true})
+	return http.StatusCreated, signup.NewResponse(http.StatusCreated)
 }
 
 func handleSignUpError(err error) (int, signup.Response) {
@@ -143,7 +143,7 @@ func isDuplicatedEmail(err error) bool {
 // @Accept  json
 // @Produce  json
 // @Param changePassword body changepass.Request true "Change password Request"
-// @Success 200 {object} changepass.SwaggerResponse
+// @Success 200 {object} changepass.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
@@ -198,7 +198,7 @@ func isSamePasswordChange(err error) bool {
 // @Failure 504 {object} rest.ResponseWrapper
 // @Router /user/reset-password [put]
 func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
-	var request passreset.Request
+	var request resetpass.Request
 	if isInvalidResetPassword(c, &request) {
 		c.JSON(http.StatusBadRequest, login.NewErrorResponse(http.StatusBadRequest,
 			errors.New("email or code missing")))
@@ -207,11 +207,11 @@ func (config authenticatorRESTConfigurator) resetPassword(c *gin.Context) {
 	}
 }
 
-func isInvalidResetPassword(c *gin.Context, request *passreset.Request) bool {
+func isInvalidResetPassword(c *gin.Context, request *resetpass.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
 }
 
-func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request passreset.Request, c *gin.Context) {
+func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request resetpass.Request, c *gin.Context) {
 	if code, response := resetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent { //nolint
 		c.Status(http.StatusNoContent)
 	} else {
@@ -219,18 +219,18 @@ func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(reque
 	}
 }
 
-func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, passreset.Response) { //nolint
+func resetPasswordHandler(email string, code string, newPassword string, handler interactors.PasswordManager) (int, resetpass.Response) { //nolint
 	if err := handler.ResetPassword(email, code, newPassword); err != nil {
 		return handleResetPasswordError(err)
 	}
-	return http.StatusNoContent, passreset.Response{}
+	return http.StatusNoContent, resetpass.NewResponse(http.StatusNoContent)
 }
 
-func handleResetPasswordError(err error) (int, passreset.Response) {
+func handleResetPasswordError(err error) (int, resetpass.Response) {
 	if isInvalidEmail(err) || isPasswordLength(err) || isInvalidCode(err) || isSamePasswordChange(err) {
-		return http.StatusBadRequest, passreset.Response{}
+		return http.StatusBadRequest, resetpass.NewErrorResponse(http.StatusBadRequest, err)
 	}
-	return http.StatusInternalServerError, passreset.Response{}
+	return http.StatusInternalServerError, resetpass.NewErrorResponse(http.StatusInternalServerError, err)
 }
 
 func isInvalidCode(err error) bool {
@@ -243,7 +243,7 @@ func isInvalidCode(err error) bool {
 // @Accept  json
 // @Produce  json
 // @Param resetPassword body forgotpass.Request true "Forgot password request"
-// @Success 202 {object} forgotpass.SwaggerResponse
+// @Success 202 {object} forgotpass.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /user/reset-password-request [put]
@@ -266,7 +266,7 @@ func forgotPasswordHandler(email string, handler interactors.PasswordManager) (i
 	if err != nil {
 		return handleForgotPasswordError(err)
 	}
-	return http.StatusAccepted, forgotpass.NewResponse(http.StatusAccepted, &forgotpass.Result{Success: true})
+	return http.StatusAccepted, forgotpass.NewResponse(http.StatusAccepted)
 }
 
 func handleForgotPasswordError(err error) (int, forgotpass.Response) {
@@ -281,7 +281,7 @@ func handleForgotPasswordError(err error) (int, forgotpass.Response) {
 // @Accept  json
 // @Produce  json
 // @Param Authorization header string true "Authorization: Bearer <jwtToken>"
-// @Success 200 {object} token.SwaggerResponse
+// @Success 200 {object} token.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
@@ -317,7 +317,7 @@ func verifyJWTHandler(t string, handler interactors.Authenticator) (int, token.R
 		}
 		return http.StatusInternalServerError, token.NewErrorResponse(http.StatusInternalServerError, err)
 	}
-	return http.StatusOK, token.NewResponse(http.StatusOK, &token.Result{User: user})
+	return http.StatusOK, token.NewResponse(http.StatusOK, user)
 }
 
 func isInvalidToken(err error) bool {
