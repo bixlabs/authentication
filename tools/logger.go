@@ -6,9 +6,10 @@ import (
 )
 
 // For more information: https://github.com/sirupsen/logrus/blob/master/example_basic_test.go
-// If we want to use a specific logging service there are multiple formatters implementations here: https://github.com/sirupsen/logrus#formatters
+// If we want to use a specific logging service there
+// are multiple formatters implementations here: https://github.com/sirupsen/logrus#formatters
 
-var logger *logrus.Logger
+var log *logrus.Logger //nolint
 
 func InitializeLogger() {
 	if isProduction() {
@@ -24,19 +25,18 @@ func isProduction() bool {
 
 func initializeLoggerForProduction() {
 	initializeLogger()
-	logger.Level = logrus.InfoLevel
-	logger.SetReportCaller(false)
-
+	log.Level = logrus.InfoLevel
+	log.SetReportCaller(false)
 }
 
 func initializeLogger() {
-	logger = logrus.New()
-	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	logger.SetReportCaller(true)
-	logger.Level = logrus.TraceLevel
-	logger.Out = os.Stdout
+	log = logrus.New()
+	log.Formatter = &logrus.TextFormatter{FullTimestamp: true}
+	log.SetReportCaller(true)
+	log.Level = logrus.TraceLevel
+	log.Out = os.Stdout
 }
 
 func Log() *logrus.Logger {
-	return logger
+	return log
 }
