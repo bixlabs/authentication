@@ -1,5 +1,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/bixlabs/authentication?style=flat-square)](https://goreportcard.com/report/github.com/bixlabs/authentication)
-[![CircleCI](https://circleci.com/gh/bixlabs/authentication/tree/master.svg?style=svg)](https://circleci.com/gh/bixlabs/authentication/tree/master)
+[![CircleCI](https://circleci.com/gh/bixlabs/authentication/tree/master.svg?style=svg&circle-token=9c16e87a902492f39722b74475c33e0fe4efc7b2)](https://circleci.com/gh/bixlabs/authentication/tree/master)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/bixlabs/authentication?include_prereleases)
 # Requirements
 
