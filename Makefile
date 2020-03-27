@@ -58,9 +58,6 @@ docker-build:
 docker-run:
 		docker-compose -f deployments/docker-compose.yml up -d
 
-docker-run-dev:
-		docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.dev.yml up
-
 		
 #####################################################
 ## Deployments

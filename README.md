@@ -1,3 +1,7 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/bixlabs/go-layout?style=flat-square)](https://goreportcard.com/report/github.com/bixlabs/authentication)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/bixlabs/authentication)
+[![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/bixlabs/authentication/releases/latest)
+
 # Requirements
 
 * go 1.11 or higher.
@@ -22,14 +26,8 @@ $ make
 $ make run
 ```
 
-* this will run an HTTP server in port 8080, if you want to change this port you have to specify it through the environment variable (AUTH_SERVER_PORT) in the _.env_ file.
-* For testing all the define endpoints you can try out these different CURL commands:
-```bash
-    * Create: $ curl -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"
-    * Read: $ curl -X GET "http://localhost:8080/todo/1"
-    * Update: $ curl -X PUT -H "Content-type: application/json" -d '{"i_am": "1", "title": "Some Todo Title", "the_rest": "description", "when_finish": "2018-12-06T14:26:40.623Z"}' "http://localhost:8080/todo"
-    * Delete: $ curl -X DELETE "http://localhost:8080/todo/1"
-```
+* This will run an HTTP server in port 8080, if you want to change this port you have to specify it through the environment variable (AUTH_SERVER_PORT) in the _.env_ file.
+* For testing all existing endpoints you can try them out in swagger UI.
 
 ## How to generate API documentation
 * Initialize the documentation (this will generate a _docs_ folder in the root folder)
@@ -40,7 +38,7 @@ or
 ```bash
 $ swag init -g ./api/main.go
 ```
-* Then we need to run the project as a web server and go to [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html#)
+* Then we `make run` and go to [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html#)
 
     
 ## Running the project to show output in console
@@ -79,20 +77,6 @@ $ make build-for-windows
 ```
 * Same steps as above, an executable will be created in _./tpm/_
 
-## Hot reload for the Web Server
-
-* To run the project with hot reload: 
-```bash
-$ make run-dev
-```
-or 
-
-```bash
-$ air -c .air.config
-```
-* IMPORTANT: Hot reload will not work in MacOS or windows, you have to change the configuration of `.air.config` to instead of using `make build` to use the correct build process depending on the OS you are. For windows you also have to change the _bin_ to have the _.exe_ extension.
-
-
 ## How to run format
 
 * We use `go vet` and `go fmt` for simple linter and formatting, running `make format` will do.
@@ -117,8 +101,7 @@ $ golangci-lint run
 * This is how we initialize the logger [here](./tools/logger.go), specifically `InitializeLogger`
 * We have to run `InitializeLogger` before using the `Log` function, [here's an example](./cmd/api/main.go)
 * Finally [examples of using the logger](todo/interactors/todo_handler.go)
-* visit their website for advance information on how to use it.
-* When using `make run-dev` we won't see the colors of the log message, with `make run` we will.
+* Visit their website for advance information on how to use it.
 
 ## How to handle environment variables
 
@@ -138,7 +121,7 @@ or
 ```bash
 $ go test -cover -v ./...
 ```
-* this will run all the test files in the project.
+* This will run all the test files in the project.
 * Test should be in the same folder of the file they are testing and the file name of the test must have the suffix `_test`, if you see the example in _test_ folder you will get it right away.
 * Gomega is being used for improving assertion mechanism.
 
@@ -177,18 +160,6 @@ Possibly in the future we will have different ways of providing external storage
         * Make the file executable: `$ chmod +x <path_to_executable_relative_to_root>`
         * Run it: `$ <path_to_executable_relative_to_root>`
 
-## Badges
-
-* [Go Report Card](https://goreportcard.com/) - It will scan your code with `gofmt`, `go vet`, `gocyclo`, `golint`, `ineffassign`, `license` and `misspell`. Replace `github.com/bixlabs/go-layout` with your project reference.
-
-* [GoDoc](http://godoc.org) - It will provide online version of your GoDoc generated documentation. Change the link to point to your project.
-
-* Release - It will show the latest release number for your project. Change the github link to point to your project.
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/bixlabs/go-layout?style=flat-square)](https://goreportcard.com/report/github.com/bixlabs/go-layout)
-[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/golang-standards/project-layout)
-[![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/golang-standards/project-layout/releases/latest)
-
 ## Docker
 
 ### Getting Started
@@ -214,12 +185,6 @@ If you need to build the image:
 $ make docker-build
 ```
 
-For development you must run the project with hot reload:
-
-```bash
-$ make docker-run-dev
-```
-
 Behind the scenes we are using docker-compose, 
 but you could build and run the same configuration using docker:
 
@@ -231,11 +196,6 @@ $ docker build -f build/package/Dockerfile -t authentication_api .
 $ docker run -d --env-file=.env -p 9000:9000 --name authentication_api authentication_api
 ```
 
-Also with hot reload:
-
-```bash
-$ docker run -d --env-file=.env -p 9000:9000 --name authentication_api authentication_api make run-dev
-```
 
 ## Notes
 
