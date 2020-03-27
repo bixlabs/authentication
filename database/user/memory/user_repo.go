@@ -34,44 +34,44 @@ func (u *UserRepo) IsEmailAvailable(email string) (bool, error) {
 
 func (u *UserRepo) GetHashedPassword(email string) (string, error) {
 	if isAvailable, err := u.IsEmailAvailable(email); err == nil && !isAvailable {
-		user := u.users[email]
-		return user.Password, nil
+		temp := u.users[email]
+		return temp.Password, nil
 	}
 	tools.Log().Warn("A user couldn't be found when finding the hashed password of it")
 	return "", errors.New("user doesn't exist")
 }
 
 func (u *UserRepo) ChangePassword(email, newPassword string) error {
-	user := u.users[email]
-	user.Password = newPassword
+	if temp, ok := u.users[email]; ok {
+		temp.Password = newPassword
+		u.users[email] = temp
+	}
 
-	// FIXME: we are inserting the user if it does not exist
-	u.users[email] = user
 	return nil
 }
 
 func (u *UserRepo) UpdateResetToken(email, resetToken string) error {
-	user := u.users[email]
-	user.ResetToken = resetToken
-	u.users[user.Email] = user
+	temp := u.users[email]
+	temp.ResetToken = resetToken
+	u.users[temp.Email] = temp
 	return nil
 }
 
 func (u *UserRepo) Find(email string) (structures.User, error) {
-	user, exist := u.users[email]
-	if !exist || user.DeletedAt != nil {
+	temp, exist := u.users[email]
+	if !exist || temp.DeletedAt != nil {
 		return structures.User{}, errors.New("email does not exist")
 	}
-	return user, nil
+	return temp, nil
 }
 
 // Precondition: user should already exist
 func (u *UserRepo) Delete(user structures.User) error {
-	deletedAt := time.Now()
-	user.DeletedAt = &deletedAt
-
-	// FIXME: we are inserting the user if it does not exist
-	u.users[user.Email] = user
+	if temp, ok := u.users[user.Email]; ok {
+		deletedAt := time.Now()
+		temp.DeletedAt = &deletedAt
+		u.users[user.Email] = temp
+	}
 
 	return nil
 }

@@ -38,9 +38,7 @@ func TestUserManager(t *testing.T) {
 			_, err := um.Create(user)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.InvalidEmailError{}))
 		})
 
 		g.It("Should have a password of at least 8 characters", func() {
@@ -48,9 +46,7 @@ func TestUserManager(t *testing.T) {
 			_, err := um.Create(user)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.PasswordLengthError{}))
 		})
 
 		g.It("Should create a user with an ID", func() {
@@ -99,9 +95,7 @@ func TestUserManager(t *testing.T) {
 			_, err := um.Create(user)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupDuplicateEmailMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.DuplicatedEmailError{}))
 		})
 	})
 
@@ -122,9 +116,7 @@ func TestUserManager(t *testing.T) {
 			err := um.Delete(invalidEmail)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.InvalidEmailError{}))
 		})
 
 		g.It("Should return an error in case the user does not exist", func() {
@@ -166,9 +158,7 @@ func TestUserManager(t *testing.T) {
 			_, err := um.Find(invalidEmail)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.InvalidEmailError{}))
 		})
 
 		g.It("Should return an error in case the user does not exist", func() {
@@ -204,9 +194,7 @@ func TestUserManager(t *testing.T) {
 			_, err := um.Update(invalidEmail, updateAttrs)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.InvalidEmailError{}))
 		})
 
 		g.It("Should return an error in case the user does not exist", func() {
@@ -222,9 +210,7 @@ func TestUserManager(t *testing.T) {
 			_, err := um.Update(validEmail, updateAttrs)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupInvalidEmailMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.InvalidEmailError{}))
 		})
 
 		g.It("Should return an error in case the update password does not have at least 8 characters", func() {
@@ -232,9 +218,7 @@ func TestUserManager(t *testing.T) {
 			_, err := um.Update(validEmail, updateAttrs)
 
 			Expect(err).NotTo(BeNil())
-
-			// TODO: rename this error property
-			g.Assert(err.Error()).Equal(util.SignupPasswordLengthMessage)
+			Expect(err).To(BeAssignableToTypeOf(util.PasswordLengthError{}))
 		})
 
 		g.It("Should Update a valid user", func() {
