@@ -1,7 +1,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/bixlabs/authentication?style=flat-square)](https://goreportcard.com/report/github.com/bixlabs/authentication)
-[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/bixlabs/authentication)
-[![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/bixlabs/authentication/releases/latest)
-
+[![CircleCI](https://circleci.com/gh/bixlabs/authentication/tree/master.svg?style=svg)](https://circleci.com/gh/bixlabs/authentication/tree/master)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/bixlabs/authentication?include_prereleases)
 # Requirements
 
 * go 1.11 or higher.
