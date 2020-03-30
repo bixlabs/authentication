@@ -77,9 +77,9 @@ func TestIntegration(t *testing.T) {
 			aUser := structures.User{Email: validEmail, Password: validPassword}
 			_, err := auth.Signup(aUser)
 			Expect(err).To(BeNil())
-			code, err := passwordManager.ForgotPassword(aUser.Email)
+			code, err := passwordManager.StartResetPassword(aUser.Email)
 			Expect(err).To(BeNil())
-			err = passwordManager.ResetPassword(aUser.Email, code, newPassword)
+			err = passwordManager.FinishResetPassword(aUser.Email, code, newPassword)
 			Expect(err).To(BeNil())
 			response, err := auth.Login(aUser.Email, newPassword)
 			Expect(err).To(BeNil())

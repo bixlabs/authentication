@@ -1,4 +1,4 @@
-package forgotpass
+package startresetpass
 
 import (
 	"github.com/bixlabs/authentication/tools/rest"

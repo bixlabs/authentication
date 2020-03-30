@@ -92,7 +92,7 @@ func (pm passwordManager) hashAndSavePassword(email, newPassword string) error {
 	return nil
 }
 
-func (pm passwordManager) ForgotPassword(email string) (string, error) {
+func (pm passwordManager) StartResetPassword(email string) (string, error) {
 	loggerFields := logrus.Fields{"email": email, "meth": "passwordManager:ForgotPassword"}
 	contextLogger := tools.Log().WithFields(loggerFields)
 
@@ -138,7 +138,7 @@ func (pm passwordManager) generateRandomNumber() string {
 		pm.ResetPasswordCodeMin)
 }
 
-func (pm passwordManager) ResetPassword(email string, code string, newPassword string) error {
+func (pm passwordManager) FinishResetPassword(email string, code string, newPassword string) error {
 	loggerFields := logrus.Fields{"email": email, "meth": "passwordManager:ResetPassword"}
 	contextLogger := tools.Log().WithFields(loggerFields)
 
