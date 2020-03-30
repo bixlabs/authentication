@@ -215,7 +215,7 @@ func isInvalidFinishResetPassword(c *gin.Context, request *finishresetpass.Reque
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Code == ""
 }
 
-func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request finishresetpass.Request, c *gin.Context) {
+func (config authenticatorRESTConfigurator) handleNoContentOrErrorResponse(request finishresetpass.Request, c *gin.Context) { //nolint
 	if code, response := finishResetPasswordHandler(request.Email, request.Code, request.NewPassword, config.passwordManager); code == http.StatusNoContent { //nolint
 		c.Status(http.StatusNoContent)
 	} else {
