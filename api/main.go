@@ -38,7 +38,7 @@ const powerForHeaderBytes = 20
 
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
-// @BasePath /
+// @BasePath /v1/
 
 func main() {
 	tools.InitializeLogger()

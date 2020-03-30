@@ -73,19 +73,19 @@ func TestRest(t *testing.T) {
 		})
 
 		g.It("should return 400 if email is invalid", func() {
-			code, _ := forgotPasswordHandler(invalidEmail, passwordManager)
+			code, _ := startForgotPasswordHandler(invalidEmail, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 500 if email doesn't exist", func() {
-			code, _ := forgotPasswordHandler(validEmail, passwordManager)
+			code, _ := startForgotPasswordHandler(validEmail, passwordManager)
 			Expect(code).To(Equal(http.StatusInternalServerError))
 		})
 
 		g.It("should return 202 if everything goes well", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := forgotPasswordHandler(validEmail, passwordManager)
+			code, _ := startForgotPasswordHandler(validEmail, passwordManager)
 			Expect(code).To(Equal(http.StatusAccepted))
 		})
 	})
@@ -181,36 +181,36 @@ func TestRest(t *testing.T) {
 		})
 
 		g.It("should return 400 if email is invalid", func() {
-			code, _ := resetPasswordHandler(invalidEmail, "4000", validPassword, passwordManager)
+			code, _ := finishResetPasswordHandler(invalidEmail, "4000", validPassword, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 400 if password length is not correct", func() {
-			code, _ := resetPasswordHandler(validEmail, "4000", invalidPassword, passwordManager)
+			code, _ := finishResetPasswordHandler(validEmail, "4000", invalidPassword, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 400 if reset token is invalid", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			_, _ = forgotPasswordHandler(validEmail, passwordManager)
-			code, _ := resetPasswordHandler(validEmail, "23423423424", validPassword, passwordManager)
+			_, _ = startForgotPasswordHandler(validEmail, passwordManager)
+			code, _ := finishResetPasswordHandler(validEmail, "23423423424", validPassword, passwordManager)
 			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 400 if newPassword is the same as the actual one", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := passwordManager.ForgotPassword(validEmail)
-			httpCode, _ := resetPasswordHandler(validEmail, code, validPassword, passwordManager)
+			code, _ := passwordManager.StartResetPassword(validEmail)
+			httpCode, _ := finishResetPasswordHandler(validEmail, code, validPassword, passwordManager)
 			Expect(httpCode).To(Equal(http.StatusBadRequest))
 		})
 
 		g.It("should return 204 if password is changed successfully", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := passwordManager.ForgotPassword(validEmail)
-			httpCode, _ := resetPasswordHandler(validEmail, code, "secured_password2", passwordManager)
+			code, _ := passwordManager.StartResetPassword(validEmail)
+			httpCode, _ := finishResetPasswordHandler(validEmail, code, "secured_password2", passwordManager)
 			Expect(httpCode).To(Equal(http.StatusNoContent))
 		})
 

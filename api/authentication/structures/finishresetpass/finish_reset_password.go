@@ -1,4 +1,4 @@
-package resetpass
+package finishresetpass
 
 import "github.com/bixlabs/authentication/tools/rest"
 

@@ -98,19 +98,19 @@ func TestPasswordManager(t *testing.T) {
 		})
 
 		g.It("Should return an error when an invalid email is provided", func() {
-			_, err := passwordManager.ForgotPassword(invalidEmail)
+			_, err := passwordManager.StartResetPassword(invalidEmail)
 			Expect(err.Error()).To(Equal(util.SignupInvalidEmailMessage))
 		})
 
 		g.It("Should return an error when the email is not present in the storage", func() {
-			_, err := passwordManager.ForgotPassword(validEmail)
+			_, err := passwordManager.StartResetPassword(validEmail)
 			Expect(err.Error()).To(Equal("email does not exist"))
 		})
 
 		g.It("Should generate a code and send an email", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			_, err := passwordManager.ForgotPassword(validEmail)
+			_, err := passwordManager.StartResetPassword(validEmail)
 
 			Expect(err).To(BeNil())
 		})
@@ -124,21 +124,21 @@ func TestPasswordManager(t *testing.T) {
 		})
 
 		g.It("Should return an error when an invalid email is provided", func() {
-			err := passwordManager.ResetPassword(invalidEmail, "0", "")
+			err := passwordManager.FinishResetPassword(invalidEmail, "0", "")
 			Expect(err.Error()).To(Equal(util.SignupInvalidEmailMessage))
 		})
 
 		g.It("Should return an error when new password doesn't match length", func() {
-			err := passwordManager.ResetPassword(validEmail, "0", invalidPassword)
+			err := passwordManager.FinishResetPassword(validEmail, "0", invalidPassword)
 			Expect(err.Error()).To(Equal(util.SignupPasswordLengthMessage))
 		})
 
 		g.It("Should return an error if the provided code is not correct", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			_, _ = passwordManager.ForgotPassword(validEmail)
+			_, _ = passwordManager.StartResetPassword(validEmail)
 
-			err := passwordManager.ResetPassword(validEmail, "0", "secured_password2")
+			err := passwordManager.FinishResetPassword(validEmail, "0", "secured_password2")
 			Expect(err.Error()).To(Equal(util.InvalidResetPasswordCode{}.Error()))
 		})
 
@@ -148,8 +148,8 @@ func TestPasswordManager(t *testing.T) {
 			if err != nil {
 				panic(err)
 			}
-			code, _ := passwordManager.ForgotPassword(validEmail)
-			err = passwordManager.ResetPassword(validEmail, code, validPassword)
+			code, _ := passwordManager.StartResetPassword(validEmail)
+			err = passwordManager.FinishResetPassword(validEmail, code, validPassword)
 			_, ok := err.(util.SamePasswordChangeError)
 			Expect(true).To(Equal(ok))
 		})
@@ -157,9 +157,9 @@ func TestPasswordManager(t *testing.T) {
 		g.It("Should change the password given the correct code", func() {
 			user := structures.User{Email: validEmail, Password: validPassword}
 			_, _ = auth.Signup(user)
-			code, _ := passwordManager.ForgotPassword(validEmail)
+			code, _ := passwordManager.StartResetPassword(validEmail)
 
-			err := passwordManager.ResetPassword(validEmail, code, "secured_password2")
+			err := passwordManager.FinishResetPassword(validEmail, code, "secured_password2")
 			if err != nil {
 				panic(err)
 			}
