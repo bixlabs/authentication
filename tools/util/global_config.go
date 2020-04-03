@@ -5,14 +5,14 @@ import (
 	"github.com/caarlos0/env"
 )
 
-var config GlobalConfig
+var config GlobalConfig //nolint
 
 func IsDevEnvironment() bool {
 	return newConfig().Env == "dev"
 }
 
 type GlobalConfig struct {
-   Env  string `env:"AUTH_SERVER_APP_ENV" envDefault:"dev"`
+	Env string `env:"AUTH_SERVER_APP_ENV" envDefault:"dev"`
 }
 
 func newConfig() GlobalConfig {
@@ -31,6 +31,3 @@ func parseConfiguration() GlobalConfig {
 	}
 	return config
 }
-
-
-
