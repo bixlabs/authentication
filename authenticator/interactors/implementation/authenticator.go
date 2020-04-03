@@ -18,7 +18,7 @@ type authenticator struct {
 	repository     user.Repository
 	emailSender    email.Sender
 	ExpirationTime int    `env:"TOKEN_EXPIRATION" envDefault:"3600"`
-	Secret         string `env:"AUTH_SERVER_SECRET"`
+	Secret         string `env:"AUTH_SERVER_SECRET" envDefault:"super-secret"`
 }
 
 func NewAuthenticator(repository user.Repository, sender email.Sender) interactors.Authenticator {

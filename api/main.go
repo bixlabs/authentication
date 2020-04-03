@@ -105,7 +105,7 @@ func addRequestID() gin.HandlerFunc {
 }
 
 func logger() gin.HandlerFunc {
-	if os.Getenv("AUTH_SERVER_APP_ENV") == "dev" {
+	if util.IsDevEnvironment() {
 		return gin.Logger()
 	}
 

@@ -15,9 +15,9 @@ import (
 type sqliteStorage struct {
 	db       *gorm.DB
 	Name     string `env:"AUTH_SERVER_DATABASE_NAME" envDefault:"sqlite.s3db"`
-	User     string `env:"AUTH_SERVER_DATABASE_USER"`
-	Password string `env:"AUTH_SERVER_DATABASE_PASSWORD"`
-	Salt     string `env:"AUTH_SERVER_DATABASE_SALT"`
+	User     string `env:"AUTH_SERVER_DATABASE_USER" envDefault:"admin"`
+	Password string `env:"AUTH_SERVER_DATABASE_PASSWORD" envDefault:"secure-password"`
+	Salt     string `env:"AUTH_SERVER_DATABASE_SALT" envDefault:"salted"`
 }
 
 func NewSqliteStorage() (user.Repository, func()) {
