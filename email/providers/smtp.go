@@ -30,11 +30,11 @@ func NewSMTPSender() email.Provider {
 	}
 
 	if sender.Username == "" {
-		contextLogger.Panic("a username is required", err)
+		contextLogger.Panic("AUTH_SERVER_SMTP_USERNAME env variable is not set", err)
 	}
 
 	if sender.Password == "" {
-		contextLogger.Panic("a password is required", err)
+		contextLogger.Panic("AUTH_SERVER_SMTP_PASSWORD env variable is not set", err)
 	}
 
 	sender.dialer = gomail.NewDialer(sender.Host, sender.Port, sender.Username, sender.Password)
