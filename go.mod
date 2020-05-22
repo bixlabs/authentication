@@ -20,8 +20,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
-	github.com/onsi/ginkgo v1.7.0 // indirect
-	github.com/onsi/gomega v1.9.0
+	github.com/onsi/gomega v1.10.1
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.5.0+incompatible
@@ -34,7 +33,6 @@ require (
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.5
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
-	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/tools v0.0.0-20200325203130-f53864d0dba1 // indirect
 	google.golang.org/appengine v1.6.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
