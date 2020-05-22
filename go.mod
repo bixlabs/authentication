@@ -9,8 +9,8 @@ require (
 	github.com/franela/goblin v0.0.0-20180407132755-cd5d08fb4ede
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
-	github.com/go-openapi/spec v0.19.7 // indirect
-	github.com/go-openapi/swag v0.19.8 // indirect
+	github.com/go-openapi/spec v0.19.8 // indirect
+	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
@@ -31,9 +31,12 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.6.3
 	github.com/swaggo/gin-swagger v1.2.0
-	github.com/swaggo/swag v1.6.5
+	github.com/swaggo/swag v1.6.6
+	github.com/urfave/cli v1.22.4 // indirect
+	github.com/urfave/cli/v2 v2.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
-	golang.org/x/tools v0.0.0-20200325203130-f53864d0dba1 // indirect
+	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2 // indirect
+	golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375 // indirect
 	google.golang.org/appengine v1.6.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
