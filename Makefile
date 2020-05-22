@@ -45,7 +45,7 @@ run-cli:
 		make format && go run cmd/cli/main.go
 
 api-docs:
-		$(GOPATH)/bin/swag init -g ./api/main.go -o ./api/docs
+		$(GOPATH)/bin/swag init --generalInfo ./api/main.go -o ./api/docs
 
 cli-docs:
 		go run ./admincli/docs/main.go
