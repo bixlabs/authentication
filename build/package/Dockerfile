@@ -2,9 +2,6 @@ FROM golang:1.14
 
 WORKDIR /app
 
-RUN mkdir -p ./api/docs
-RUN touch ./api/docs/docs.go
-
 COPY deps.sh ./
 
 RUN ./deps.sh
