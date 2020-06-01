@@ -301,16 +301,23 @@ func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
 	}
 }
 
-func getTokenFromHeader(c *gin.Context) (string, error) {
-	t := c.Request.Header.Get("Authorization")
+type authHeader struct {
+	authorization string `header:"Authorization"`
+}
 
-	if t == "" || !strings.Contains(t, "Bearer") {
+func getTokenFromHeader(c *gin.Context) (string, error) {
+	t := authHeader{}
+
+	if err := c.ShouldBindHeader(&t); err != nil {
 		return "", errors.New("token missing or malformed")
 	}
-	headerSeparated := strings.Split(t, " ")
-	if len(headerSeparated) != tokenHeaderLength {
+
+	headerSeparated := strings.Split(t.authorization, " ")
+
+	if len(headerSeparated) != tokenHeaderLength || !strings.Contains(t.authorization, "Bearer") {
 		return "", errors.New("token missing or malformed")
 	}
+
 	return headerSeparated[1], nil
 }
 
