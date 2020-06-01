@@ -302,7 +302,7 @@ func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
 }
 
 type authHeader struct {
-	authorization string `header:"Authorization"`
+	Authorization string `header:"Authorization"`
 }
 
 func getTokenFromHeader(c *gin.Context) (string, error) {
@@ -312,9 +312,9 @@ func getTokenFromHeader(c *gin.Context) (string, error) {
 		return "", errors.New("token missing or malformed")
 	}
 
-	headerSeparated := strings.Split(t.authorization, " ")
+	headerSeparated := strings.Split(t.Authorization, " ")
 
-	if len(headerSeparated) != tokenHeaderLength || !strings.Contains(t.authorization, "Bearer") {
+	if len(headerSeparated) != tokenHeaderLength || !strings.Contains(t.Authorization, "Bearer") {
 		return "", errors.New("token missing or malformed")
 	}
 
