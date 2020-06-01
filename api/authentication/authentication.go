@@ -301,11 +301,11 @@ func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
 	}
 }
 
-func getTokenFromHeader(c *gin.Context) (string, error) {
-	type authHeader struct {
-		authorization string `header:"Authorization"`
-	}
+type authHeader struct {
+	authorization string `header:"Authorization"`
+}
 
+func getTokenFromHeader(c *gin.Context) (string, error) {
 	t := authHeader{}
 
 	if err := c.ShouldBindHeader(&t); err != nil {
