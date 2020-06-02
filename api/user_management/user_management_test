@@ -1,0 +1,36 @@
+package user_management
+
+import (
+	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/tools"
+	"github.com/franela/goblin"
+	. "github.com/onsi/gomega"
+	"github.com/sirupsen/logrus"
+
+	"testing"
+)
+
+
+func TestUserManagementRest(t *testing.T) {
+	g := goblin.Goblin(t)
+	tools.InitializeLogger()
+	// This line prevents the logs to appear in the tests.
+	tools.Log().Level = logrus.FatalLevel
+	var _ interactors.UserManager
+
+	//special hook for gomega
+	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
+
+	g.Describe("Login rest handler", func() {
+		g.BeforeEach(func() {
+			//userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
+			//auth = implementation.NewAuthenticator(userRepo, sender)
+		})
+
+		g.It("should return 400 if email is invalid", func() {
+			//code, _ := loginHandler(invalidEmail, validPassword, auth)
+			//Expect(code).To(Equal(http.StatusBadRequest))
+		})
+
+	})
+}

@@ -23,7 +23,7 @@ const invalidEmail = "invalid_email"
 const validPassword = "secured_password"
 const invalidPassword = "07chars"
 
-func TestRest(t *testing.T) {
+func TestAuthenticatorRest(t *testing.T) {
 	g := goblin.Goblin(t)
 	tools.InitializeLogger()
 	// This line prevents the logs to appear in the tests.
