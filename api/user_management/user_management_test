@@ -2,34 +2,50 @@ package user_management
 
 import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
+	"github.com/bixlabs/authentication/authenticator/interactors/implementation"
+	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/database/user/memory"
+	email2 "github.com/bixlabs/authentication/email"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/franela/goblin"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
+	"net/http"
 
 	"testing"
 )
 
+const validEmail = "test@email.com"
+const invalidEmail = "invalid_email"
+const validPassword = "secured_password"
+const invalidPassword = "07chars"
 
 func TestUserManagementRest(t *testing.T) {
 	g := goblin.Goblin(t)
 	tools.InitializeLogger()
 	// This line prevents the logs to appear in the tests.
 	tools.Log().Level = logrus.FatalLevel
-	var _ interactors.UserManager
+	var userManager interactors.UserManager
+	var auth interactors.Authenticator
 
 	//special hook for gomega
 	RegisterFailHandler(func(m string, _ ...int) { g.Fail(m) })
 
-	g.Describe("Login rest handler", func() {
+	g.Describe("Create rest handler", func() {
 		g.BeforeEach(func() {
-			//userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
-			//auth = implementation.NewAuthenticator(userRepo, sender)
+			userRepo, sender := memory.NewUserRepo(), email2.NewDummySender()
+			auth = implementation.NewAuthenticator(userRepo, sender)
+			userManager = implementation.NewUserManager(auth, userRepo)
 		})
 
 		g.It("should return 400 if email is invalid", func() {
-			//code, _ := loginHandler(invalidEmail, validPassword, auth)
-			//Expect(code).To(Equal(http.StatusBadRequest))
+			user := structures.User{
+				Email:             invalidEmail,
+				Password:          validPassword,
+			}
+
+			code, _ := createHandler(user, userManager)
+			Expect(code).To(Equal(http.StatusBadRequest))
 		})
 
 	})
