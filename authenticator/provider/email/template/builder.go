@@ -17,6 +17,7 @@ import (
 // Builder represents a template loader and builder for the emails
 type Builder struct {
 	TemplatePath string `env:"AUTH_SERVER_EMAIL_TEMPLATE_PATH"`
+	custom	bool
 }
 
 func NewTemplateBuilder() *Builder {
@@ -38,29 +39,35 @@ func NewTemplateBuilder() *Builder {
 		loader.TemplatePath = path.Join(path.Dir(filename), templateRelativePath)
 	}
 
+	loader.custom = true
 	return loader
 }
 
 // Build generates html and text templates using the templateName with the params
-func (tb *Builder) Build(templateName string, params interface{}) (htmlTemplate, textTemplate string, error error) {
-	currentTemplateDirName := strings.Replace(templateName, "_", "", 1)
-	currentTemplateDirPath := path.Join(tb.TemplatePath, currentTemplateDirName)
+func (tb *Builder) Build(defaultTemplateName string, params interface{}) (htmlTemplate, textTemplate string, error error) {
 
-	htmlTemplateName := templateName + ".html"
-	htmlTemplatePath := path.Join(currentTemplateDirPath, htmlTemplateName)
-	htmlMessage, err := tb.buildHTMLTemplate(htmlTemplateName, htmlTemplatePath, params)
+	currentDefaultTemplateDirName := strings.Replace(defaultTemplateName, "_", "", 1)
+	currentDefaultTemplateDirPath := path.Join(tb.TemplatePath, currentDefaultTemplateDirName)
+
+	defaultTemplateName = defaultTemplateName + ".html"
+	defaultHTMLTemplatePath := path.Join(currentDefaultTemplateDirPath, defaultTemplateName)
+	htmlMessage, err := tb.buildHTMLTemplate(defaultTemplateName, defaultHTMLTemplatePath, params)
 	if err != nil {
 		return "", "", err
 	}
 
-	textTemplateName := templateName + ".txt"
-	textTemplatePath := path.Join(currentTemplateDirPath, textTemplateName)
-	textMessage, err := tb.buildTextTemplate(textTemplateName, textTemplatePath, params)
-	if err != nil {
-		return "", "", err
-	}
+	// textTemplateName := templateName + ".txt"
+	// textTemplatePath := path.Join(currentTemplateDirPath, textTemplateName)
+	// textMessage, err := tb.buildTextTemplate(textTemplateName, textTemplatePath, params)
+	// if err != nil {
+	// 	return "", "", err
+	// }
 
-	return htmlMessage, textMessage, nil
+	// return htmlMessage, textMessage, nil
+}
+
+func (tb *Builder) defultTemplateBuild() {
+
 }
 
 func (tb *Builder) buildHTMLTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
