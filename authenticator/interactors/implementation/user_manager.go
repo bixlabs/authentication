@@ -24,7 +24,7 @@ func (um userManager) Create(user structures.User) (structures.User, error) {
 	contextLogger := tools.Log().WithFields(loggerFields)
 
 	if user, err := um.generatePasswordIfEmpty(&user); err != nil {
-		contextLogger.WithError(err).Debug("error creating user with empty password")
+		contextLogger.WithError(err).Error("error creating user with empty password")
 
 		return user, err
 	}
@@ -60,7 +60,7 @@ func (um userManager) Delete(email string) error {
 
 	userToRemove, err := um.repository.Find(email)
 	if err != nil {
-		contextLogger.Debug("email not found in repository")
+		contextLogger.WithError(err).Error("email not found in repository")
 
 		return util.UserNotFoundError{}
 	}
@@ -80,7 +80,7 @@ func (um userManager) Find(email string) (structures.User, error) {
 
 	user, err := um.repository.Find(email)
 	if err != nil {
-		contextLogger.WithError(err).Debug("email not found in repository")
+		contextLogger.WithError(err).Error("email not found in repository")
 
 		return structures.User{}, util.UserNotFoundError{}
 	}
@@ -130,7 +130,7 @@ func (um userManager) Update(email string, updateAttrs structures.UpdateUser) (s
 	if updateAttrs.Password != "" {
 		hashedPassword, err := util.HashPassword(updateAttrs.Password)
 		if err != nil {
-			contextLogger.WithError(err).Debug("error hashing the updated password")
+			contextLogger.WithError(err).Error("error hashing the updated password")
 
 			return user, err
 		}
