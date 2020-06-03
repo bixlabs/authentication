@@ -44,7 +44,7 @@ func NewTemplateBuilder() *Builder {
 }
 
 // Build generates html and text templates using the templateName with the params
-func (tb *Builder) Build(defaultTemplateName string, params interface{}) (htmlTemplate, textTemplate string, error error) {
+func (tb *Builder) Build(defaultTemplateName string, params interface{}) (string, string, error) {
 	htmlMessage, textMessage, err := tb.defultTemplateBuild(defaultTemplateName, params)
 
 	if tb.custom {
