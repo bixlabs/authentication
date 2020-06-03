@@ -121,7 +121,7 @@ func (um userManager) Update(email string, updateAttrs structures.UpdateUser) (s
 
 	if updateAttrs.Email != user.Email {
 		if isAvailable, err := um.repository.IsEmailAvailable(updateAttrs.Email); err != nil || !isAvailable {
-			contextLogger.WithError(err).Debug("A duplicated email was provided")
+			contextLogger.WithError(err).Error("A duplicated email was provided")
 
 			return user, util.DuplicatedEmailError{}
 		}
