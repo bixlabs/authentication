@@ -29,40 +29,48 @@ func NewTemplateBuilder() *Builder {
 	}
 
 	if loader.TemplatePath == "" {
-		_, filename, _, ok := runtime.Caller(1)
-
-		if !ok {
-			tools.Log().Panic("Getting the current directory of email templates", err)
-		}
-
-		const templateRelativePath = "template"
-		loader.TemplatePath = path.Join(path.Dir(filename), templateRelativePath)
+		loader.TemplatePath = getDefaultPath()
 		loader.custom = false
 	}
 
+	tools.Log().Printf("custom path set for template: %v\n", loader.custom)
 	return loader
 }
 
 // Build generates html and text templates using the templateName with the params
 func (tb *Builder) Build(defaultTemplateName string, params interface{}) (string, string, error) {
-	htmlMessage, textMessage, err := tb.defultTemplateBuild(defaultTemplateName, params)
+	var (
+		htmlMessage string
+		textMessage string
+		err         error
+	)
 
-	if tb.custom {
-		htmlMessageCustom, textMessageCustom, errCustom := tb.customTemplateBuild(params)
+	if !tb.custom {
+		htmlMessage, textMessage, err = tb.defaultTemplateBuild(defaultTemplateName, params)
+	} else {
+		htmlMessage, textMessage, err = tb.customTemplateBuild(params)
 
-		if errCustom != nil {
-			return htmlMessage, textMessage, err
+		if err != nil {
+			tb.TemplatePath = getDefaultPath()
+			htmlMessage, textMessage, err = tb.defaultTemplateBuild(defaultTemplateName, params)
 		}
-
-		htmlMessage = htmlMessageCustom
-		textMessage = textMessageCustom
-		err = errCustom
 	}
 
 	return htmlMessage, textMessage, err
 }
 
-func (tb *Builder) defultTemplateBuild(defaultTemplateName string, params interface{}) (string, string, error) {
+func getDefaultPath() string {
+	_, filename, _, ok := runtime.Caller(0)
+
+	if !ok {
+		tools.Log().Panic("Getting the current directory of email templates")
+	}
+
+	defaultPath := path.Join(path.Dir(filename))
+	return defaultPath
+}
+
+func (tb *Builder) defaultTemplateBuild(defaultTemplateName string, params interface{}) (string, string, error) {
 	currentDefaultTemplateDirName := strings.Replace(defaultTemplateName, "_", "", 1)
 	currentDefaultTemplateDirPath := path.Join(tb.TemplatePath, currentDefaultTemplateDirName)
 
@@ -89,7 +97,7 @@ func (tb *Builder) defultTemplateBuild(defaultTemplateName string, params interf
 
 func (tb *Builder) customTemplateBuild(params interface{}) (string, string, error) {
 	pathSplit := strings.Split(tb.TemplatePath, "/")
-	customHTMLTemplateName := pathSplit[len(pathSplit)-1] + ".html"
+	customHTMLTemplateName := pathSplit[len(pathSplit)-1]
 
 	htmlMessage, err := tb.buildHTMLTemplate(customHTMLTemplateName, tb.TemplatePath, params)
 
@@ -97,14 +105,14 @@ func (tb *Builder) customTemplateBuild(params interface{}) (string, string, erro
 		return "", "", err
 	}
 
-	customTextTemplateName := pathSplit[len(pathSplit)-1] + ".html"
+	customTextTemplateName := pathSplit[len(pathSplit)-1]
 	textMessage, err := tb.buildTextTemplate(customTextTemplateName, tb.TemplatePath, params)
 
 	if err != nil {
 		return "", "", err
 	}
 
-	return htmlMessage, textMessage, err
+	return htmlMessage, textMessage, nil
 }
 
 func (tb *Builder) buildHTMLTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
