@@ -2,13 +2,14 @@ package providers
 
 import (
 	"context"
+	"time"
+
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/provider/email/message"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
 	"github.com/mailgun/mailgun-go/v3"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 const sendEmailContextTimeoutSeconds = 10
@@ -64,7 +65,7 @@ func (ms mailgunSender) Send(emailMessage *message.Message) error {
 }
 
 func (ms mailgunSender) fromEmailMessageToMailgunMessage(message *message.Message) *mailgun.Message {
-	mgMessage := ms.mg.NewMessage(message.From, message.Subject, message.Text, message.To)
+	mgMessage := ms.mg.NewMessage(message.From, message.Subject, "", message.To)
 	mgMessage.SetHtml(message.HTML)
 
 	return mgMessage

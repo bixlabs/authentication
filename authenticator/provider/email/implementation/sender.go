@@ -33,7 +33,10 @@ func NewSender(provider email.Provider) email.Sender {
 // this message contains the code to reset the password.
 func (s sender) ForgotPasswordRequest(user structures.User, code string) error {
 	templateBuilder := template.NewTemplateBuilder()
-	htmlMessage, textMessage, err := templateBuilder.Build("forgot_password", &forgotpassword.TemplateParam{Code: code})
+	defaultTemplate := forgotpassword.NewTemplateHTML()
+	defaultTemplateParam := forgotpassword.NewTempateParam(code)
+	htmlMessage, err := templateBuilder.Build(defaultTemplate, defaultTemplateParam)
+
 	if err != nil {
 		return err
 	}
@@ -45,7 +48,6 @@ func (s sender) ForgotPasswordRequest(user structures.User, code string) error {
 		ToName:   "",
 		Subject:  "Reset your Password",
 		HTML:     htmlMessage,
-		Text:     textMessage,
 		Type:     "Forgot Password",
 	}
 

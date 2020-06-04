@@ -4,3 +4,9 @@ package forgotpassword
 type TemplateParam struct {
 	Code string
 }
+
+func NewTempateParam(code string) *TemplateParam {
+	param := &TemplateParam{Code: code}
+
+	return param
+}

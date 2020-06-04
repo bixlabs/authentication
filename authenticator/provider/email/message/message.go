@@ -7,7 +7,6 @@ type Message struct {
 	To       string
 	ToName   string
 	Subject  string
-	Text     string
 	HTML     string
 	Type     string
 }

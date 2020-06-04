@@ -2,16 +2,17 @@ package template
 
 import (
 	"bytes"
+	htmlParser "html/template"
+	"path"
+	"runtime"
+	"strings"
+
+	template "github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
+
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
-	"runtime"
-
 	// autoload is not working in main
-	_ "github.com/joho/godotenv/autoload"
-	htmlTemplate "html/template"
-	"path"
-	"strings"
-	textTemplate "text/template"
+	//_ "github.com/joho/godotenv/autoload"
 )
 
 // Builder represents a template loader and builder for the emails
@@ -33,30 +34,28 @@ func NewTemplateBuilder() *Builder {
 		loader.custom = false
 	}
 
-	tools.Log().Printf("custom path set for template: %v\n", loader.custom)
 	return loader
 }
 
 // Build generates html and text templates using the templateName with the params
-func (tb *Builder) Build(defaultTemplateName string, params interface{}) (string, string, error) {
+func (tb *Builder) Build(defaultHTML template.TemplateHTML, params interface{}) (string, error) {
 	var (
 		htmlMessage string
-		textMessage string
 		err         error
 	)
 
 	if !tb.custom {
-		htmlMessage, textMessage, err = tb.defaultTemplateBuild(defaultTemplateName, params)
+		htmlMessage, err = tb.defaultTemplateBuild(defaultHTML, params)
 	} else {
-		htmlMessage, textMessage, err = tb.customTemplateBuild(params)
+		htmlMessage, err = tb.customTemplateBuild(params)
 
 		if err != nil {
 			tb.TemplatePath = getDefaultPath()
-			htmlMessage, textMessage, err = tb.defaultTemplateBuild(defaultTemplateName, params)
+			htmlMessage, err = tb.defaultTemplateBuild(defaultHTML, params)
 		}
 	}
 
-	return htmlMessage, textMessage, err
+	return htmlMessage, err
 }
 
 func getDefaultPath() string {
@@ -70,53 +69,31 @@ func getDefaultPath() string {
 	return defaultPath
 }
 
-func (tb *Builder) defaultTemplateBuild(defaultTemplateName string, params interface{}) (string, string, error) {
-	currentDefaultTemplateDirName := strings.Replace(defaultTemplateName, "_", "", 1)
-	currentDefaultTemplateDirPath := path.Join(tb.TemplatePath, currentDefaultTemplateDirName)
-
-	defaultHTMLTemplateName := defaultTemplateName + ".html"
-	defaultHTMLTemplatePath := path.Join(currentDefaultTemplateDirPath, defaultHTMLTemplateName)
-
-	htmlMessage, err := tb.buildHTMLTemplate(defaultHTMLTemplateName, defaultHTMLTemplatePath, params)
+func (tb *Builder) defaultTemplateBuild(defaultHTML template.TemplateHTML, params interface{}) (string, error) {
+	htmlMessage, err := tb.buildDefaultTemplate(defaultHTML, params)
 
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 
-	defaultTextTemplateName := defaultTemplateName + ".txt"
-	defaultTextTemplatePath := path.Join(currentDefaultTemplateDirPath, defaultTextTemplateName)
-
-	textMessage, err := tb.buildTextTemplate(defaultTextTemplateName, defaultTextTemplatePath, params)
-
-	if err != nil {
-		return "", "", err
-	}
-
-	return htmlMessage, textMessage, nil
+	return htmlMessage, nil
 }
 
-func (tb *Builder) customTemplateBuild(params interface{}) (string, string, error) {
+func (tb *Builder) customTemplateBuild(params interface{}) (string, error) {
 	pathSplit := strings.Split(tb.TemplatePath, "/")
 	customHTMLTemplateName := pathSplit[len(pathSplit)-1]
 
 	htmlMessage, err := tb.buildHTMLTemplate(customHTMLTemplateName, tb.TemplatePath, params)
 
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 
-	customTextTemplateName := pathSplit[len(pathSplit)-1]
-	textMessage, err := tb.buildTextTemplate(customTextTemplateName, tb.TemplatePath, params)
-
-	if err != nil {
-		return "", "", err
-	}
-
-	return htmlMessage, textMessage, nil
+	return htmlMessage, nil
 }
 
 func (tb *Builder) buildHTMLTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
-	t := htmlTemplate.New(templateName)
+	t := htmlParser.New(templateName)
 
 	var err error
 	t, err = t.ParseFiles(templatePath)
@@ -132,11 +109,11 @@ func (tb *Builder) buildHTMLTemplate(templateName, templatePath string, template
 	return tpl.String(), nil
 }
 
-func (tb *Builder) buildTextTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
-	t := textTemplate.New(templateName)
+func (tb *Builder) buildDefaultTemplate(template template.TemplateHTML, templateValues interface{}) (string, error) {
+	t := htmlParser.New(template.Name)
 
 	var err error
-	t, err = t.ParseFiles(templatePath)
+	t, err = t.Parse(template.HTMLTemplate)
 	if err != nil {
 		return "", err
 	}
