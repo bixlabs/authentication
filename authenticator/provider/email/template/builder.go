@@ -3,11 +3,9 @@ package template
 import (
 	"bytes"
 	htmlParser "html/template"
-	"path"
-	"runtime"
 	"strings"
 
-	template "github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
+	forgotPass "github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
 
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
@@ -30,7 +28,6 @@ func NewTemplateBuilder() *Builder {
 	}
 
 	if loader.TemplatePath == "" {
-		loader.TemplatePath = getDefaultPath()
 		loader.custom = false
 	}
 
@@ -38,7 +35,7 @@ func NewTemplateBuilder() *Builder {
 }
 
 // Build generates html and text templates using the templateName with the params
-func (tb *Builder) Build(defaultHTML template.TemplateHTML, params interface{}) (string, error) {
+func (tb *Builder) Build(defaultHTML forgotPass.TemplateHTML, params interface{}) (string, error) {
 	var (
 		htmlMessage string
 		err         error
@@ -50,7 +47,6 @@ func (tb *Builder) Build(defaultHTML template.TemplateHTML, params interface{}) 
 		htmlMessage, err = tb.customTemplateBuild(params)
 
 		if err != nil {
-			tb.TemplatePath = getDefaultPath()
 			htmlMessage, err = tb.defaultTemplateBuild(defaultHTML, params)
 		}
 	}
@@ -58,18 +54,7 @@ func (tb *Builder) Build(defaultHTML template.TemplateHTML, params interface{}) 
 	return htmlMessage, err
 }
 
-func getDefaultPath() string {
-	_, filename, _, ok := runtime.Caller(0)
-
-	if !ok {
-		tools.Log().Panic("Getting the current directory of email templates")
-	}
-
-	defaultPath := path.Join(path.Dir(filename))
-	return defaultPath
-}
-
-func (tb *Builder) defaultTemplateBuild(defaultHTML template.TemplateHTML, params interface{}) (string, error) {
+func (tb *Builder) defaultTemplateBuild(defaultHTML forgotPass.TemplateHTML, params interface{}) (string, error) {
 	htmlMessage, err := tb.buildDefaultTemplate(defaultHTML, params)
 
 	if err != nil {
@@ -109,7 +94,7 @@ func (tb *Builder) buildHTMLTemplate(templateName, templatePath string, template
 	return tpl.String(), nil
 }
 
-func (tb *Builder) buildDefaultTemplate(template template.TemplateHTML, templateValues interface{}) (string, error) {
+func (tb *Builder) buildDefaultTemplate(template forgotPass.TemplateHTML, templateValues interface{}) (string, error) {
 	t := htmlParser.New(template.Name)
 
 	var err error
