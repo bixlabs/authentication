@@ -4,4 +4,17 @@ Feature: build HTML templates for reset password
     I need to build the default or a customice html templates
 
     Scenario: No template provided
-        Given Start to type your Given step here
+        Given an empty enviroment variable 
+        When the system sends an email
+        Then the email should arrive with the default template
+
+    Scenario: Correct template provided
+        Given an correct environment variable
+        When the system sends an email
+        Then the email should arrive with the template provided
+    
+    Scenario: Incorrect template provided
+        Given a wrong enviroment variable
+        When the systems sends an email
+        Then the email should arrive with the default template
+

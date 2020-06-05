@@ -48,6 +48,7 @@ func (tb *Builder) Build(defaultHTML forgotPass.TemplateHTML, params interface{}
 
 		if err != nil {
 			htmlMessage, err = tb.defaultTemplateBuild(defaultHTML, params)
+			tools.Log().Info("The custom template provided is not valid, default template used instead")
 		}
 	}
 
