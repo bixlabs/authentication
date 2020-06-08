@@ -2,16 +2,17 @@ package template
 
 import (
 	"bytes"
-	"github.com/bixlabs/authentication/tools"
-	"github.com/caarlos0/env"
 	"runtime"
 
+	"github.com/bixlabs/authentication/tools"
+	"github.com/caarlos0/env"
+
 	// autoload is not working in main
-	_ "github.com/joho/godotenv/autoload"
 	htmlTemplate "html/template"
 	"path"
 	"strings"
 	textTemplate "text/template"
+	//_ "github.com/joho/godotenv/autoload"
 )
 
 // Builder represents a template loader and builder for the emails
