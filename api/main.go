@@ -61,8 +61,8 @@ func NewGinRouter() *gin.Engine {
 	return result
 }
 
-func configureSwagger(result *gin.Engine) gin.IRoutes {
-	return result.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+func configureSwagger(result *gin.Engine) {
+	result.GET("/documentation/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
 
 func runGinRouter(router *gin.Engine, port string) {

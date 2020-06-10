@@ -2,6 +2,9 @@ package authentication
 
 import (
 	"errors"
+	"net/http"
+	"strings"
+
 	"github.com/bixlabs/authentication/api/authentication/structures/changepass"
 	"github.com/bixlabs/authentication/api/authentication/structures/finishresetpass"
 	"github.com/bixlabs/authentication/api/authentication/structures/login"
@@ -12,8 +15,6 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strings"
 )
 
 const tokenHeaderLength = 2
@@ -28,14 +29,21 @@ func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interac
 }
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
+	routerHealth := r.Group("/api")
+	routerHealth.GET("/", restConfig.healthcheck)
+
 	router := r.Group("/v1/user")
 	router.POST("/login", restConfig.login)
 	router.POST("/signup", restConfig.signup)
 	router.PUT("/change-password", restConfig.changePassword)
 	router.PUT("/finish-reset-password", restConfig.finishResetPassword)
 	router.POST("/start-reset-password", restConfig.startResetPassword)
-	router.GET("token/validate", restConfig.verifyJWT)
+	router.GET("/token/validate", restConfig.verifyJWT)
 	return r
+}
+
+func (confifg authenticatorRESTConfigurator) healthcheck(c *gin.Context) {
+	c.Redirect(http.StatusFound, "/documentation/index.html")
 }
 
 // @Tags User
