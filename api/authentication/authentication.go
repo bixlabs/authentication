@@ -42,7 +42,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 	return r
 }
 
-func (confifg authenticatorRESTConfigurator) healthcheck(c *gin.Context) {
+func (config authenticatorRESTConfigurator) healthcheck(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/documentation/index.html")
 }
 
