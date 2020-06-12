@@ -3,6 +3,7 @@ package template
 import (
 	"bytes"
 	htmlParser "html/template"
+	"io/ioutil"
 	"strings"
 
 	forgotPass "github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
@@ -15,91 +16,65 @@ import (
 
 // Builder represents a template loader and builder for the emails
 type Builder struct {
-	TemplatePath string `env:"AUTH_SERVER_EMAIL_TEMPLATE_PATH"`
-	custom       bool
+	TemplatePath    string `env:"AUTH_SERVER_EMAIL_TEMPLATE_PATH"`
+	DefaultTemplate forgotPass.TemplateHTML
+	CustomTemplate  string
+	CustomName      string
 }
 
-func NewTemplateBuilder() *Builder {
-	loader := &Builder{custom: true}
-	err := env.Parse(loader)
+func NewTemplateBuilder(defaultTemplate forgotPass.TemplateHTML) Builder {
+	loader := Builder{}
+	err := env.Parse(&loader)
 
 	if err != nil {
 		tools.Log().Panic("Parsing the env variables for the template build failed", err)
 	}
 
-	if loader.TemplatePath == "" {
-		loader.custom = false
+	loader.DefaultTemplate = defaultTemplate
+
+	if loader.TemplatePath != "" {
+		loader.setCustomTemplate()
 	}
 
 	return loader
 }
 
 // Build generates html and text templates using the templateName with the params
-func (tb *Builder) Build(defaultHTML forgotPass.TemplateHTML, params interface{}) (string, error) {
+func (tb Builder) Build(params interface{}) (string, error) {
 	var (
 		htmlMessage string
 		err         error
 	)
 
-	if !tb.custom {
-		htmlMessage, err = tb.defaultTemplateBuild(defaultHTML, params)
-	} else {
-		htmlMessage, err = tb.customTemplateBuild(params)
+	if tb.TemplatePath != "" {
+		htmlMessage, err = buildTemplate(tb.CustomName, tb.CustomTemplate, params)
+	}
 
-		if err != nil {
-			htmlMessage, err = tb.defaultTemplateBuild(defaultHTML, params)
-			tools.Log().Info("The custom template provided is not valid, default template used instead")
-		}
+	if err != nil || tb.TemplatePath == "" {
+		htmlMessage, err = buildTemplate(tb.DefaultTemplate.Name, tb.DefaultTemplate.HTMLTemplate, params)
 	}
 
 	return htmlMessage, err
 }
 
-func (tb *Builder) defaultTemplateBuild(defaultHTML forgotPass.TemplateHTML, params interface{}) (string, error) {
-	htmlMessage, err := tb.buildDefaultTemplate(defaultHTML, params)
-
+func (tb *Builder) setCustomTemplate() {
+	reader, err := ioutil.ReadFile(tb.TemplatePath)
 	if err != nil {
-		return "", err
+		tools.Log().WithError(err).Info("Error parsing custom template provided, default template will be used")
+		tb.TemplatePath = ""
+		return
 	}
 
-	return htmlMessage, nil
+	nameSplit := strings.Split(tb.TemplatePath, "/")
+	tb.CustomName = nameSplit[len(nameSplit)-1]
+	tb.CustomTemplate = string(reader)
 }
 
-func (tb *Builder) customTemplateBuild(params interface{}) (string, error) {
-	pathSplit := strings.Split(tb.TemplatePath, "/")
-	customHTMLTemplateName := pathSplit[len(pathSplit)-1]
-
-	htmlMessage, err := tb.buildHTMLTemplate(customHTMLTemplateName, tb.TemplatePath, params)
-
-	if err != nil {
-		return "", err
-	}
-
-	return htmlMessage, nil
-}
-
-func (tb *Builder) buildHTMLTemplate(templateName, templatePath string, templateValues interface{}) (string, error) {
+func buildTemplate(templateName, templateHTML string, templateValues interface{}) (string, error) {
 	t := htmlParser.New(templateName)
 
 	var err error
-	t, err = t.ParseFiles(templatePath)
-	if err != nil {
-		return "", err
-	}
-
-	var tpl bytes.Buffer
-	if err := t.Execute(&tpl, templateValues); err != nil {
-		return "", err
-	}
-
-	return tpl.String(), nil
-}
-
-func (tb *Builder) buildDefaultTemplate(template forgotPass.TemplateHTML, templateValues interface{}) (string, error) {
-	t := htmlParser.New(template.Name)
-
-	var err error
-	t, err = t.Parse(template.HTMLTemplate)
+	t, err = t.Parse(templateHTML)
 	if err != nil {
 		return "", err
 	}

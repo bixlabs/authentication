@@ -34,8 +34,8 @@ func NewSender(provider email.Provider) email.Sender {
 func (s sender) ForgotPasswordRequest(user structures.User, code string) error {
 	defaultTemplate := forgotpassword.NewTemplateHTML()
 	defaultTemplateParam := forgotpassword.NewTempateParam(code)
-	templateBuilder := template.NewTemplateBuilder()
-	htmlMessage, err := templateBuilder.Build(defaultTemplate, defaultTemplateParam)
+	templateBuilder := template.NewTemplateBuilder(defaultTemplate)
+	htmlMessage, err := templateBuilder.Build(defaultTemplateParam)
 
 	if err != nil {
 		return err

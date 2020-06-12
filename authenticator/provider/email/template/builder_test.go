@@ -1,7 +1,6 @@
 package template
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -10,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
+	utilTest "github.com/bixlabs/authentication/test/util"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/cucumber/godog"
-	"github.com/cucumber/godog/colors"
 )
 
 const relativeGoodPath = "forgotpassword/custom_template_test.html"
@@ -23,7 +22,7 @@ type BuilderTest struct {
 	testerDefaultTemplate forgotpassword.TemplateHTML
 	testerParam           *forgotpassword.TemplateParam
 	testerTemplate        string
-	tester                *Builder
+	tester                Builder
 	code                  string
 	fullGoodPath          string
 	fullBadPath           string
@@ -35,10 +34,10 @@ func newBuilderTest() *BuilderTest {
 
 	tester.fullGoodPath = path.Join(path.Dir(filename), relativeGoodPath)
 	tester.fullBadPath = path.Join(path.Dir(filename), relativeBadPath)
-	tester.tester = NewTemplateBuilder()
 	tester.envVariable = "AUTH_SERVER_EMAIL_TEMPLATE_PATH"
 	tester.testerParam = forgotpassword.NewTempateParam(tester.code)
 	tester.testerDefaultTemplate = forgotpassword.NewTemplateHTML()
+	tester.tester = NewTemplateBuilder(tester.testerDefaultTemplate)
 
 	return tester
 }
@@ -49,7 +48,7 @@ func (bd *BuilderTest) anEmptyEnviromentVariable() error {
 	if err != nil {
 		err = fmt.Errorf("failed seting up an empty environment variable")
 	}
-	bd.tester = NewTemplateBuilder()
+	bd.tester = NewTemplateBuilder(bd.testerDefaultTemplate)
 
 	return err
 }
@@ -60,7 +59,7 @@ func (bd *BuilderTest) aCorrectEnvironmentVariable() error {
 	if err != nil {
 		err = fmt.Errorf("failed seting up a correct environment variable")
 	}
-	bd.tester = NewTemplateBuilder()
+	bd.tester = NewTemplateBuilder(bd.testerDefaultTemplate)
 
 	return err
 }
@@ -71,13 +70,13 @@ func (bd *BuilderTest) aWrongEnviromentVariable() error {
 	if err != nil {
 		err = fmt.Errorf("failed seting up a wrong environment variable")
 	}
-	bd.tester = NewTemplateBuilder()
+	bd.tester = NewTemplateBuilder(bd.testerDefaultTemplate)
 
 	return err
 }
 
 func (bd *BuilderTest) theSystemSendsAnEmail() error {
-	htmlResponse, err := bd.tester.Build(bd.testerDefaultTemplate, bd.testerParam)
+	htmlResponse, err := bd.tester.Build(bd.testerParam)
 	bd.testerTemplate = htmlResponse
 
 	if err != nil {
@@ -87,7 +86,8 @@ func (bd *BuilderTest) theSystemSendsAnEmail() error {
 }
 
 func (bd *BuilderTest) theEmailShouldArriveWithTheDefaultTemplate() error {
-	templateComparator, err := bd.tester.defaultTemplateBuild(bd.testerDefaultTemplate, bd.testerParam)
+	templateComparator, err := buildTemplate(bd.tester.DefaultTemplate.Name,
+		bd.tester.DefaultTemplate.HTMLTemplate, bd.testerParam)
 
 	if err != nil {
 		err = fmt.Errorf("failed on building comparator template")
@@ -101,8 +101,8 @@ func (bd *BuilderTest) theEmailShouldArriveWithTheDefaultTemplate() error {
 }
 
 func (bd *BuilderTest) theEmailShouldArriveWithTheTemplateProvided() error {
-	templateComparator, err := bd.tester.customTemplateBuild(bd.testerParam)
-
+	templateComparator, err := buildTemplate(bd.tester.CustomName,
+		bd.tester.CustomTemplate, bd.testerParam)
 	if err != nil {
 		err = fmt.Errorf("failed on building comparator template")
 	}
@@ -131,26 +131,6 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the email should arrive with the default template$`, builder.theEmailShouldArriveWithTheDefaultTemplate)
 }
 
-var opts = godog.Options{
-	Output: colors.Colored(os.Stdout),
-	Format: "pretty",
-}
-
-func init() {
-	godog.BindFlags("godog.", flag.CommandLine, &opts)
-}
-
 func TestMain(m *testing.M) {
-	flag.Parse()
-	opts.Paths = flag.Args()
-
-	// godog v0.9.0 (latest) and earlier
-	status := godog.RunWithOptions("godogs", func(s *godog.Suite) {
-		FeatureContext(s)
-	}, opts)
-
-	if st := m.Run(); st > status {
-		status = st
-	}
-	os.Exit(status)
+	utilTest.TestMainWrapper(m, FeatureContext)
 }
