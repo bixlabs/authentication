@@ -36,7 +36,7 @@ or
 ```bash
 $ swag init -g ./api/main.go
 ```
-* Then we `make run` and go to [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html#)
+* Then we `make run` and go to [http://localhost:8080/documentation/index.html](http://localhost:8080/documentation/index.html#)
 
     
 ## Running the project to show output in console

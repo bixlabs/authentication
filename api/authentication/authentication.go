@@ -29,9 +29,6 @@ func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interac
 }
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
-	routerHealth := r.Group("/api")
-	routerHealth.GET("/", restConfig.healthcheck)
-
 	router := r.Group("/v1/user")
 	router.POST("/login", restConfig.login)
 	router.POST("/signup", restConfig.signup)
@@ -40,10 +37,6 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 	router.POST("/start-reset-password", restConfig.startResetPassword)
 	router.GET("/token/validate", restConfig.verifyJWT)
 	return r
-}
-
-func (config authenticatorRESTConfigurator) healthcheck(c *gin.Context) {
-	c.Redirect(http.StatusFound, "/documentation/index.html")
 }
 
 // @Tags User
