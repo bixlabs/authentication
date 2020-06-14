@@ -46,11 +46,16 @@ func configureHealthCheckRoute(healthCheck checker, r *gin.Engine) *gin.Engine {
 }
 
 func (hc checker) healthCheck(c *gin.Context) {
-	if hc.authenticator != nil && hc.passwordManager != nil &&
-		hc.repository != nil && hc.sender != nil {
-		c.JSON(http.StatusOK, check.NewResponse(http.StatusOK))
-	} else {
-		c.JSON(http.StatusInternalServerError, check.NewErrorResponse(http.StatusInternalServerError,
-			errors.New("one or more services are down")))
+	c.JSON(healthCheckHandler(hc.repository, hc.sender, hc.authenticator, hc.passwordManager))
+}
+
+func healthCheckHandler(repo user.Repository, emailSender email.Sender, auth interactors.Authenticator,
+	passManager interactors.PasswordManager) (int, check.Response) {
+	if auth == nil || passManager == nil ||
+		repo == nil || emailSender == nil {
+		return http.StatusInternalServerError, check.NewErrorResponse(http.StatusInternalServerError,
+			errors.New("one or more services are down"))
 	}
+
+	return http.StatusOK, check.NewResponse(http.StatusOK)
 }
