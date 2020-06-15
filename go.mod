@@ -12,7 +12,7 @@ require (
 	github.com/go-openapi/spec v0.19.8 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/google/uuid v1.1.1
-	github.com/jinzhu/gorm v1.9.12
+	github.com/jinzhu/gorm v1.9.13
 	github.com/joho/godotenv v1.3.0
 	github.com/mailgun/mailgun-go/v3 v3.6.4
 	github.com/mailru/easyjson v0.7.1 // indirect
