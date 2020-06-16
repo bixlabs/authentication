@@ -79,7 +79,7 @@ variable "app_count" {
 
 // TODO: Create a healtcheck endpoint and update health_check_path variable
 variable "health_check_path" {
-  default = "/swagger/index.html"
+  default = "/healthcheck"
 }
 
 variable "fargate_cpu" {

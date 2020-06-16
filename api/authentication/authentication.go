@@ -2,6 +2,9 @@ package authentication
 
 import (
 	"errors"
+	"net/http"
+	"strings"
+
 	"github.com/bixlabs/authentication/api/authentication/structures/changepass"
 	"github.com/bixlabs/authentication/api/authentication/structures/finishresetpass"
 	"github.com/bixlabs/authentication/api/authentication/structures/login"
@@ -12,8 +15,6 @@ import (
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strings"
 )
 
 const tokenHeaderLength = 2
@@ -34,7 +35,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 	router.PUT("/change-password", restConfig.changePassword)
 	router.PUT("/finish-reset-password", restConfig.finishResetPassword)
 	router.POST("/start-reset-password", restConfig.startResetPassword)
-	router.GET("token/validate", restConfig.verifyJWT)
+	router.GET("/token/validate", restConfig.verifyJWT)
 	return r
 }
 
