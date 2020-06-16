@@ -4,7 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/provider/email/message"
 	"github.com/bixlabs/authentication/authenticator/provider/email/template"
-	"github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
+	forgotpassword "github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"

@@ -8,7 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
+	forgotpass "github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword/implementation"
+	"github.com/bixlabs/authentication/authenticator/provider/email/template/structures"
 	utilTest "github.com/bixlabs/authentication/test/util"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/cucumber/godog"
@@ -19,8 +20,8 @@ const relativeBadPath = "forgotpassword/custom_template_test.htm"
 
 type BuilderTest struct {
 	envVariable           string
-	testerDefaultTemplate forgotpassword.TemplateHTML
-	testerParam           *forgotpassword.TemplateParam
+	testerDefaultTemplate structures.DefaultTemplate
+	testerParam           structures.ParamsTemplate
 	testerTemplate        string
 	tester                Builder
 	code                  string
@@ -35,8 +36,8 @@ func newBuilderTest() *BuilderTest {
 	tester.fullGoodPath = path.Join(path.Dir(filename), relativeGoodPath)
 	tester.fullBadPath = path.Join(path.Dir(filename), relativeBadPath)
 	tester.envVariable = "AUTH_SERVER_EMAIL_TEMPLATE_PATH"
-	tester.testerParam = forgotpassword.NewTempateParam(tester.code)
-	tester.testerDefaultTemplate = forgotpassword.NewTemplateHTML()
+	tester.testerParam = forgotpass.NewTempateParam(tester.code)
+	tester.testerDefaultTemplate = forgotpass.NewTemplateHTML()
 	tester.tester = NewTemplateBuilder(tester.testerDefaultTemplate)
 
 	return tester
@@ -86,8 +87,8 @@ func (bd *BuilderTest) theSystemSendsAnEmail() error {
 }
 
 func (bd *BuilderTest) theEmailShouldArriveWithTheDefaultTemplate() error {
-	templateComparator, err := buildTemplate(bd.tester.DefaultTemplate.Name,
-		bd.tester.DefaultTemplate.HTMLTemplate, bd.testerParam)
+	templateComparator, err := buildTemplate(bd.tester.DefaultName,
+		bd.tester.DefaultTemplate, bd.testerParam)
 
 	if err != nil {
 		err = fmt.Errorf("failed on building comparator template")
