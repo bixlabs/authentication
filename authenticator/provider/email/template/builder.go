@@ -85,7 +85,7 @@ func buildTemplate(templateName, templateHTML string, templateValues structures.
 	for _, v := range templateValues.GetParams() {
 		if !strings.Contains(templateHTML, v) {
 			err = errors.New("template does not contains one or more parameters")
-			tools.Log().WithError(err).Info("Custom html is not completely correct, default email used instead")
+			tools.Log().WithError(err).Warn("Custom html is not completely correct, default email used instead")
 			return "", err
 		}
 	}
