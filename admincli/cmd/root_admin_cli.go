@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/spf13/cobra"
-	"os"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -45,6 +46,7 @@ func Execute() {
 	}
 
 	if err := rootCmd.Execute(); err != nil {
+		tools.Log().WithError(err).Info("error executing cli")
 		os.Exit(1)
 	}
 }

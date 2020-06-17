@@ -42,7 +42,7 @@ run:
 		make api-docs && make format && go run api/main.go
 
 run-cli:
-		make format && go run cmd/cli/main.go
+		make format && go run admincli/main.go
 
 api-docs:
 		$(GOPATH)/bin/swag init --generalInfo  ./api/main.go --output ./api/docs
@@ -58,7 +58,7 @@ docker-build:
 docker-run:
 		docker-compose -f deployments/docker-compose.yml up -d
 
-		
+
 #####################################################
 ## Deployments
 #####################################################
