@@ -55,7 +55,7 @@ func (bd *BuilderTest) anEmptyEnviromentVariable() error {
 }
 
 func (bd *BuilderTest) aCorrectEnvironmentVariable() error {
-	err := os.Setenv("AUTH_SERVER_EMAIL_TEMPLATE_PATH", bd.fullGoodPath)
+	err := os.Setenv(bd.envVariable, bd.fullGoodPath)
 
 	if err != nil {
 		err = fmt.Errorf("failed seting up a correct environment variable")
@@ -115,23 +115,34 @@ func (bd *BuilderTest) theEmailShouldArriveWithTheTemplateProvided() error {
 	return err
 }
 
-func FeatureContext(s *godog.Suite) {
-	tools.InitializeLogger()
-	builder := newBuilderTest()
+var builder *BuilderTest
 
-	s.Step(`^an empty enviroment variable$`, builder.anEmptyEnviromentVariable)
-	s.Step(`^the systems sends an email$`, builder.theSystemSendsAnEmail)
-	s.Step(`^the email should arrive with the default template$`, builder.theEmailShouldArriveWithTheDefaultTemplate)
+func InitializeTestSuite(ctx *godog.TestSuiteContext) {
+	ctx.BeforeSuite(func() {
+		tools.InitializeLogger()
+		builder = newBuilderTest()
+	})
+}
 
-	s.Step(`^an correct environment variable$`, builder.aCorrectEnvironmentVariable)
-	s.Step(`^the system sends an email$`, builder.theSystemSendsAnEmail)
-	s.Step(`^the email should arrive with the template provided$`, builder.theEmailShouldArriveWithTheTemplateProvided)
+func InitializeScenario(ctx *godog.ScenarioContext) {
+	ctx.BeforeScenario(func(*godog.Scenario) {
+		builder = newBuilderTest() // clean the state before every scenario
+	})
 
-	s.Step(`^a wrong enviroment variable$`, builder.aWrongEnviromentVariable)
-	s.Step(`^the system sends an email$`, builder.theSystemSendsAnEmail)
-	s.Step(`^the email should arrive with the default template$`, builder.theEmailShouldArriveWithTheDefaultTemplate)
+	ctx.Step(`^an empty enviroment variable$`, builder.anEmptyEnviromentVariable)
+	ctx.Step(`^the systems sends an email$`, builder.theSystemSendsAnEmail)
+	ctx.Step(`^the email should arrive with the default template$`, builder.theEmailShouldArriveWithTheDefaultTemplate)
+
+	ctx.Step(`^an correct environment variable$`, builder.aCorrectEnvironmentVariable)
+	ctx.Step(`^the system sends an email$`, builder.theSystemSendsAnEmail)
+	ctx.Step(`^the email should arrive with the template provided$`, builder.theEmailShouldArriveWithTheTemplateProvided)
+
+	ctx.Step(`^a wrong enviroment variable$`, builder.aWrongEnviromentVariable)
+	ctx.Step(`^the system sends an email$`, builder.theSystemSendsAnEmail)
+	ctx.Step(`^the email should arrive with the default template$`, builder.theEmailShouldArriveWithTheDefaultTemplate)
+
 }
 
 func TestMain(m *testing.M) {
-	utilTest.TestMainWrapper(m, FeatureContext)
+	utilTest.TestMainWrapper(m, InitializeTestSuite, InitializeScenario)
 }

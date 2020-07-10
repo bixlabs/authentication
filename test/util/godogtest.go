@@ -9,8 +9,10 @@ import (
 	"github.com/cucumber/godog/colors"
 )
 
-func TestMainWrapper(m *testing.M, featureContext func(*godog.Suite)) {
-	var opts = godog.Options{
+// TestMainWrapper binds godog test with go test framework
+func TestMainWrapper(m *testing.M, initializeTestSuite func(ctx *godog.TestSuiteContext),
+	initializeScenario func(ctx *godog.ScenarioContext)) {
+	opts := godog.Options{
 		Output: colors.Colored(os.Stdout),
 		Format: "pretty",
 	}
@@ -18,14 +20,15 @@ func TestMainWrapper(m *testing.M, featureContext func(*godog.Suite)) {
 	flag.Parse()
 	opts.Paths = flag.Args()
 
-	// godog v0.9.0 (latest) and earlier
-	status := godog.RunWithOptions("godogs", func(s *godog.Suite) {
-		featureContext(s)
-	}, opts)
+	status := godog.TestSuite{
+		Name:                 "godogs",
+		TestSuiteInitializer: initializeTestSuite,
+		ScenarioInitializer:  initializeScenario,
+		Options:              &opts,
+	}.Run()
 
 	if st := m.Run(); st > status {
 		status = st
 	}
-
 	os.Exit(status)
 }
