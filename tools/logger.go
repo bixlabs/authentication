@@ -1,8 +1,9 @@
 package tools
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 // For more information: https://github.com/sirupsen/logrus/blob/master/example_basic_test.go

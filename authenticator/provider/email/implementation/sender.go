@@ -4,7 +4,7 @@ import (
 	"github.com/bixlabs/authentication/authenticator/provider/email"
 	"github.com/bixlabs/authentication/authenticator/provider/email/message"
 	"github.com/bixlabs/authentication/authenticator/provider/email/template"
-	"github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword"
+	forgotpassword "github.com/bixlabs/authentication/authenticator/provider/email/template/forgotpassword/implementation"
 	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
@@ -32,8 +32,11 @@ func NewSender(provider email.Provider) email.Sender {
 // builds a forgot email message and send it using the emailSender
 // this message contains the code to reset the password.
 func (s sender) ForgotPasswordRequest(user structures.User, code string) error {
-	templateBuilder := template.NewTemplateBuilder()
-	htmlMessage, textMessage, err := templateBuilder.Build("forgot_password", &forgotpassword.TemplateParam{Code: code})
+	defaultTemplate := forgotpassword.NewTemplateHTML()
+	defaultTemplateParam := forgotpassword.NewTempateParam(code)
+	templateBuilder := template.NewTemplateBuilder(defaultTemplate)
+	htmlMessage, err := templateBuilder.Build(defaultTemplateParam)
+
 	if err != nil {
 		return err
 	}
@@ -45,7 +48,6 @@ func (s sender) ForgotPasswordRequest(user structures.User, code string) error {
 		ToName:   "",
 		Subject:  "Reset your Password",
 		HTML:     htmlMessage,
-		Text:     textMessage,
 		Type:     "Forgot Password",
 	}
 

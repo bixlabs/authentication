@@ -56,7 +56,7 @@ func (ss SendgridSender) fromEmailMessageToSendgridMessage(message *message.Mess
 	from := mail.NewEmail(message.FromName, message.From)
 	to := mail.NewEmail(message.ToName, message.To)
 
-	return mail.NewSingleEmail(from, message.Subject, to, message.Text, message.HTML)
+	return mail.NewSingleEmail(from, message.Subject, to, "", message.HTML)
 }
 
 func (ss SendgridSender) getLogger() *logrus.Entry {
