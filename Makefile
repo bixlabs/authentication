@@ -36,7 +36,7 @@ clean:
 		rm -r -f ./tmp
 
 lint:
-		./bin/golangci-lint run --enable-all -D goimports -D godox -D wsl
+		./bin/golangci-lint run --enable-all -D goimports -D godox -D wsl --timeout 2m0s
 
 run:
 		make api-docs && make format && go run api/main.go
