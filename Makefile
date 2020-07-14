@@ -41,9 +41,6 @@ lint:
 run:
 		make api-docs && make format && go run api/main.go
 
-run-cli:
-		make format && go run cmd/cli/main.go
-
 api-docs:
 		$(GOPATH)/bin/swag init --generalInfo  ./api/main.go --output ./api/docs
 

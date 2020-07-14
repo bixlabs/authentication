@@ -39,14 +39,6 @@ $ swag init -g ./api/main.go
 * Then we `make run` and go to [http://localhost:8080/documentation/index.html](http://localhost:8080/documentation/index.html#)
 
     
-## Running the project to show output in console
-
-* Because we are using Clean Architecture, we want to show how the same code is running in different ways without too much effort:
-```bash
- $ make run-cli
-```
-* You should see the output of the CRUD in your console.
-
 ## How to make build of a main.go file and run it on Linux.
 
 ```bash

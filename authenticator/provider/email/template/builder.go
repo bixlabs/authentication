@@ -11,8 +11,6 @@ import (
 
 	"github.com/bixlabs/authentication/tools"
 	"github.com/caarlos0/env"
-	// autoload is not working in main
-	//_ "github.com/joho/godotenv/autoload"
 )
 
 // Builder represents a template loader and builder for the emails
