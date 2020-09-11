@@ -13,7 +13,7 @@ require (
 	github.com/franela/goblin v0.0.0-20180407132755-cd5d08fb4ede
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
-	github.com/go-openapi/spec v0.19.8 // indirect
+	github.com/go-openapi/spec v0.19.9 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/imdario/mergo v0.3.9 // indirect
@@ -43,7 +43,7 @@ require (
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
 	golang.org/x/text v0.3.3 // indirect
-	golang.org/x/tools v0.0.0-20200710042808-f1c4188a97a1 // indirect
+	golang.org/x/tools v0.0.0-20200724172932-b5fc9d354d99 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )

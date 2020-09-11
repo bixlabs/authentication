@@ -17,6 +17,8 @@ func NewEmailProvider() email.Provider {
 		return NewSengridSender()
 	case "smtp":
 		return NewSMTPSender()
+	case "none":
+		return NewNoneSender()
 	default:
 		return NewSMTPSender()
 	}
