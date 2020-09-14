@@ -12,7 +12,7 @@ RUN go mod download
 
 COPY . .
 
-RUN make build-for-docker
+RUN make build-linux
 
 EXPOSE 9000
 

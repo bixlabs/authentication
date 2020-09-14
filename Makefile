@@ -1,6 +1,6 @@
 all: deps lint
 
-.PHONY: test clean format lint coverage coverage-html build build-for-mac build-for-windows
+.PHONY: test clean format lint coverage coverage-html build
 
 deps:
 		./deps.sh
@@ -17,26 +17,31 @@ coverage-html:
 format:
 		go vet ./... && go fmt ./...
 
-build:
-		make api-docs && make format && go build --tags "sqlite_userauth" -o ./tmp/auth-server ./api/main.go
+build: build-linux build-for-mac build-for-windows
 
-build-for-mac:
-		GOOS=darwin GOARCH=amd64 make build
+build-linux: format api-docs
+		go build --tags "sqlite_userauth" -o ./tmp/authenticator-server-linux ./api/main.go
 
-build-for-windows:
-		GOOS=windows GOARCH=386 make api-docs && make format && go build -o ./tmp/auth-server.exe ./api/main.go
+build-for-mac: format api-docs
+		GOOS=darwin GOARCH=amd64 go build --tags "sqlite_userauth" -o ./tmp/authenticator-server-mac ./api/main.go
+
+build-for-windows: format api-docs
+		GOOS=windows GOARCH=386 go build -o ./tmp/authenticator-server-win.exe ./api/main.go
 
 build-admin-cli:
 		make format && go build -o ./tmp/admincli ./admincli/main.go
-
-build-for-docker:
-		make build
 
 clean:
 		rm -r -f ./tmp
 
 lint:
-		./bin/golangci-lint run --enable-all -D goimports -D godox -D wsl --timeout 2m0s
+		./bin/golangci-lint run --enable-all \
+			-D goimports \
+			-D godox \
+			-D wsl \
+			-D godot \
+			-D goerr113 \
+			--timeout 2m0s
 
 run:
 		make api-docs && make format && go run api/main.go
