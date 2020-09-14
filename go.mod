@@ -15,7 +15,7 @@ require (
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/go-openapi/spec v0.19.9 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
-	github.com/google/uuid v1.1.1
+	github.com/google/uuid v1.1.2
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/jinzhu/gorm v1.9.14
 	github.com/joho/godotenv v1.3.0
@@ -42,7 +42,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
-	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20200913032122-97363e29fc9b // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
