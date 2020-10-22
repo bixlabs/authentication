@@ -52,7 +52,7 @@ api-docs:
 cli-docs:
 		go run ./admincli/docs/main.go
 ci:
-		make all build-linux build-windows
+		make all build-linux
 
 docker-build:
 		docker-compose -f deployments/docker-compose.yml build
