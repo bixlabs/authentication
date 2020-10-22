@@ -23,7 +23,7 @@ build-linux: format api-docs
 		go build --tags "sqlite_userauth" -o ./tmp/authenticator-server-linux ./api/main.go
 
 build-for-mac: format api-docs
-		GOOS=darwin GOARCH=amd64 go build --tags "sqlite_userauth" -o ./tmp/authenticator-server-mac ./api/main.go
+		CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build --tags "sqlite_userauth" -o ./tmp/authenticator-server-mac ./api/main.go
 
 build-for-windows: format api-docs
 		GOOS=windows GOARCH=386 go build -o ./tmp/authenticator-server-win.exe ./api/main.go
@@ -52,7 +52,7 @@ api-docs:
 cli-docs:
 		go run ./admincli/docs/main.go
 ci:
-		make all build
+		make all build-linux
 
 docker-build:
 		docker-compose -f deployments/docker-compose.yml build
