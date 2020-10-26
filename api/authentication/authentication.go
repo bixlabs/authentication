@@ -29,17 +29,19 @@ func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interac
 }
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
-	router := r.Group("/v1/user")
+	router := r.Group("/v1/authentication")
+	
 	router.POST("/login", restConfig.login)
 	router.POST("/signup", restConfig.signup)
 	router.PUT("/change-password", restConfig.changePassword)
 	router.PUT("/finish-reset-password", restConfig.finishResetPassword)
 	router.POST("/start-reset-password", restConfig.startResetPassword)
 	router.GET("/token/validate", restConfig.verifyJWT)
+
 	return r
 }
 
-// @Tags User
+// @Tags Authentication
 // @Summary Login functionality
 // @Description Attempts to authenticate the user with the given credentials.
 // @Accept  json
@@ -49,7 +51,7 @@ func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Router /user/login [post]
+// @Router /authentication/login [post]
 func (config authenticatorRESTConfigurator) login(c *gin.Context) {
 	var request login.Request
 	if isInvalidLoginRequest(c, &request) {
@@ -87,7 +89,7 @@ func handleLoginError(err error) (int, login.RestResponse) {
 	return code, login.NewErrorResponse(code, err)
 }
 
-// @Tags User
+// @Tags Authentication
 // @Summary Signup functionality
 // @Description Attempts to create a user provided the correct information.
 // @Accept  json
@@ -96,7 +98,7 @@ func handleLoginError(err error) (int, login.RestResponse) {
 // @Success 201 {object} signup.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Router /user/signup [post]
+// @Router /authentication/signup [post]
 func (config authenticatorRESTConfigurator) signup(c *gin.Context) {
 	var request signup.Request
 	if isInvalidSignupRequest(c, &request) {
@@ -141,7 +143,7 @@ func isDuplicatedEmail(err error) bool {
 	return ok
 }
 
-// @Tags User
+// @Tags Authentication
 // @Summary Change password functionality
 // @Description It changes the password provided the old one and a new password.
 // @Accept  json
@@ -151,7 +153,7 @@ func isDuplicatedEmail(err error) bool {
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Router /user/change-password [put]
+// @Router /authentication/change-password [put]
 func (config authenticatorRESTConfigurator) changePassword(c *gin.Context) {
 	var request changepass.Request
 	if isInvalidChangePasswordRequest(c, &request) {
@@ -189,7 +191,7 @@ func isSamePasswordChange(err error) bool {
 	return ok
 }
 
-// @Tags User
+// @Tags Authentication
 // @Summary Finish Reset password functionality
 // @Description It changes your password given the correct code and new password.
 // @Accept  json
@@ -201,7 +203,7 @@ func isSamePasswordChange(err error) bool {
 // @Failure 408 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Failure 504 {object} rest.ResponseWrapper
-// @Router /user/finish-reset-password [put]
+// @Router /authentication/finish-reset-password [put]
 func (config authenticatorRESTConfigurator) finishResetPassword(c *gin.Context) {
 	var request finishresetpass.Request
 	if isInvalidFinishResetPassword(c, &request) {
@@ -243,7 +245,7 @@ func isInvalidCode(err error) bool {
 	return ok
 }
 
-// @Tags User
+// @Tags Authentication
 // @Summary Start reset password functionality
 // @Description It enters into the flow of reset password sending an email with instructions
 // @Accept  json
@@ -252,7 +254,7 @@ func isInvalidCode(err error) bool {
 // @Success 202 {object} startresetpass.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Router /user/start-reset-password [post]
+// @Router /authentication/start-reset-password [post]
 func (config authenticatorRESTConfigurator) startResetPassword(c *gin.Context) {
 	var request startresetpass.Request
 	if isInvalidStartResetPassword(c, &request) {
@@ -282,7 +284,7 @@ func handleForgotPasswordError(err error) (int, startresetpass.Response) {
 	return http.StatusInternalServerError, startresetpass.NewErrorResponse(http.StatusInternalServerError, err)
 }
 
-// @Tags Token
+// @Tags Authentication
 // @Summary Validates a JWT and returns the claims for it.
 // @Description If the JWT is valid this endpoint returns the user inside of the token.
 // @Accept  json
@@ -292,7 +294,7 @@ func handleForgotPasswordError(err error) (int, startresetpass.Response) {
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 401 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
-// @Router /user/token/validate [get]
+// @Router /authentication/token/validate [get]
 func (config authenticatorRESTConfigurator) verifyJWT(c *gin.Context) {
 	t, err := getTokenFromHeader(c)
 	if err != nil {
