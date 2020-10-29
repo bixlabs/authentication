@@ -30,7 +30,7 @@ func NewAuthenticatorRESTConfigurator(auth interactors.Authenticator, pm interac
 
 func configureAuthRoutes(restConfig authenticatorRESTConfigurator, r *gin.Engine) *gin.Engine {
 	router := r.Group("/v1/authentication")
-	
+
 	router.POST("/login", restConfig.login)
 	router.POST("/signup", restConfig.signup)
 	router.PUT("/change-password", restConfig.changePassword)
