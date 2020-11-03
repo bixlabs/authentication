@@ -34,6 +34,8 @@ func configureUserManagerRoutes(restConfig userManagerRESTConfigurator, r *gin.E
 	return r
 }
 
+const emailMissingMessage = "email missing"
+
 // @Tags User
 // @Summary Find one User functionality
 // @Description Retrieve one user by email.
@@ -48,7 +50,7 @@ func (config userManagerRESTConfigurator) findOne(c *gin.Context) {
 	var request findOne.Request
 
 	if isInvalidFindOneRequest(c, &request) {
-		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("email missing")))
+		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New(emailMissingMessage)))
 	} else {
 		c.JSON(findOneHandler(request.Email, config.userManager))
 	}
@@ -82,7 +84,7 @@ func (config userManagerRESTConfigurator) create(c *gin.Context) {
 	var request create.Request
 
 	if isInvalidCreateRequest(c, &request) {
-		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("email missing")))
+		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New(emailMissingMessage)))
 	} else {
 		c.JSON(createHandler(request, config.userManager))
 	}
@@ -146,7 +148,7 @@ func (config userManagerRESTConfigurator) update(c *gin.Context) {
 }
 
 func isInvalidUpdateRequest(c *gin.Context, request *update.Request) bool {
-	return c.ShouldBindJSON(request) != nil
+	return c.ShouldBindJSON(request) != nil || request.ID == ""
 }
 
 func updateHandler(email string, request update.Request, handler interactors.UserManager) (int, update.Response) {
@@ -181,7 +183,7 @@ func (config userManagerRESTConfigurator) delete(c *gin.Context) {
 	var request delete.Request
 
 	if isInvalidDeleteRequest(c, &request) {
-		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("email missing")))
+		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New(emailMissingMessage)))
 	} else {
 		c.JSON(deleteHandler(request.Email, config.userManager))
 	}
