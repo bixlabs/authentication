@@ -2,6 +2,7 @@ package usermanager
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/bixlabs/authentication/api/usermanager/structures/create"
@@ -10,7 +11,6 @@ import (
 	"github.com/bixlabs/authentication/api/usermanager/structures/mappers"
 	"github.com/bixlabs/authentication/api/usermanager/structures/update"
 	"github.com/bixlabs/authentication/authenticator/interactors"
-	"github.com/bixlabs/authentication/authenticator/structures"
 	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/gin-gonic/gin"
 )
@@ -40,7 +40,7 @@ func configureUserManagerRoutes(restConfig userManagerRESTConfigurator, r *gin.E
 // @Accept  json
 // @Produce  json
 // @Param findone body findone.Request true "Find User Request"
-// @Success 201 {object} findone.Response
+// @Success 200 {object} findone.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /users/search [post]
@@ -84,7 +84,7 @@ func (config userManagerRESTConfigurator) create(c *gin.Context) {
 	if isInvalidCreateRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("email missing")))
 	} else {
-		c.JSON(createHandler(mappers.CreateRequestToUser(request), config.userManager))
+		c.JSON(createHandler(request, config.userManager))
 	}
 }
 
@@ -92,11 +92,11 @@ func isInvalidCreateRequest(c *gin.Context, request *create.Request) bool {
 	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Password == ""
 }
 
-func createHandler(user structures.User, handler interactors.UserManager) (int, create.Response) {
-	user, err := handler.Create(user)
+func createHandler(request create.Request, handler interactors.UserManager) (int, create.Response) {
+	user, err := handler.Create(mappers.CreateRequestToUser(request))
 
 	if err != nil {
-		handleCreateError(err)
+		return handleCreateError(err)
 	}
 
 	return http.StatusOK, create.NewResponse(http.StatusOK, user)
@@ -130,7 +130,7 @@ func isDuplicatedEmail(err error) bool {
 // @Accept  json
 // @Produce  json
 // @Param update body update.Request true "Update User Request"
-// @Success 201 {object} update.Response
+// @Success 200 {object} update.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /users [put]
@@ -138,9 +138,9 @@ func (config userManagerRESTConfigurator) update(c *gin.Context) {
 	var request update.Request
 
 	if isInvalidUpdateRequest(c, &request) {
-		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("email missing")))
+		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("Json body failed on parsing")))
 	} else {
-		c.JSON(updateHandler(request.Email, mappers.UpdateRequestToUpdateUser(request), config.userManager))
+		c.JSON(updateHandler(request.ID, request, config.userManager))
 	}
 }
 
@@ -148,8 +148,9 @@ func isInvalidUpdateRequest(c *gin.Context, request *update.Request) bool {
 	return c.ShouldBindJSON(request) != nil
 }
 
-func updateHandler(email string, updateAttrs structures.UpdateUser, handler interactors.UserManager) (int, update.Response) {
-	user, err := handler.Update(email, updateAttrs)
+func updateHandler(email string, request update.Request, handler interactors.UserManager) (int, update.Response) {
+	fmt.Println(request)
+	user, err := handler.Update(email, mappers.UpdateRequestToUpdateUser(request))
 
 	if err != nil {
 		return handleUpdateError(err)
@@ -157,7 +158,6 @@ func updateHandler(email string, updateAttrs structures.UpdateUser, handler inte
 
 	return http.StatusOK, update.NewResponse(http.StatusOK, user)
 }
-
 
 func handleUpdateError(err error) (int, update.Response) {
 	if isInvalidEmail(err) || isPasswordLength(err) || isDuplicatedEmail(err) {
@@ -172,7 +172,7 @@ func handleUpdateError(err error) (int, update.Response) {
 // @Accept  json
 // @Produce  json
 // @Param delete body delete.Request true "Delete User Request"
-// @Success 201 {object} delete.Response
+// @Success 200 {object} delete.Response
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /users [delete]

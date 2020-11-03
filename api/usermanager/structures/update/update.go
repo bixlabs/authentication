@@ -5,13 +5,17 @@ import (
 	"github.com/bixlabs/authentication/tools/rest"
 )
 
-type Request struct {
+type Data struct {
 	Email            string `json:"email,omitempty"`
 	Password         string `json:"password,omitempty"`
 	GivenName        string `json:"givenName,omitempty"`
 	SecondName       string `json:"secondName,omitempty"`
 	FamilyName       string `json:"familyName,omitempty"`
 	SecondFamilyName string `json:"secondFamilyName,omitempty"`
+}
+type Request struct {
+	ID   string `json:"id"`
+	User Data   `json:"user,omitempty"`
 }
 
 type Result struct {

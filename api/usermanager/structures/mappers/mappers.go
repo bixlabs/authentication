@@ -12,6 +12,6 @@ func CreateRequestToUser(request create.Request) structures.User {
 }
 
 func UpdateRequestToUpdateUser(request update.Request) structures.UpdateUser {
-	return structures.UpdateUser{Email: request.Email, Password: request.Password, GivenName: request.GivenName,
-		SecondName: request.SecondName, FamilyName: request.FamilyName, SecondFamilyName: request.SecondFamilyName}
+	return structures.UpdateUser{Email: request.User.Email, Password: request.User.Password, GivenName: request.User.GivenName,
+		SecondName: request.User.SecondName, FamilyName: request.User.FamilyName, SecondFamilyName: request.User.SecondFamilyName}
 }
