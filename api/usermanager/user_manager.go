@@ -36,7 +36,7 @@ func configureUserManagerRoutes(restConfig userManagerRESTConfigurator, r *gin.E
 
 // @Tags User
 // @Summary Find one User functionality
-// @Description Retreive one user by email.
+// @Description Retrieve one user by email.
 // @Accept  json
 // @Produce  json
 // @Param findone body findone.Request true "Find User Request"
@@ -70,7 +70,7 @@ func findOneHandler(email string, handler interactors.UserManager) (int, findOne
 
 // @Tags User
 // @Summary Create one User functionality
-// @Description Retreive user created.
+// @Description Retrieve user created.
 // @Accept  json
 // @Produce  json
 // @Param create body create.Request true "Create User Request"

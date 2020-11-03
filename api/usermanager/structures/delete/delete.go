@@ -9,7 +9,7 @@ type Request struct {
 }
 
 type Result struct {
-	Success bool `json:"sucess"`
+	Success bool `json:"success"`
 }
 
 type Response struct {
