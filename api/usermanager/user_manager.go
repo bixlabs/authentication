@@ -11,6 +11,7 @@ import (
 	"github.com/bixlabs/authentication/api/usermanager/structures/update"
 	"github.com/bixlabs/authentication/authenticator/interactors"
 	"github.com/bixlabs/authentication/authenticator/structures"
+	"github.com/bixlabs/authentication/authenticator/interactors/implementation/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,7 +44,6 @@ func configureUserManagerRoutes(restConfig userManagerRESTConfigurator, r *gin.E
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /users/search [post]
-
 func (config userManagerRESTConfigurator) findOne(c *gin.Context) {
 	var request findOne.Request
 
@@ -78,7 +78,6 @@ func findOneHandler(email string, handler interactors.UserManager) (int, findOne
 // @Failure 400 {object} rest.ResponseWrapper
 // @Failure 500 {object} rest.ResponseWrapper
 // @Router /users [post]
-
 func (config userManagerRESTConfigurator) create(c *gin.Context) {
 	var request create.Request
 
@@ -90,17 +89,81 @@ func (config userManagerRESTConfigurator) create(c *gin.Context) {
 }
 
 func isInvalidCreateRequest(c *gin.Context, request *create.Request) bool {
-	return c.ShouldBindJSON(request) != nil || request.Email == ""
+	return c.ShouldBindJSON(request) != nil || request.Email == "" || request.Password == ""
 }
 
 func createHandler(user structures.User, handler interactors.UserManager) (int, create.Response) {
 	user, err := handler.Create(user)
 
 	if err != nil {
-		return http.StatusNotFound, create.NewErrorResponse(http.StatusNotFound, err)
+		handleCreateError(err)
 	}
 
 	return http.StatusOK, create.NewResponse(http.StatusOK, user)
+}
+
+func handleCreateError(err error) (int, create.Response) {
+	if isInvalidEmail(err) || isPasswordLength(err) || isDuplicatedEmail(err) {
+		return http.StatusBadRequest, create.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	return http.StatusInternalServerError, create.NewErrorResponse(http.StatusInternalServerError, err)
+}
+
+func isInvalidEmail(err error) bool {
+	_, ok := err.(util.InvalidEmailError)
+	return ok
+}
+
+func isPasswordLength(err error) bool {
+	_, ok := err.(util.PasswordLengthError)
+	return ok
+}
+
+func isDuplicatedEmail(err error) bool {
+	_, ok := err.(util.DuplicatedEmailError)
+	return ok
+}
+
+// @Tags User
+// @Summary Update User functionality
+// @Description Update one user.
+// @Accept  json
+// @Produce  json
+// @Param update body update.Request true "Update User Request"
+// @Success 201 {object} update.Response
+// @Failure 400 {object} rest.ResponseWrapper
+// @Failure 500 {object} rest.ResponseWrapper
+// @Router /users [put]
+func (config userManagerRESTConfigurator) update(c *gin.Context) {
+	var request update.Request
+
+	if isInvalidUpdateRequest(c, &request) {
+		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("email missing")))
+	} else {
+		c.JSON(updateHandler(request.Email, mappers.UpdateRequestToUpdateUser(request), config.userManager))
+	}
+}
+
+func isInvalidUpdateRequest(c *gin.Context, request *update.Request) bool {
+	return c.ShouldBindJSON(request) != nil
+}
+
+func updateHandler(email string, updateAttrs structures.UpdateUser, handler interactors.UserManager) (int, update.Response) {
+	user, err := handler.Update(email, updateAttrs)
+
+	if err != nil {
+		return handleUpdateError(err)
+	}
+
+	return http.StatusOK, update.NewResponse(http.StatusOK, user)
+}
+
+
+func handleUpdateError(err error) (int, update.Response) {
+	if isInvalidEmail(err) || isPasswordLength(err) || isDuplicatedEmail(err) {
+		return http.StatusBadRequest, update.NewErrorResponse(http.StatusBadRequest, err)
+	}
+	return http.StatusInternalServerError, update.NewErrorResponse(http.StatusInternalServerError, err)
 }
 
 // @Tags User
@@ -135,38 +198,4 @@ func deleteHandler(email string, handler interactors.UserManager) (int, delete.R
 	}
 
 	return http.StatusOK, delete.NewResponse(http.StatusOK)
-}
-
-// @Tags User
-// @Summary Update User functionality
-// @Description Update one user.
-// @Accept  json
-// @Produce  json
-// @Param update body update.Request true "Update User Request"
-// @Success 201 {object} update.Response
-// @Failure 400 {object} rest.ResponseWrapper
-// @Failure 500 {object} rest.ResponseWrapper
-// @Router /users [put]
-func (config userManagerRESTConfigurator) update(c *gin.Context) {
-	var request update.Request
-
-	if isInvalidUpdateRequest(c, &request) {
-		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest, errors.New("email missing")))
-	} else {
-		c.JSON(updateHandler(request.Email, mappers.UpdateRequestToUpdateUser(request), config.userManager))
-	}
-}
-
-func isInvalidUpdateRequest(c *gin.Context, request *update.Request) bool {
-	return c.ShouldBindJSON(request) != nil || request.Email == ""
-}
-
-func updateHandler(email string, updateAttrs structures.UpdateUser, handler interactors.UserManager) (int, update.Response) {
-	user, err := handler.Update(email, updateAttrs)
-
-	if err != nil {
-		return http.StatusNotFound, update.NewErrorResponse(http.StatusNotFound, err)
-	}
-
-	return http.StatusOK, update.NewResponse(http.StatusOK, user)
 }
