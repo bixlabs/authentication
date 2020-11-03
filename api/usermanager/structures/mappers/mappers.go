@@ -8,7 +8,7 @@ import (
 
 func CreateRequestToUser(request create.Request) structures.User {
 	return structures.User{Email: request.Email, Password: request.Password,
-		GivenName: request.GivenName,SecondName: request.SecondName,
+		GivenName: request.GivenName, SecondName: request.SecondName,
 		FamilyName: request.FamilyName, SecondFamilyName: request.SecondFamilyName}
 }
 
