@@ -139,7 +139,7 @@ func (config userManagerRESTConfigurator) update(c *gin.Context) {
 
 	if isInvalidUpdateRequest(c, &request) {
 		c.JSON(http.StatusBadRequest, findOne.NewErrorResponse(http.StatusBadRequest,
-			errors.New("Json body failed on parsing")))
+			errors.New("json body failed on parsing")))
 	} else {
 		c.JSON(updateHandler(request.ID, request, config.userManager))
 	}
