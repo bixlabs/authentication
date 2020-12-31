@@ -15,7 +15,7 @@ require (
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/go-openapi/spec v0.19.9 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.1.3
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
