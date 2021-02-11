@@ -16,4 +16,4 @@ RUN make build-linux
 
 EXPOSE 9000
 
-CMD ["./tmp/auth-server"]
+CMD ["./tmp/authenticator-server-linux"]
