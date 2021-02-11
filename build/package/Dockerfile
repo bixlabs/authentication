@@ -2,15 +2,15 @@ FROM golang:1.14
 
 WORKDIR /app
 
-COPY deps.sh ./
+COPY ../../deps.sh ./
 
 RUN ./deps.sh
 
-COPY go.mod go.sum ./
+COPY ../../go.mod go.sum ./
 
 RUN go mod download
 
-COPY . .
+COPY build/package .
 
 RUN make build-linux
 
