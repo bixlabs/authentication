@@ -3,7 +3,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- master
+- CD-Implementation
 
 resources:
 - repo: self
@@ -22,7 +22,7 @@ variables:
 stages:
 - stage: Build
   displayName: Build and push stage
-  
+
   jobs:
   - job: Build
     displayName: Build
