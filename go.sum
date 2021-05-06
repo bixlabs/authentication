@@ -386,6 +386,7 @@ github.com/sendgrid/sendgrid-go v3.6.3+incompatible/go.mod h1:QRQt+LX/NmgVEvmdRw
 github.com/sendgrid/sendgrid-go v3.6.4+incompatible h1:FYh0yWd99fIPbq6vnDUfnS74nsymbzQIJ2e8sIFB2lk=
 github.com/sendgrid/sendgrid-go v3.6.4+incompatible/go.mod h1:QRQt+LX/NmgVEvmdRw0VT/QgUn499+iza2FnDca9fg8=
 github.com/sendgrid/sendgrid-go v3.8.0+incompatible/go.mod h1:QRQt+LX/NmgVEvmdRw0VT/QgUn499+iza2FnDca9fg8=
+github.com/sendgrid/sendgrid-go v3.10.0+incompatible/go.mod h1:QRQt+LX/NmgVEvmdRw0VT/QgUn499+iza2FnDca9fg8=
 github.com/sethvargo/go-password v0.1.3 h1:18KkbGDkw8SuzeohAbWqBLNSfRQblVwEHOLbPa0PvWM=
 github.com/sethvargo/go-password v0.1.3/go.mod h1:2tyaaoHK/AlXwh5WWQDYjqQbHcq4cjPj5qb/ciYvu/Q=
 github.com/sethvargo/go-password v0.2.0 h1:BTDl4CC/gjf/axHMaDQtw507ogrXLci6XRiLc7i/UHI=
