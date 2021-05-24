@@ -12,7 +12,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/franela/goblin v0.0.0-20180407132755-cd5d08fb4ede
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.2
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/google/uuid v1.2.0
 	github.com/imdario/mergo v0.3.9 // indirect
