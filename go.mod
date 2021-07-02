@@ -23,18 +23,15 @@ require (
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/onsi/gomega v1.10.5
-	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sendgrid/rest v2.4.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.8.0+incompatible
 	github.com/sethvargo/go-password v0.2.0
 	github.com/sirupsen/logrus v1.7.0
-	github.com/spf13/afero v1.2.2 // indirect
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.2.0
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/spf13/viper v1.7.1
+	github.com/spf13/viper v1.8.1
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
